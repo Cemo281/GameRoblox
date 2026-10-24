@@ -3,14 +3,23 @@
 ## Monnaie
 - **Argent** (`$`), affiché dans les leaderstats et sauvegardé (DataStore).
 - Gagné par : les personnages posés sur la base (revenu par seconde), les combats.
-- Dépensé pour : améliorer la machine RNG, **à définir** (rebirth ? autres ?).
+
+## Dépenses
+| Dépense | Page |
+|---|---|
+| Rebirth | [Rebirth et évolutions](Rebirth-et-evolutions.md) |
+| Déblocage des emplacements de personnages | [Base et inventaire](Base-et-inventaire.md) |
+| Étoiles des personnages (reroll) | [Personnages](Personnages.md) |
+| Évolutions (en plus des doublons) | [Rebirth et évolutions](Rebirth-et-evolutions.md) |
+| Améliorations de la machine RNG | [Machine RNG](Machine-RNG.md) |
+
+Les montants de chaque dépense sont **à définir**.
 
 ## Revenu des personnages
-- Chaque personnage posé sur un emplacement produit son revenu par seconde (voir [Personnages](Personnages.md)).
+- Chaque personnage posé sur un emplacement produit son revenu par seconde (voir [Personnages](Personnages.md)), multiplié par le bonus de rebirth.
 - L'argent **n'arrive pas directement** sur le compte : il s'accumule et le joueur doit **le collecter**.
-- Mode de collecte : un **collecteur unique** dans la base récupère d'un coup l'argent produit par tous les personnages posés.
-- Emplacement du collecteur dans la base : **à définir**.
-- Plafond d'accumulation avant collecte : **à définir**.
+- Un **collecteur unique**, placé **dans l'enclos**, récupère d'un coup l'argent de tous les personnages posés.
+- **Pas de plafond** d'accumulation avant collecte.
 
 ## Revenu hors ligne
 - Oui : le joueur gagne de l'argent pendant qu'il est déconnecté.
@@ -18,4 +27,4 @@
 
 ## Rythme
 Règle de conception : le premier tirage doit être possible dans les 30 premières secondes ; la progression ralentit ensuite.
-Le tirage est gratuit et seulement limité par son animation (voir [Machine RNG](Machine-RNG.md)) : la progression repose donc sur les **chances de rareté**, les **améliorations de la machine** payées en argent et le **rebirth**.
+Le tirage est gratuit et seulement limité par son animation (voir [Machine RNG](Machine-RNG.md)) : la progression repose donc sur les **chances de rareté**, les **dépenses** ci-dessus et le **rebirth**.

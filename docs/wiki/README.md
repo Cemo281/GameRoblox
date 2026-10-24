@@ -31,3 +31,10 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | Pas de limite de tirage autre que l'animation de tirage (servant de temps de recharge, appliqué côté serveur). |
 | 2026-10-24 | Collecte de l'argent par un collecteur unique dans la base. |
 | 2026-10-24 | Luffy Gear 2 (Secret) s'obtient par tirage, très rare. Lot 1 = 11 personnages. |
+| 2026-10-24 | Chances au niveau 0 : Commun 60 %, Rare 25 %, Légendaire 10 %, Mythique 4,9 %, Secret 0,1 %. |
+| 2026-10-24 | Revenus du lot 1 validés (Nami 10 → Luffy Gear 2 1000 $/s). |
+| 2026-10-24 | Dépenses d'argent : rebirth, déblocage des emplacements, étoiles (reroll), évolutions, machine RNG. |
+| 2026-10-24 | Machine RNG : 10 niveaux, coût ×2,5 par niveau, chances déplacées du Commun vers les raretés supérieures. |
+| 2026-10-24 | Collecteur dans l'enclos, sans plafond d'accumulation. |
+| 2026-10-24 | Rebirth : remet à zéro l'argent et la machine, garde les personnages, +50 % de revenu par rebirth. |
+| 2026-10-24 | Nouvelle mécanique : étoiles des personnages, obtenues par reroll payant. |
