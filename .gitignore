@@ -1,0 +1,26 @@
+# Project place file
+/GameRoblox.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+sourcemap.json
+
+# Place files
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+
+# Packages (Wally)
+Packages/
+ServerPackages/
+DevPackages/
+
+# Secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
