@@ -7,7 +7,10 @@ Jeu Roblox Idle / Simulator / Gacha (RNG) sur le thème des cartes d'animé, ave
 - **Carte** : îles célestes en organisation radiale.
   - **Hub central (Sanctuaire Mère)** : zone sociale et marchande (ateliers d'amélioration globale, recyclage/vente, classements, piédestal d'événement).
   - **Bases joueurs** : îlots satellites reliés au Hub (machine RNG à l'entrée, enclos central de ferme passive, podiums d'exposition).
-- **État** : grayboxing de la base joueur dans Studio. Aucun gameplay codé : `src/server/Leaderstats.server.luau` est vide, le système de tirage (`GachaSystem`, raretés Commun/Rare/Légendaire) est à créer.
+- **État** : grayboxing d'une base joueur dans Studio (placés à la main dans Workspace, pas dans Rojo) : le Model `Zone Joueur` (enclos délimité par des `Barrière`), avec à l'entrée le Part `RNG` (cube de la machine gacha) et le Model `Podium` (Podium1-3). Monnaie `Argent` en place (`DataService`). Le système de tirage (`GachaSystem`, raretés Commun/Rare/Légendaire) est à créer.
+
+## Données sauvegardées
+DataStore `PlayerData`, clé `Player_<UserId>`, valeur `{ Version: number, Argent: number }` (type `PlayerData` dans `src/server/DataService.luau`). Toute lecture/modification de l'argent passe par `DataService.GetArgent / AddArgent / SpendArgent` côté serveur. En Studio, sans « Enable Studio Access to API Services », la partie tourne sans sauvegarde.
 
 ## Stack et commandes
 Rojo 7.7.1, selene, StyLua, gérés par Rokit (`rokit.toml`). Modèles 3D : Blender.
