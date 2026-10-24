@@ -10,7 +10,7 @@ Jeu Roblox Idle / Simulator / Gacha (RNG) sur le thème des cartes d'animé, ave
 - **État** : grayboxing d'une base joueur dans Studio (construite dans la place, pas dans Rojo ni dans git), Model `Workspace.BaseJoueur` (PrimaryPart `Centre`, pour être dupliqué autour du Hub) :
   - `Zone Joueur` (enclos délimité par des `Barrière`, entrée au milieu du côté avant), `Sol`, `Allee` (de l'entrée au cube RNG) ;
   - `RNG` : cube de la machine gacha au fond, en face de l'entrée, tagué `MachineRNG` (CollectionService) ;
-  - `Emplacements/Emplacement1..24` : cases pour poser les personnages gagnés (attribut `Index`), 12 de chaque côté de l'allée ;
+  - `Emplacements/Emplacement1..10` : cases pour poser les personnages gagnés (attribut `Index`), 5 de chaque côté de l'allée (impairs à gauche, pairs à droite, 1-2 près de l'entrée) ;
   - `Podium` (Podium1-3) à gauche de l'entrée, `Panneau` (TextLabel `NomProprietaire`) à droite, `PointApparition` devant l'entrée ;
   - sauvegarde de l'état précédent : `ServerStorage.Sauvegarde_AvantBaseJoueur`. Monnaie `Argent` en place (`DataService`). Tirage de test en place : `GachaSystem.server.luau` (ProximityPrompt sur `RNG`, bloc coloré par rareté), réglages dans `src/shared/GachaConfig.luau` (prix et chances PROVISOIRES, gameplay pas encore défini). `RevenuTest.server.luau` (+1 Argent/s) est provisoire, à supprimer quand la ferme passive sera codée.
 
