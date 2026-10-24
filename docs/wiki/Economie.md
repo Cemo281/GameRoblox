@@ -8,7 +8,8 @@
 ## Revenu des personnages
 - Chaque personnage posé sur un emplacement produit son revenu par seconde (voir [Personnages](Personnages.md)).
 - L'argent **n'arrive pas directement** sur le compte : il s'accumule et le joueur doit **le collecter**.
-- Mode de collecte : **à définir** (par emplacement, ou un collecteur unique dans la base ?).
+- Mode de collecte : un **collecteur unique** dans la base récupère d'un coup l'argent produit par tous les personnages posés.
+- Emplacement du collecteur dans la base : **à définir**.
 - Plafond d'accumulation avant collecte : **à définir**.
 
 ## Revenu hors ligne
@@ -17,4 +18,4 @@
 
 ## Rythme
 Règle de conception : le premier tirage doit être possible dans les 30 premières secondes ; la progression ralentit ensuite.
-Le tirage étant gratuit, ce qui limite la vitesse des tirages est **à définir** (voir [Machine RNG](Machine-RNG.md)).
+Le tirage est gratuit et seulement limité par son animation (voir [Machine RNG](Machine-RNG.md)) : la progression repose donc sur les **chances de rareté**, les **améliorations de la machine** payées en argent et le **rebirth**.

@@ -5,7 +5,9 @@ Le cube au fond de chaque base, en face de l'entrée.
 ## Tirage
 - **Gratuit.**
 - Donne un personnage du lot débloqué, selon les chances de rareté.
-- Ce qui limite la fréquence des tirages : **à définir** (temps de recharge, tickets, autre ?).
+- **Pas de tickets ni de prix** : ce qui limite la fréquence, c'est l'**animation de tirage**. Pendant qu'elle se joue, le joueur ne peut pas relancer.
+- Le serveur applique un temps de recharge égal à la durée de l'animation (le client ne peut pas le contourner).
+- Durée de l'animation : **à définir** *(proposition : 3 à 5 s)*. Une amélioration pour la raccourcir : **à définir**.
 
 ## Améliorations
 L'argent sert à améliorer la machine :

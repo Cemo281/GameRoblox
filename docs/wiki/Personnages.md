@@ -3,10 +3,9 @@
 Chaque personnage a une **rareté** et des **statistiques** : revenu par seconde et dégâts en combat.
 Les personnages sortent par **lots** ; un nouveau lot se débloque par [rebirth](Rebirth-et-evolutions.md).
 
-> ⚠️ **Propriété intellectuelle** : les personnages de One Piece (et d'autres licences comme DBZ) sont protégés.
-> Les règles de Roblox interdisent leur usage sans licence ; un jeu qui les utilise peut être supprimé sur plainte.
-> Décision en attente : garder ces noms comme noms de travail et les remplacer par des personnages originaux avant publication ?
-> Voir [Questions ouvertes](Questions-ouvertes.md).
+> ⚠️ **Propriété intellectuelle — décision** : les noms One Piece (et DBZ, etc.) sont des **noms de travail**.
+> Ils seront remplacés par des **personnages originaux** (mêmes rôles, raretés et stats) **avant publication**.
+> Côté code : les noms et modèles sont des données (config), jamais écrits en dur dans la logique.
 
 ## Raretés
 | Rareté | Ordre | Revenu indicatif (lot 1) | Chance de tirage |
@@ -34,7 +33,7 @@ Règle validée : de quelques dizaines de $/s pour les moins rares à quelques m
 | Luffy | Mythique | 100 | à définir |
 | Luffy Gear 2 | Secret | à définir *(proposition : 1000)* | à définir |
 
-Le lot 1 compte 11 personnages (10 + 1 secret). Voir [Questions ouvertes](Questions-ouvertes.md) : Luffy Gear 2 s'obtient-il par tirage ou par évolution ?
+Le lot 1 compte **11 personnages** : 10 + 1 Secret. **Luffy Gear 2 s'obtient par tirage**, avec une chance très faible.
 
 ## Lots suivants
 **À définir.** Exemple donné : un lot sur le thème DBZ, avec une évolution « 10 Goku + 20 Vegeta → Vegeto ».

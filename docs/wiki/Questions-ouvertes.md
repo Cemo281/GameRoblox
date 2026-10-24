@@ -3,12 +3,12 @@
 Décisions à prendre. Une fois tranchée, une question est retirée d'ici et la réponse va dans la page concernée et dans le journal du [README](README.md).
 
 ## Prioritaires (bloquent la boucle principale)
-1. **Propriété intellectuelle** : garder les personnages One Piece comme noms de travail et les remplacer par des personnages originaux avant publication, ou publier avec ?
-2. **Tirage gratuit** : qu'est-ce qui limite la vitesse des tirages ? (temps de recharge qui s'allonge, tickets gagnés avec le temps, autre)
-3. **À quoi sert l'argent** en dehors des améliorations de la machine ? (rebirth, emplacements, autre)
-4. **Chances de tirage** par rareté, au niveau 0 de la machine.
-5. **Collecte** : un bouton/zone par emplacement, ou un collecteur unique dans la base ? Plafond avant collecte ?
-6. **Lot 1** : 10 ou 11 personnages ? Luffy Gear 2 (Secret) s'obtient-il par tirage ou par évolution ?
+1. **Chances de tirage** par rareté, au niveau 0 de la machine.
+2. **À quoi sert l'argent** en dehors des améliorations de la machine ? (rebirth, emplacements, autre)
+3. **Améliorations de la machine** : nombre de niveaux, coût, gain de chances par niveau.
+4. **Durée de l'animation de tirage** (= temps entre deux tirages).
+5. **Revenus manquants** du lot 1 (voir les propositions dans [Personnages](Personnages.md)).
+6. **Collecteur** : où le placer dans la base ? Plafond d'argent accumulé avant collecte ?
 
 ## Plus tard
 7. Rebirth : condition, coût, ce qui est remis à zéro, bonus conservé.
@@ -18,3 +18,4 @@ Décisions à prendre. Une fois tranchée, une question est retirée d'ici et la
 11. Rôle du podium.
 12. Mutations : effets.
 13. Combats : lieu, taille d'équipe, ennemis.
+14. Personnages originaux qui remplaceront les noms de travail (avant publication).

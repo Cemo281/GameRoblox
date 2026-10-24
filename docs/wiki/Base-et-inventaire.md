@@ -5,6 +5,7 @@ Un îlot par joueur (modèle `BaseJoueur` dans Studio) :
 - **Enclos** avec une allée centrale de l'entrée jusqu'à la **machine RNG** (au fond, en face de l'entrée).
 - **10 emplacements** pour poser ses personnages (5 de chaque côté de l'allée).
 - **Podium** à gauche de l'entrée, **panneau** avec le nom du propriétaire à droite.
+- **Collecteur** unique pour récupérer l'argent produit (à placer, voir [Économie](Economie.md)).
 - Rôle du podium : **à définir** (exposer ses meilleurs personnages ?).
 
 ## Emplacements

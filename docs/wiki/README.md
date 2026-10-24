@@ -27,3 +27,7 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | Doublons utiles : évolutions chez le marchand (ex. N exemplaires de A + M de B → carte C). |
 | 2026-10-24 | Emplacements pleins : on peut retirer un personnage et le stocker dans l'inventaire. |
 | 2026-10-24 | Combats automatiques contre des ennemis du jeu ; le joueur choisit son équipe. Récompenses : argent et mutations. |
+| 2026-10-24 | Noms One Piece = noms de travail, remplacés par des personnages originaux avant publication. |
+| 2026-10-24 | Pas de limite de tirage autre que l'animation de tirage (servant de temps de recharge, appliqué côté serveur). |
+| 2026-10-24 | Collecte de l'argent par un collecteur unique dans la base. |
+| 2026-10-24 | Luffy Gear 2 (Secret) s'obtient par tirage, très rare. Lot 1 = 11 personnages. |
