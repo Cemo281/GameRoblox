@@ -44,3 +44,4 @@ Workspace (Baseplate), Lighting et SoundService sont définis dans `default.proj
 - Après chaque modification : `selene <fichiers modifiés>`. Le formatage StyLua est appliqué automatiquement par un hook (`.claude/hooks/format-lua.ps1`).
 - Environnement : Windows, PowerShell.
 - Skills : `/nouveau-module`, `/audit-remotes`. Agent de relecture : `relecteur-roblox`.
+- MCP `Roblox_Studio` (`.mcp.json`, serveur MCP intégré à Studio) : sert à inspecter Studio (Workspace, grayboxing, console). Le code reste écrit dans `src/`, jamais directement dans Studio via le MCP.
