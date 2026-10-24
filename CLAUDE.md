@@ -17,6 +17,10 @@ Jeu Roblox Idle / Simulator / Gacha (RNG) sur le thème des cartes d'animé, ave
 ## Données sauvegardées
 DataStore `PlayerData`, clé `Player_<UserId>`, valeur `{ Version: number, Argent: number }` (type `PlayerData` dans `src/server/DataService.luau`). Toute lecture/modification de l'argent passe par `DataService.GetArgent / AddArgent / SpendArgent` côté serveur. En Studio, sans « Enable Studio Access to API Services », la partie tourne sans sauvegarde.
 
+## Wiki de game design
+`docs/wiki/` fait foi pour les règles du jeu (personnages, raretés, économie, rebirth, combats). Le lire avant de coder une mécanique.
+Dès qu'une décision de game design est prise : mettre à jour la page concernée, ajouter une ligne au journal de `docs/wiki/README.md` et retirer la question de `Questions-ouvertes.md`. Ne jamais inventer une valeur : la marquer *(proposition)* ou **à définir**.
+
 ## Stack et commandes
 Rojo 7.7.1, selene, StyLua, gérés par Rokit (`rokit.toml`). Modèles 3D : Blender.
 
