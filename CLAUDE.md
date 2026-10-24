@@ -3,19 +3,30 @@
 ## Le jeu
 Jeu Roblox Idle / Simulator / Gacha (RNG) sur le thème des cartes d'animé, avec des modèles 3D animés de personnages.
 
-- **Boucle** : les animations des personnages rapportent de l'argent passivement → l'argent sert à améliorer la machine RNG (gacha), acheter des packs et augmenter les taux de rareté. Les combats utilisent aussi les animations.
-- **Carte** : îles célestes en organisation radiale.
-  - **Hub central (Sanctuaire Mère)** : zone sociale et marchande (ateliers d'amélioration globale, recyclage/vente, classements, piédestal d'événement).
-  - **Bases joueurs** : îlots satellites reliés au Hub (machine RNG à l'entrée, enclos central de ferme passive, podiums d'exposition).
-- **État** : grayboxing d'une base joueur dans Studio (construite dans la place, pas dans Rojo ni dans git), Model `Workspace.BaseJoueur` (PrimaryPart `Centre`, pour être dupliqué autour du Hub) :
+Règles détaillées : voir le wiki (`docs/wiki/`). Résumé : tirage gratuit → personnage (rareté + étoiles) posé sur un emplacement → revenu à récupérer au collecteur → argent pour améliorer la machine, débloquer des emplacements, rebirth… Carte : îles célestes en étoile autour d'un Hub (Sanctuaire Mère).
+
+- **Map (dans la place Studio, pas dans Rojo ni dans git)** : Model `Workspace.BaseJoueur` (tag `BaseJoueur`, PrimaryPart `Centre`, prévu pour être dupliqué autour du Hub) :
   - `Zone Joueur` (enclos délimité par des `Barrière`, entrée au milieu du côté avant), `Sol`, `Allee` (de l'entrée au cube RNG) ;
-  - `RNG` : cube de la machine gacha au fond, en face de l'entrée, tagué `MachineRNG` (CollectionService) ;
-  - `Emplacements/Emplacement1..10` : cases pour poser les personnages gagnés (attribut `Index`), 5 de chaque côté de l'allée (impairs à gauche, pairs à droite, 1-2 près de l'entrée) ;
-  - `Podium` (Podium1-3) à gauche de l'entrée, `Panneau` (TextLabel `NomProprietaire`) à droite, `PointApparition` devant l'entrée ;
-  - sauvegarde de l'état précédent : `ServerStorage.Sauvegarde_AvantBaseJoueur`. Monnaie `Argent` en place (`DataService`). Tirage de test en place : `GachaSystem.server.luau` (ProximityPrompt sur `RNG`, bloc coloré par rareté), réglages dans `src/shared/GachaConfig.luau` (prix et chances PROVISOIRES, gameplay pas encore défini). `RevenuTest.server.luau` (+1 Argent/s) est provisoire, à supprimer quand la ferme passive sera codée.
+  - `RNG` : cube de la machine gacha au fond, en face de l'entrée, tag `MachineRNG` ;
+  - `Emplacements/Emplacement1..10` : cases des personnages (attribut `Index`), impairs à gauche, pairs à droite, 1-2 près de l'entrée ;
+  - `Collecteur` : dalle dorée (tag `Collecteur`) à droite de l'allée près de l'entrée ;
+  - `Podium` à gauche de l'entrée, `Panneau` (TextLabel `NomProprietaire`) à droite, `PointApparition` devant l'entrée ;
+  - sauvegardes des états précédents dans `ServerStorage.Sauvegarde_*`.
+- **Code en place** : boucle de base jouable en solo (1 base). Pas encore d'UI, d'animation de tirage, de modèles 3D (blocs colorés provisoires), de déblocage d'emplacements, de machine améliorable, de rebirth.
+
+## Code serveur
+`src/server/init.server.luau` est le seul Script : il initialise les services (ModuleScripts) dans l'ordre :
+- `DataService` : chargement/sauvegarde, leaderstats `Argent`, seules fonctions qui modifient les données.
+- `BaseService` : attribue une base libre (tag `BaseJoueur`) au chargement des données, panneau, apparition, affichage des personnages posés ; `GetProprietaire(instance)` pour vérifier la possession.
+- `GachaService` : ProximityPrompt sur chaque `MachineRNG`, tirage serveur (propriétaire, distance, cooldown = `DureeAnimation`). En Studio : `ServerStorage.TestTirage` (BindableFunction) pour tester.
+- `RevenuService` : revenu chaque seconde → `ArgentNonCollecte`, collecte au toucher du `Collecteur`.
+Config partagée (données uniquement) : `src/shared/Personnages.luau`, `GachaConfig.luau`, `Economie.luau` (formule de revenu).
 
 ## Données sauvegardées
-DataStore `PlayerData`, clé `Player_<UserId>`, valeur `{ Version: number, Argent: number }` (type `PlayerData` dans `src/server/DataService.luau`). Toute lecture/modification de l'argent passe par `DataService.GetArgent / AddArgent / SpendArgent` côté serveur. En Studio, sans « Enable Studio Access to API Services », la partie tourne sans sauvegarde.
+DataStore `PlayerData`, clé `Player_<UserId>`, format v2 (type `PlayerData` dans `src/server/DataService.luau`) :
+`{ Version, Argent, ArgentNonCollecte, Personnages = {[uid] = {Id, Etoiles}}, Emplacements = {[index texte] = uid}, EmplacementsDebloques, NiveauMachine, Rebirths, ProchainUid }`.
+`lireDonnees` migre les anciennes versions et valide chaque champ ; une sauvegarde de version plus récente ou de type inattendu n'est ni chargée ni écrasée. Les sauvegardes d'un même joueur sont sérialisées et `BindToClose` attend celles en cours.
+**À faire avant publication** : verrou de session (ProfileStore ou verrou maison) pour éviter qu'un joueur qui change vite de serveur écrase sa progression. Les `Id` de personnages sont sauvegardés : ne jamais les renommer après publication. En Studio, sans « Enable Studio Access to API Services », la partie tourne sans sauvegarde.
 
 ## Wiki de game design
 `docs/wiki/` fait foi pour les règles du jeu (personnages, raretés, économie, rebirth, combats). Le lire avant de coder une mécanique.

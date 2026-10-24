@@ -18,4 +18,4 @@ Payées en argent.
 - Le niveau de la machine est **remis à zéro au rebirth**.
 
 ## État technique
-Tirage de test en place (`GachaSystem.server.luau`, réglages dans `src/shared/GachaConfig.luau`) : prix et chances provisoires, à remplacer par les valeurs de ce wiki.
+Tirage gratuit en place (`src/server/GachaService.luau`), avec les chances de rareté et d'étoiles de ce wiki (`src/shared/GachaConfig.luau`). Durée d'animation provisoire : 3 s. Pas encore d'animation ni d'améliorations.

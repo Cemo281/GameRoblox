@@ -17,5 +17,5 @@ Un îlot par joueur (modèle `BaseJoueur` dans Studio) :
 
 ## Inventaire
 - Contient les personnages obtenus qui ne sont pas posés.
-- Taille max : **à définir**.
+- Taille max : **à définir**. Limite technique provisoire dans le code : 100 personnages au total (posés + inventaire) ; une fois atteinte, la machine refuse de tirer. Sans limite, la sauvegarde grossirait sans fin (tirage gratuit).
 - Les personnages de l'inventaire ne produisent pas d'argent.

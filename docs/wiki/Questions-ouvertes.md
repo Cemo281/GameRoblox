@@ -17,7 +17,7 @@ Décisions à prendre. Une fois tranchée, une question est retirée d'ici et la
 10. Coût du rebirth.
 11. Évolutions du lot 1 (recettes et coût en argent).
 12. Revenu hors ligne : limite (durée, pourcentage).
-13. Inventaire : taille max.
+13. Inventaire : taille max (provisoire : 100) et que faire quand il est plein (refuser le tirage, vendre automatiquement les communs… ?).
 14. Rôle du podium.
 15. Mutations : effets.
 16. Combats : lieu, taille d'équipe, ennemis.
