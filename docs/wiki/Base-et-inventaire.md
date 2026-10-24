@@ -10,7 +10,9 @@ Un îlot par joueur (modèle `BaseJoueur` dans Studio) :
 
 ## Emplacements
 - Un personnage posé sur un emplacement produit son revenu.
-- Les emplacements se **débloquent avec de l'argent**. Nombre d'emplacements débloqués au départ et coût de chaque déblocage : **à définir**.
+- **2 emplacements ouverts au départ** ; les 8 autres se **débloquent avec de l'argent**.
+- Coût de chaque déblocage : **à définir** *(proposition : chaque emplacement ~2× plus cher que le précédent)*.
+- Les emplacements débloqués sont conservés au rebirth.
 - Quand les emplacements sont pleins, on peut **retirer** un personnage pour le **stocker dans l'inventaire**.
 
 ## Inventaire

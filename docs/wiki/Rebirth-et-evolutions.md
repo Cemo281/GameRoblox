@@ -4,9 +4,8 @@
 - Permet de **débloquer le lot** de personnages suivant.
 - **Coûte de l'argent.** Montant : **à définir**.
 - **Remis à zéro** : l'argent et le niveau de la machine RNG.
-- **Conservé** : les personnages (posés et en inventaire).
-- **Bonus permanent** : +50 % de revenu par rebirth. Cumul (additif : +50 %, +100 %, +150 %… ou multiplicatif : ×1,5, ×2,25…) : **à définir**.
-- Les emplacements débloqués et les étoiles sont-ils conservés : **à définir**.
+- **Conservé** : les personnages (posés et en inventaire), leurs étoiles, les emplacements débloqués.
+- **Bonus permanent** : +50 % de revenu par rebirth, **additif** (1 rebirth = +50 %, 2 = +100 %, 3 = +150 %…).
 
 ## Doublons
 On peut obtenir plusieurs fois le même personnage. Les doublons servent aux évolutions.
