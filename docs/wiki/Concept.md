@@ -13,10 +13,10 @@ Idle / Simulator / Gacha (RNG) sur Roblox, autour de cartes d'animé représent�
 7. Les personnages partent en **combat automatique** pour gagner de l'argent et des **mutations**.
 
 ## Carte
-Îles célestes en organisation radiale (en étoile).
+Carte **au sol** (pas d'îles flottantes), en organisation radiale (en étoile).
 
-- **Hub central — Sanctuaire Mère** : zone sociale et marchande (marchand d'évolutions, ateliers d'amélioration globale, recyclage/vente, classements, piédestal d'événement).
-- **Bases joueurs** : îlots satellites reliés au Hub, un par joueur. Voir [Base et inventaire](Base-et-inventaire.md).
+- **Hub central — Sanctuaire Mère** : zone sociale et marchande (marchand d'évolutions, ateliers d'amélioration globale, recyclage/vente, classements, piédestal d'événement). Voir [Hub](Hub.md).
+- **Bases joueurs** : parcelles disposées en étoile autour du Hub et reliées à lui par un chemin, une par joueur (7 par serveur). Voir [Base et inventaire](Base-et-inventaire.md).
 
 ## État du développement
 Voir `CLAUDE.md` (section « Le jeu ») pour l'état technique à jour.

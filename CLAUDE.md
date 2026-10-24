@@ -3,7 +3,7 @@
 ## Le jeu
 Jeu Roblox Idle / Simulator / Gacha (RNG) sur le thème des cartes d'animé, avec des modèles 3D animés de personnages.
 
-Règles détaillées : voir le wiki (`docs/wiki/`). Résumé : tirage gratuit → personnage (rareté + étoiles) posé sur un emplacement → revenu à récupérer au collecteur → argent pour améliorer la machine, débloquer des emplacements, rebirth… Carte : îles célestes en étoile autour d'un Hub (Sanctuaire Mère).
+Règles détaillées : voir le wiki (`docs/wiki/`). Résumé : tirage gratuit → personnage (rareté + étoiles) posé sur un emplacement → revenu à récupérer au collecteur → argent pour améliorer la machine, débloquer des emplacements, rebirth… Carte au sol (pas d'îles flottantes) : 7 bases en étoile autour d'un Hub (Sanctuaire Mère).
 
 - **Map (dans la place Studio, pas dans Rojo ni dans git)** : Model `Workspace.BaseJoueur` (tag `BaseJoueur`, PrimaryPart `Centre`, prévu pour être dupliqué autour du Hub) :
   - `Zone Joueur` (enclos délimité par des `Barrière`, entrée au milieu du côté avant), `Sol`, `Allee` (de l'entrée au cube RNG) ;
@@ -12,6 +12,8 @@ Règles détaillées : voir le wiki (`docs/wiki/`). Résumé : tirage gratuit �
   - `Collecteur` : dalle dorée (tag `Collecteur`) à droite de l'allée près de l'entrée ;
   - `Podium` à gauche de l'entrée, `Panneau` (TextLabel `NomProprietaire`) à droite, `PointApparition` devant l'entrée ;
   - sauvegardes des états précédents dans `ServerStorage.Sauvegarde_*`.
+- **Hub (maquette grise)** : Model `Workspace.Hub` (tag `Hub`, PrimaryPart `Centre` en (-14, 1.5, 0), aligné sur `BaseJoueur`) : `Plateau` (cylindre r = 70), `PlaceCentrale`, `Piedestal` (attribut `Role`), `Chemins/Chemin1..7` (attribut `Index`, Chemin1 = base existante vers -Z), `EmplacementsBases/Base1..7` (pièces invisibles = CFrame du `Centre` de chaque copie de `BaseJoueur`), `Stands/Stand<Id>` (attribut `Stand` : `Evolutions`, `Etoiles`, `Ateliers`, `Recyclage` ; `Comptoir`, `PNJ` provisoire, `Enseigne`), `Classements`.
+- **Limite de carte** : anneau `Wall` (18 `Mur`) + `Wall_Grass` centré sur le Hub, face intérieure à ≈ 254 studs (bases jusqu'à ≈ 236) ; sol `Base` / `Baseplate` centrés sur le Hub. État d'avant dans `ServerStorage.Sauvegarde_AvantRecentrageMurs`.
 - **Code en place** : boucle de base jouable en solo (1 base). Pas encore d'UI, d'animation de tirage, de modèles 3D (blocs colorés provisoires), de déblocage d'emplacements, de machine améliorable, de rebirth.
 
 ## Code serveur

@@ -2,6 +2,7 @@
 
 ## Rebirth
 - Permet de **débloquer le lot** de personnages suivant.
+- Se fait **dans la base** (pas au Hub).
 - **Coûte de l'argent.** Montant : **à définir**.
 - **Remis à zéro** : l'argent et le niveau de la machine RNG.
 - **Conservé** : les personnages (posés et en inventaire), leurs étoiles, les emplacements débloqués.

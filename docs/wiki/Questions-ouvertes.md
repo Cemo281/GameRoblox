@@ -23,3 +23,9 @@ Décisions à prendre. Une fois tranchée, une question est retirée d'ici et la
 16. Combats : lieu, taille d'équipe, ennemis.
 17. Chance au sein d'une rareté : tous les personnages à égalité ?
 18. Personnages originaux qui remplaceront les noms de travail (avant publication).
+
+## Hub
+22. Atelier d'améliorations globales : liste et effets.
+23. Recyclage / vente : prix et règles (rareté, étoiles).
+24. Classements : critères.
+25. Piédestal d'événement : fonctionnement.

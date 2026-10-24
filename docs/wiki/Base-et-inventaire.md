@@ -1,7 +1,7 @@
 # Base et inventaire
 
 ## Base joueur
-Un îlot par joueur (modèle `BaseJoueur` dans Studio) :
+Une parcelle par joueur (modèle `BaseJoueur` dans Studio) :
 - **Enclos** avec une allée centrale de l'entrée jusqu'à la **machine RNG** (au fond, en face de l'entrée).
 - **10 emplacements** pour poser ses personnages (5 de chaque côté de l'allée).
 - **Collecteur** unique, dans l'enclos, pour récupérer l'argent produit (voir [Économie](Economie.md)). Position exacte : **à définir**.

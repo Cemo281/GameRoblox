@@ -11,6 +11,7 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | [Économie](Economie.md) | Argent, collecte, revenu hors ligne |
 | [Machine RNG](Machine-RNG.md) | Tirages, chances, améliorations |
 | [Base et inventaire](Base-et-inventaire.md) | Emplacements, stockage |
+| [Hub](Hub.md) | Sanctuaire Mère : stands des marchands, plan de la zone centrale |
 | [Rebirth et évolutions](Rebirth-et-evolutions.md) | Rebirth, déblocage des lots, marchand, évolutions |
 | [Combats](Combats.md) | Combats automatiques, récompenses, mutations |
 | [Questions ouvertes](Questions-ouvertes.md) | Ce qui reste à décider |
@@ -44,3 +45,9 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | Rebirth : bonus additif (+50 % par rebirth) ; emplacements débloqués et étoiles conservés. |
 | 2026-10-24 | Étoiles au tirage : 1★ 50 %, 2★ 30 %, 3★ 15 %, 4★ 4 %, 5★ 1 %. Le reroll peut faire baisser les étoiles. |
 | 2026-10-24 | Revenu = base × (1 + 0,2 × étoiles) × (1 + 0,5 × rebirths). |
+| 2026-10-24 | Hub (Sanctuaire Mère) : page créée, stands des marchands et plan en proposition. |
+| 2026-10-24 | Le rebirth se fait dans la base. |
+| 2026-10-24 | 7 ou 8 joueurs (bases) par serveur, à fixer après test en jeu. |
+| 2026-10-24 | Plan du Hub validé : plateau circulaire, piédestal au centre, stands en couronne entre les ponts, classements au bord. |
+| 2026-10-24 | 7 bases (joueurs) par serveur. |
+| 2026-10-24 | Pas d'îles flottantes : carte au sol, bases reliées au Hub par des chemins. |
