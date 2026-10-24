@@ -42,3 +42,5 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | 2 emplacements ouverts au départ, les 8 autres à débloquer avec de l'argent. |
 | 2026-10-24 | Étoiles : 5 max, +20 % de revenu par étoile, nombre aléatoire au tirage, reroll payant chez un marchand (prix selon la rareté). |
 | 2026-10-24 | Rebirth : bonus additif (+50 % par rebirth) ; emplacements débloqués et étoiles conservés. |
+| 2026-10-24 | Étoiles au tirage : 1★ 50 %, 2★ 30 %, 3★ 15 %, 4★ 4 %, 5★ 1 %. Le reroll peut faire baisser les étoiles. |
+| 2026-10-24 | Revenu = base × (1 + 0,2 × étoiles) × (1 + 0,5 × rebirths). |

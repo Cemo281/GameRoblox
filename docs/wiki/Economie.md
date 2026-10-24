@@ -18,7 +18,8 @@ Les montants de chaque dépense sont **à définir**.
 
 ## Revenu des personnages
 - Chaque personnage posé sur un emplacement produit son revenu par seconde (voir [Personnages](Personnages.md)), augmenté par ses étoiles et par le bonus de rebirth.
-- Formule *(proposition, ordre de calcul à confirmer)* : `revenu de base × (1 + 0,2 × étoiles) × (1 + 0,5 × rebirths)`.
+- Formule : `revenu de base × (1 + 0,2 × étoiles) × (1 + 0,5 × rebirths)`.
+  Exemple : Luffy (100 $/s), 3 étoiles, 2 rebirths → 100 × 1,6 × 2 = 320 $/s.
 - L'argent **n'arrive pas directement** sur le compte : il s'accumule et le joueur doit **le collecter**.
 - Un **collecteur unique**, placé **dans l'enclos**, récupère d'un coup l'argent de tous les personnages posés.
 - **Pas de plafond** d'accumulation avant collecte.

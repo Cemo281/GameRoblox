@@ -37,12 +37,18 @@ Au sein d'une rareté, chaque personnage a la même chance : **à confirmer**.
 | Luffy Gear 2 | Secret | 1000 | à définir |
 
 ## Étoiles
-- Chaque personnage possède de 0 à **5 étoiles** maximum *(minimum 0 ou 1 : à confirmer)*.
+- Chaque personnage possède de **1 à 5 étoiles**.
 - Effet : **+20 % de revenu par étoile**.
-- À l'obtention (tirage), le personnage reçoit un **nombre d'étoiles aléatoire**. Probabilités de chaque nombre d'étoiles : **à définir**.
+- À l'obtention (tirage), le personnage reçoit un **nombre d'étoiles aléatoire** :
+
+  | Étoiles | 1 | 2 | 3 | 4 | 5 |
+  |---|---|---|---|---|---|
+  | Chance | 50 % | 30 % | 15 % | 4 % | 1 % |
+
 - **Reroll** : chez un **marchand d'étoiles**, le joueur paie pour retirer au hasard le nombre d'étoiles d'un de ses personnages.
   - Le prix dépend de la **rareté** du personnage. Montants : **à définir**.
-  - Le reroll peut-il faire baisser le nombre d'étoiles : **à confirmer**.
+  - Le reroll **peut faire baisser** le nombre d'étoiles.
+  - Probabilités du reroll (mêmes que le tirage ?) : **à définir**.
 - Les étoiles sont conservées au rebirth.
 
 ## Lots suivants
