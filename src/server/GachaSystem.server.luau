@@ -1,7 +1,8 @@
 --!strict
--- GachaSystem : tirage sur le cube RNG du Workspace via un ProximityPrompt.
+-- GachaSystem : tirage sur chaque machine RNG (Part taguée "MachineRNG") via un ProximityPrompt.
 -- Le serveur vérifie cooldown, distance et argent, puis tire la rareté : rien ne vient du client.
 
+local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,7 +16,8 @@ type Rarete = {
 	Couleur: Color3,
 }
 
-local machine = workspace:WaitForChild("RNG") :: BasePart
+local TAG_MACHINE = "MachineRNG"
+
 local random = Random.new()
 local dernierTirage: { [Player]: number } = {}
 
@@ -39,7 +41,7 @@ local function tirerRarete(): Rarete
 	return GachaConfig.Raretes[#GachaConfig.Raretes]
 end
 
-local function afficherResultat(player: Player, rarete: Rarete)
+local function afficherResultat(machine: BasePart, player: Player, rarete: Rarete)
 	local bloc = Instance.new("Part")
 	bloc.Name = rarete.Nom
 	bloc.Size = Vector3.new(3, 3, 3)
@@ -67,7 +69,7 @@ local function afficherResultat(player: Player, rarete: Rarete)
 	Debris:AddItem(bloc, GachaConfig.DureeVieResultat)
 end
 
-local function onTriggered(player: Player)
+local function onTriggered(machine: BasePart, player: Player)
 	local maintenant = os.clock()
 	local dernier = dernierTirage[player]
 	if dernier and maintenant - dernier < GachaConfig.Cooldown then
@@ -90,17 +92,31 @@ local function onTriggered(player: Player)
 
 	local rarete = tirerRarete()
 	print(`[Gacha] {player.Name} a obtenu : {rarete.Nom}`)
-	afficherResultat(player, rarete)
+	afficherResultat(machine, player, rarete)
 end
 
-local prompt = Instance.new("ProximityPrompt")
-prompt.ActionText = "Tirer"
-prompt.ObjectText = `Machine RNG ({GachaConfig.Prix} Argent)`
-prompt.HoldDuration = 0
-prompt.MaxActivationDistance = GachaConfig.DistanceMax - 5
-prompt.RequiresLineOfSight = false
-prompt.Parent = machine
-prompt.Triggered:Connect(onTriggered)
+local function installerMachine(instance: Instance)
+	if not instance:IsA("BasePart") then
+		return
+	end
+	local machine = instance
+
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = "Tirer"
+	prompt.ObjectText = `Machine RNG ({GachaConfig.Prix} Argent)`
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = GachaConfig.DistanceMax - 5
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = machine
+	prompt.Triggered:Connect(function(player: Player)
+		onTriggered(machine, player)
+	end)
+end
+
+for _, machine in CollectionService:GetTagged(TAG_MACHINE) do
+	installerMachine(machine)
+end
+CollectionService:GetInstanceAddedSignal(TAG_MACHINE):Connect(installerMachine)
 
 Players.PlayerRemoving:Connect(function(player: Player)
 	dernierTirage[player] = nil
