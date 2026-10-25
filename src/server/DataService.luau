@@ -395,6 +395,37 @@ function DataService.Poser(player: Player, uid: string, index: number): boolean
 	return true
 end
 
+-- Retire un personnage posé et le remet dans l'inventaire. Renvoie false s'il n'était pas posé.
+function DataService.Retirer(player: Player, uid: string): boolean
+	local profile = profiles[player]
+	if not profile then
+		return false
+	end
+	local emplacements = profile.data.Emplacements
+	for index, uidPose in emplacements do
+		if uidPose == uid then
+			emplacements[index] = nil
+			return true
+		end
+	end
+	return false
+end
+
+-- Premier emplacement débloqué et libre, ou nil.
+function DataService.PremierEmplacementLibre(player: Player): number?
+	local profile = profiles[player]
+	if not profile then
+		return nil
+	end
+	local data = profile.data
+	for index = 1, data.EmplacementsDebloques do
+		if not data.Emplacements[tostring(index)] then
+			return index
+		end
+	end
+	return nil
+end
+
 function DataService.AjouterNonCollecte(player: Player, montant: number)
 	local profile = profiles[player]
 	if profile and isValidAmount(montant) then

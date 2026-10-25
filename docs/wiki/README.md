@@ -15,6 +15,7 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | [Rebirth et évolutions](Rebirth-et-evolutions.md) | Rebirth, déblocage des lots, marchand, évolutions |
 | [Combats](Combats.md) | Combats automatiques, récompenses, mutations |
 | [Questions ouvertes](Questions-ouvertes.md) | Ce qui reste à décider |
+| [TODO](TODO.md) | Suivi des tâches de développement (En cours / À faire / Terminé) |
 
 ## Journal des décisions
 | Date | Décision |

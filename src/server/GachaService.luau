@@ -14,6 +14,7 @@ local GachaConfig = require(ReplicatedStorage.Shared.GachaConfig)
 local Personnages = require(ReplicatedStorage.Shared.Personnages)
 local BaseService = require(script.Parent.BaseService)
 local DataService = require(script.Parent.DataService)
+local InterfaceService = require(script.Parent.InterfaceService)
 
 local GachaService = {}
 
@@ -65,19 +66,6 @@ local function tirerPersonnage(rebirths: number): (Personnages.Personnage, numbe
 		return e.Chance
 	end).Etoiles
 	return personnage, etoiles
-end
-
-local function premierEmplacementLibre(player: Player): number?
-	local data = DataService.GetData(player)
-	if not data then
-		return nil
-	end
-	for index = 1, data.EmplacementsDebloques do
-		if not data.Emplacements[tostring(index)] then
-			return index
-		end
-	end
-	return nil
 end
 
 -- Affichage provisoire du résultat au-dessus de la machine, en attendant l'animation de tirage.
@@ -136,7 +124,7 @@ local function tirer(player: Player, machine: BasePart): boolean
 		return false
 	end
 	if DataService.NombrePersonnages(player) >= Economie.PersonnagesMax then
-		print(`[Gacha] {player.Name} : inventaire plein ({Economie.PersonnagesMax})`)
+		InterfaceService.Notifier(player, `Inventaire plein ({Economie.PersonnagesMax} personnages maximum).`)
 		return false
 	end
 	dernierTirage[player] = maintenant
@@ -147,16 +135,23 @@ local function tirer(player: Player, machine: BasePart): boolean
 		return false
 	end
 
-	local index = premierEmplacementLibre(player)
-	if index and DataService.Poser(player, uid, index) then
+	local index = DataService.PremierEmplacementLibre(player)
+	local pose = index ~= nil and DataService.Poser(player, uid, index)
+	if pose then
 		BaseService.RafraichirEmplacements(player)
-		print(`[Gacha] {player.Name} : {personnage.Nom} {etoiles}★ → emplacement {index}`)
-	else
-		print(`[Gacha] {player.Name} : {personnage.Nom} {etoiles}★ → inventaire`)
 	end
+	local destination = if pose then `emplacement {index}` else "inventaire"
+	print(`[Gacha] {player.Name} : {personnage.Nom} {etoiles}★ → {destination}`)
 
 	local rarete = GachaConfig.RaretesParId[personnage.Rarete]
 	afficherResultat(machine, personnage.Nom, etoiles, if rarete then rarete.Couleur else Color3.new(1, 1, 1))
+	InterfaceService.EnvoyerResultatTirage(player, {
+		Id = personnage.Id,
+		Etoiles = etoiles,
+		Revenu = Economie.RevenuParSeconde(personnage.Revenu, etoiles, data.Rebirths),
+		Emplacement = if pose then index else nil,
+	})
+	InterfaceService.EnvoyerInventaire(player)
 	return true
 end
 

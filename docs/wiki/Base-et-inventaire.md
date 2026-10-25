@@ -19,3 +19,6 @@ Une parcelle par joueur (modèle `BaseJoueur` dans Studio) :
 - Contient les personnages obtenus qui ne sont pas posés.
 - Taille max : **à définir**. Limite technique provisoire dans le code : 100 personnages au total (posés + inventaire) ; une fois atteinte, la machine refuse de tirer. Sans limite, la sauvegarde grossirait sans fin (tirage gratuit).
 - Les personnages de l'inventaire ne produisent pas d'argent.
+
+## État technique
+Interface en place : le bouton **Inventaire** liste les personnages (posés d'abord, puis par rareté) avec **Poser** (premier emplacement libre) et **Retirer**. Un tirage va sur le premier emplacement libre, sinon dans l'inventaire.

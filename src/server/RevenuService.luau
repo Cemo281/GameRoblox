@@ -8,8 +8,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economie = require(ReplicatedStorage.Shared.Economie)
 local Personnages = require(ReplicatedStorage.Shared.Personnages)
+local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local BaseService = require(script.Parent.BaseService)
 local DataService = require(script.Parent.DataService)
+local InterfaceService = require(script.Parent.InterfaceService)
 
 local RevenuService = {}
 
@@ -35,6 +37,15 @@ function RevenuService.RevenuTotal(player: Player): number
 		end
 	end
 	return total
+end
+
+-- Attributs lus par le HUD du client.
+local function mettreAJourAttributs(player: Player, revenu: number)
+	local data = DataService.GetData(player)
+	if data then
+		player:SetAttribute(Remotes.Attributs.ArgentNonCollecte, math.floor(data.ArgentNonCollecte))
+		player:SetAttribute(Remotes.Attributs.RevenuParSeconde, revenu)
+	end
 end
 
 local function rafraichirCollecteur(collecteur: BasePart, label: TextLabel)
@@ -64,7 +75,8 @@ local function onToucheCollecteur(collecteur: BasePart, autre: BasePart)
 
 	local montant = DataService.Collecter(player)
 	if montant > 0 then
-		print(`[Revenu] {player.Name} collecte {montant} $`)
+		mettreAJourAttributs(player, RevenuService.RevenuTotal(player))
+		InterfaceService.EnvoyerCollecte(player, montant)
 		local label = textesCollecteurs[collecteur]
 		if label then
 			rafraichirCollecteur(collecteur, label)
@@ -118,7 +130,9 @@ function RevenuService.Init()
 		while true do
 			local ecoule = task.wait(INTERVALLE) -- temps réel écoulé, légèrement supérieur à INTERVALLE
 			for _, player in Players:GetPlayers() do
-				DataService.AjouterNonCollecte(player, RevenuService.RevenuTotal(player) * ecoule)
+				local revenu = RevenuService.RevenuTotal(player)
+				DataService.AjouterNonCollecte(player, revenu * ecoule)
+				mettreAJourAttributs(player, revenu)
 			end
 			for collecteur, label in textesCollecteurs do
 				rafraichirCollecteur(collecteur, label)
