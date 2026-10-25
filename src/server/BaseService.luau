@@ -58,18 +58,82 @@ local function emplacementsDe(base: Model): { BasePart }
 	return resultat
 end
 
-local function creerPersonnage(emplacement: BasePart, nom: string, etoiles: number, revenu: number, couleur: Color3)
-	local bloc = Instance.new("Part")
-	bloc.Name = "Personnage"
-	bloc.Anchored = true
-	bloc.Size = TAILLE_PERSONNAGE
-	bloc.Color = couleur
-	bloc.Material = Enum.Material.SmoothPlastic
-	bloc.Position = emplacement.Position + Vector3.new(0, emplacement.Size.Y / 2 + TAILLE_PERSONNAGE.Y / 2, 0)
+-- Orientation d'un personnage posé : face à l'allée de sa base (perpendiculaire à son grand axe).
+local function orientationVersAllee(emplacement: BasePart, position: Vector3): CFrame
+	local base = trouverBase(emplacement)
+	local allee = base and base:FindFirstChild("Allee")
+	if allee and allee:IsA("BasePart") then
+		local relatif = allee.CFrame:PointToObjectSpace(position)
+		local surAxe = if allee.Size.Z >= allee.Size.X
+			then Vector3.new(0, relatif.Y, relatif.Z)
+			else Vector3.new(relatif.X, relatif.Y, 0)
+		local direction = (allee.CFrame:PointToWorldSpace(surAxe) - position) * Vector3.new(1, 0, 1)
+		if direction.Magnitude > 0.01 then
+			return CFrame.lookAt(position, position + direction)
+		end
+	end
+	return CFrame.new(position)
+end
+
+-- Modèle 3D animé (ReplicatedStorage.ModelesPersonnages.<Id>, rangé par le skill /perso-r6), ou nil.
+-- Renvoie le support de l'étiquette et la hauteur de l'étiquette au-dessus de ce support.
+local function creerModele(emplacement: BasePart, id: string): (Model?, BasePart?, number)
+	local dossier = ReplicatedStorage:FindFirstChild("ModelesPersonnages")
+	local source = dossier and dossier:FindFirstChild(id)
+	if not (source and source:IsA("Model") and source.PrimaryPart) then
+		return nil, nil, 0
+	end
+
+	local modele = source:Clone()
+	modele.Name = "Personnage"
+	local boite, taille = modele:GetBoundingBox()
+	local pivot = modele:GetPivot().Position
+	local sousPivot = pivot.Y - (boite.Position.Y - taille.Y / 2)
+	local position = emplacement.Position + Vector3.new(0, emplacement.Size.Y / 2 + sousPivot, 0)
+	modele:PivotTo(orientationVersAllee(emplacement, position))
+	modele.Parent = emplacement
+
+	local animationId = modele:GetAttribute("AnimationIdle")
+	local controleur = modele:FindFirstChildOfClass("AnimationController")
+	local animator = controleur and controleur:FindFirstChildOfClass("Animator")
+	if typeof(animationId) == "string" and animator then
+		local animation = Instance.new("Animation")
+		animation.AnimationId = animationId
+		local piste = animator:LoadAnimation(animation)
+		piste.Looped = true
+		piste:Play()
+	end
+
+	return modele, modele.PrimaryPart, taille.Y - sousPivot + 1.5
+end
+
+local function creerPersonnage(
+	emplacement: BasePart,
+	id: string,
+	nom: string,
+	etoiles: number,
+	revenu: number,
+	couleur: Color3
+)
+	local modele, support, hauteurEtiquette = creerModele(emplacement, id)
+	local bloc: BasePart
+	if modele and support then
+		bloc = support
+	else
+		local part = Instance.new("Part")
+		part.Name = "Personnage"
+		part.Anchored = true
+		part.Size = TAILLE_PERSONNAGE
+		part.Color = couleur
+		part.Material = Enum.Material.SmoothPlastic
+		part.Position = emplacement.Position + Vector3.new(0, emplacement.Size.Y / 2 + TAILLE_PERSONNAGE.Y / 2, 0)
+		bloc = part
+		hauteurEtiquette = TAILLE_PERSONNAGE.Y / 2 + 1.5
+	end
 
 	local billboard = Instance.new("BillboardGui")
 	billboard.Size = UDim2.fromOffset(160, 50)
-	billboard.StudsOffset = Vector3.new(0, TAILLE_PERSONNAGE.Y / 2 + 1.5, 0)
+	billboard.StudsOffset = Vector3.new(0, hauteurEtiquette, 0)
 	billboard.MaxDistance = 80
 
 	local label = Instance.new("TextLabel")
@@ -83,7 +147,9 @@ local function creerPersonnage(emplacement: BasePart, nom: string, etoiles: numb
 	label.Parent = billboard
 
 	billboard.Parent = bloc
-	bloc.Parent = emplacement
+	if not modele then
+		bloc.Parent = emplacement
+	end
 end
 
 -- Remet une base dans son apparence « libre ».
@@ -217,6 +283,7 @@ function BaseService.RafraichirEmplacements(player: Player)
 			local revenu = Economie.RevenuParSeconde(definition.Revenu, personnage.Etoiles, data.Rebirths)
 			creerPersonnage(
 				emplacement,
+				definition.Id,
 				definition.Nom,
 				personnage.Etoiles,
 				revenu,

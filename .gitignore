@@ -24,3 +24,7 @@ DevPackages/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Blender : sauvegardes automatiques et textures extraites par les imports FBX
+*.blend1
+*.fbm/
