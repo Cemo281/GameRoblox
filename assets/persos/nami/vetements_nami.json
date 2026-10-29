@@ -1,0 +1,128 @@
+{
+	"Vet_UpperTorso": {
+		"piece": "UpperTorso",
+		"taille": [
+			2.044,
+			0.9482,
+			1.1913
+		],
+		"decalage": [
+			-0.0,
+			0.4521,
+			-0.0
+		],
+		"triangles": 468
+	},
+	"Vet_LowerTorso": {
+		"piece": "LowerTorso",
+		"taille": [
+			2.29,
+			0.6106,
+			1.3292
+		],
+		"decalage": [
+			-0.0,
+			0.0826,
+			-0.0246
+		],
+		"triangles": 1996
+	},
+	"Vet_LeftUpperLeg": {
+		"piece": "LeftUpperLeg",
+		"taille": [
+			1.072,
+			1.16,
+			1.052
+		],
+		"decalage": [
+			-0.0,
+			0.119,
+			0.0
+		],
+		"triangles": 256
+	},
+	"Vet_RightUpperLeg": {
+		"piece": "RightUpperLeg",
+		"taille": [
+			1.072,
+			1.16,
+			1.052
+		],
+		"decalage": [
+			0.0,
+			0.119,
+			0.0
+		],
+		"triangles": 256
+	},
+	"Vet_LeftLowerLeg": {
+		"piece": "LeftLowerLeg",
+		"taille": [
+			1.164,
+			1.4718,
+			1.152
+		],
+		"decalage": [
+			-0.0,
+			0.1774,
+			0.0
+		],
+		"triangles": 360
+	},
+	"Vet_RightLowerLeg": {
+		"piece": "RightLowerLeg",
+		"taille": [
+			1.164,
+			1.4718,
+			1.152
+		],
+		"decalage": [
+			0.0,
+			0.1774,
+			0.0
+		],
+		"triangles": 360
+	},
+	"Vet_LeftFoot": {
+		"piece": "LeftFoot",
+		"taille": [
+			1.1299,
+			0.3912,
+			1.1663
+		],
+		"decalage": [
+			-0.0,
+			0.0396,
+			-0.0332
+		],
+		"triangles": 254
+	},
+	"Vet_RightFoot": {
+		"piece": "RightFoot",
+		"taille": [
+			1.1299,
+			0.3912,
+			1.1663
+		],
+		"decalage": [
+			0.0,
+			0.0396,
+			-0.0332
+		],
+		"triangles": 254
+	},
+	"Vet_LeftLowerArm": {
+		"piece": "LeftLowerArm",
+		"taille": [
+			1.07,
+			0.34,
+			1.205
+		],
+		"decalage": [
+			-0.0004,
+			-0.2908,
+			-0.0675
+		],
+		"triangles": 604
+	}
+}

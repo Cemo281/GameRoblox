@@ -1,0 +1,30 @@
+{
+	"Acc_Bourse": {
+		"piece": "LeftHand",
+		"taille": [
+			0.6801,
+			0.9,
+			0.6847
+		],
+		"decalage": [
+			-0.0033,
+			-0.4471,
+			-0.0143
+		],
+		"triangles": 1232
+	},
+	"Acc_Carte": {
+		"piece": "LeftHand",
+		"taille": [
+			1.048,
+			0.66,
+			0.176
+		],
+		"decalage": [
+			0.014,
+			-0.5271,
+			-0.25
+		],
+		"triangles": 228
+	}
+}
