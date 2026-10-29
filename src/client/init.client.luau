@@ -10,6 +10,7 @@ local Inventaire = require(script.Inventaire)
 local Notifications = require(script.Notifications)
 local Tirage = require(script.Tirage)
 local Ui = require(script.Ui)
+local Vitrine = require(script.Vitrine)
 
 local ecran = Ui.Creer("ScreenGui", {
 	Name = "Interface",
@@ -22,6 +23,7 @@ Hud.Init(ecran)
 Inventaire.Init(ecran)
 Tirage.Init(ecran)
 Notifications.Init(ecran)
+Vitrine.Init()
 
 Remotes.Evenement("Inventaire").OnClientEvent:Connect(Inventaire.MettreAJour)
 Remotes.Evenement("ResultatTirage").OnClientEvent:Connect(Tirage.Montrer)

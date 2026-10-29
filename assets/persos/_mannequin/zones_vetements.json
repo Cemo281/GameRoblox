@@ -1,0 +1,420 @@
+{
+	"source": "Calibre le 2026-10-28 sur ServerStorage.Gabarits.MannequinR15 avec test_shirt.png / test_pants.png (noms par face) et regle_shirt.png (bandes de 4 px), captures Studio des 6 vues + faces cachees (pieces masquees une a une).",
+	"image": {
+		"largeur": 585,
+		"hauteur": 559,
+		"origine": "coin haut-gauche, x vers la droite, y vers le bas, rect = [x, y, largeur, hauteur] en pixels"
+	},
+	"empilement": "Shirt et Pants utilisent la MEME disposition. Le Pants couvre torse (UpperTorso + LowerTorso) et jambes ; le Shirt couvre torse (UpperTorso + LowerTorso) et bras, et passe PAR-DESSUS le Pants sur le torse. Pour qu'un pantalon se voie sur le bassin, la zone torse du Shirt doit y etre transparente (lignes 96 a 128 pour le LowerTorso). Le Shirt ne touche pas les jambes, le Pants ne touche pas les bras.",
+	"faces_roblox": "Front = -Z (avant du perso), Back = +Z, Right = +X (droite du perso), Left = -X, Top = +Y, Bottom = -Y.",
+	"sens_de_lecture": {
+		"Front": "vue de face : haut de l'image = haut du perso, gauche de l'image = DROITE du perso",
+		"Back": "vue de dos : haut = haut, gauche de l'image = GAUCHE du perso",
+		"Right": "vue depuis la droite du perso : haut = haut, gauche de l'image = dos, droite = avant",
+		"Left": "vue depuis la gauche du perso : haut = haut, gauche de l'image = avant, droite = dos",
+		"Top": "vue de dessus : bas de l'image = avant (bord commun avec la face Front), gauche de l'image = droite du perso",
+		"Bottom": "vue de dessous : haut de l'image = avant (bord commun avec la face Front), gauche de l'image = droite du perso"
+	},
+	"raccords": "Torse : Right | Front | Left | Back cote a cote (bord droit de Back = bord gauche de Right). Bras/jambe droits : INT(Left) | Back | EXT(Right) | Front. Bras/jambe gauches : Front | EXT(Left) | Back | INT(Right). Top au-dessus de Front, Bottom en dessous de Front.",
+	"zones": {
+		"torse": {
+			"pieces": "UpperTorso (Shirt et Pants), LowerTorso (Shirt et Pants)",
+			"faces": {
+				"Top": {
+					"rect": [
+						231,
+						8,
+						128,
+						64
+					],
+					"nom_test": "TORSE / BASSIN HAUT",
+					"piece": "UpperTorso"
+				},
+				"Right": {
+					"rect": [
+						165,
+						74,
+						64,
+						128
+					],
+					"nom_test": "TORSE / BASSIN DROITE"
+				},
+				"Front": {
+					"rect": [
+						231,
+						74,
+						128,
+						128
+					],
+					"nom_test": "TORSE / BASSIN AVANT"
+				},
+				"Left": {
+					"rect": [
+						361,
+						74,
+						64,
+						128
+					],
+					"nom_test": "TORSE / BASSIN GAUCHE"
+				},
+				"Back": {
+					"rect": [
+						427,
+						74,
+						128,
+						128
+					],
+					"nom_test": "TORSE / BASSIN DOS"
+				},
+				"Bottom": {
+					"rect": [
+						231,
+						204,
+						128,
+						64
+					],
+					"nom_test": "TORSE / BASSIN BAS",
+					"piece": "LowerTorso"
+				}
+			},
+			"lignes_des_faces_laterales": {
+				"UpperTorso": [
+					0,
+					96
+				],
+				"LowerTorso": [
+					96,
+					128
+				]
+			}
+		},
+		"bras_droit": {
+			"vetement": "Shirt",
+			"pieces": "RightUpperArm, RightLowerArm, RightHand",
+			"faces": {
+				"Top": {
+					"rect": [
+						217,
+						289,
+						64,
+						64
+					],
+					"nom_test": "BRAS D HAUT",
+					"piece": "RightUpperArm (epaule)"
+				},
+				"Left": {
+					"rect": [
+						19,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS D INT",
+					"cote": "interieur, vers le torse"
+				},
+				"Back": {
+					"rect": [
+						85,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS D DOS"
+				},
+				"Right": {
+					"rect": [
+						151,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS D EXT",
+					"cote": "exterieur"
+				},
+				"Front": {
+					"rect": [
+						217,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS D AVANT"
+				},
+				"Bottom": {
+					"rect": [
+						217,
+						485,
+						64,
+						64
+					],
+					"nom_test": "BRAS D BAS",
+					"piece": "RightHand (dessous de la main)"
+				}
+			},
+			"lignes_des_faces_laterales": {
+				"RightUpperArm": [
+					0,
+					64
+				],
+				"RightLowerArm": [
+					64,
+					112
+				],
+				"RightHand": [
+					112,
+					128
+				]
+			}
+		},
+		"bras_gauche": {
+			"vetement": "Shirt",
+			"pieces": "LeftUpperArm, LeftLowerArm, LeftHand",
+			"faces": {
+				"Top": {
+					"rect": [
+						308,
+						289,
+						64,
+						64
+					],
+					"nom_test": "BRAS G HAUT",
+					"piece": "LeftUpperArm (epaule)"
+				},
+				"Front": {
+					"rect": [
+						308,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS G AVANT"
+				},
+				"Left": {
+					"rect": [
+						374,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS G EXT",
+					"cote": "exterieur"
+				},
+				"Back": {
+					"rect": [
+						440,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS G DOS"
+				},
+				"Right": {
+					"rect": [
+						506,
+						355,
+						64,
+						128
+					],
+					"nom_test": "BRAS G INT",
+					"cote": "interieur, vers le torse"
+				},
+				"Bottom": {
+					"rect": [
+						308,
+						485,
+						64,
+						64
+					],
+					"nom_test": "BRAS G BAS",
+					"piece": "LeftHand (dessous de la main)"
+				}
+			},
+			"lignes_des_faces_laterales": {
+				"LeftUpperArm": [
+					0,
+					64
+				],
+				"LeftLowerArm": [
+					64,
+					112
+				],
+				"LeftHand": [
+					112,
+					128
+				]
+			}
+		},
+		"jambe_droite": {
+			"vetement": "Pants",
+			"pieces": "RightUpperLeg, RightLowerLeg, RightFoot",
+			"faces": {
+				"Top": {
+					"rect": [
+						217,
+						289,
+						64,
+						64
+					],
+					"nom_test": "JAMBE D HAUT",
+					"piece": "RightUpperLeg (cache dans le LowerTorso)"
+				},
+				"Left": {
+					"rect": [
+						19,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE D INT",
+					"cote": "interieur, vers l'autre jambe"
+				},
+				"Back": {
+					"rect": [
+						85,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE D DOS"
+				},
+				"Right": {
+					"rect": [
+						151,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE D EXT",
+					"cote": "exterieur"
+				},
+				"Front": {
+					"rect": [
+						217,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE D AVANT"
+				},
+				"Bottom": {
+					"rect": [
+						217,
+						485,
+						64,
+						64
+					],
+					"nom_test": "JAMBE D BAS",
+					"piece": "RightFoot (semelle)"
+				}
+			},
+			"lignes_des_faces_laterales": {
+				"RightUpperLeg": [
+					0,
+					64
+				],
+				"RightLowerLeg": [
+					64,
+					112
+				],
+				"RightFoot": [
+					112,
+					128
+				]
+			}
+		},
+		"jambe_gauche": {
+			"vetement": "Pants",
+			"pieces": "LeftUpperLeg, LeftLowerLeg, LeftFoot",
+			"faces": {
+				"Top": {
+					"rect": [
+						308,
+						289,
+						64,
+						64
+					],
+					"nom_test": "JAMBE G HAUT",
+					"piece": "LeftUpperLeg (cache dans le LowerTorso)"
+				},
+				"Front": {
+					"rect": [
+						308,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE G AVANT"
+				},
+				"Left": {
+					"rect": [
+						374,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE G EXT",
+					"cote": "exterieur"
+				},
+				"Back": {
+					"rect": [
+						440,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE G DOS"
+				},
+				"Right": {
+					"rect": [
+						506,
+						355,
+						64,
+						128
+					],
+					"nom_test": "JAMBE G INT",
+					"cote": "interieur, vers l'autre jambe"
+				},
+				"Bottom": {
+					"rect": [
+						308,
+						485,
+						64,
+						64
+					],
+					"nom_test": "JAMBE G BAS",
+					"piece": "LeftFoot (semelle)"
+				}
+			},
+			"lignes_des_faces_laterales": {
+				"LeftUpperLeg": [
+					0,
+					64
+				],
+				"LeftLowerLeg": [
+					64,
+					112
+				],
+				"LeftFoot": [
+					112,
+					128
+				]
+			}
+		}
+	},
+	"lignes": "lignes_des_faces_laterales = [debut, fin[ en pixels depuis le haut de chaque zone de 128 px (Front, Back, Right, Left), identique sur les 4 faces laterales. Mesure a la bande de 4 px pres.",
+	"parties_cachees": {
+		"jambes": "lignes 0 a ~16 : haut de la cuisse rentre dans le LowerTorso, invisible au repos (visible quand la jambe se leve fort). Zone Top de la jambe : invisible au repos.",
+		"bras_bas": "le haut du LowerArm (lignes ~56 a 64) est cache dans l'UpperArm ; il apparait quand le coude plie : peindre la continuite de la manche.",
+		"jambe_bas": "idem pour le haut du LowerLeg dans l'UpperLeg quand le genou plie.",
+		"dessous_des_pieces_hautes": "le dessous de l'UpperArm / UpperLeg et le dessus du LowerArm / LowerLeg reprennent une bande unie des lignes voisines : rien a peindre de specifique."
+	},
+	"face": {
+		"decal": "Decal 'face' sur Head.Front",
+		"horizontal": "selon l'angle autour de l'axe vertical de la tete : u = 0,5 + angle / 120 deg (angle compte depuis l'avant, positif vers la GAUCHE du perso), affiche seulement pour |angle| <= 45 deg, soit les colonnes u = 0,125 a 0,875 de l'image",
+		"vertical": "projection plane : v = 0,5 - (y - 1,598) / 1,17 (haut de l'image en haut), centre = centre de la piece Head",
+		"hors_zone": "le reste de la tete (cotes, dos, dessus, dessous) prend la couleur du pixel du coin haut-gauche : fond de face_<Id>.png TRANSPARENT obligatoire",
+		"zone_utile": "image 512x512 : x de 64 a 448 (bords a 64-96 et 416-448 tres ecrases sur l'arrondi), y de 0 a 512 (lignes 0-30 et 480-512 sur les arrondis du dessus et du dessous)",
+		"image": "face_<Id>.png, 512 x 512, fond transparent",
+		"calibration": "test_face.png (cases de 64 px numerotees colonne-ligne), captures Studio face / 3-4 / profil, comparees au rendu Blender a 2 px pres"
+	}
+}

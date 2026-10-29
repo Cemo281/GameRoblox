@@ -51,5 +51,14 @@ Au sein d'une rareté, chaque personnage a la même chance : **à confirmer**.
   - Probabilités du reroll (mêmes que le tirage ?) : **à définir**.
 - Les étoiles sont conservées au rebirth.
 
+## Animations de vitrine
+Un personnage posé sur sa case joue en boucle ses animations de vitrine, avec **2 secondes de pause** entre chacune :
+**Idle** (ex. bras croisés) → pause → **Action** (démonstration de pouvoir, ex. dégainer les trois sabres) → pause → **Signature** (geste typique, ex. ranger les sabres) → pause → Idle…
+- Pendant une pause, le personnage reste figé sur la dernière image de l'animation (ex. en garde, sabres en main, après l'Action).
+- **Visible par tous** les joueurs (sabres et effets compris).
+- Un personnage qui n'a qu'une animation Idle la joue en boucle, sans pause.
+
+État technique : cycle joué par le serveur (`BaseService`), sabres et effets affichés par chaque client à partir des marqueurs des animations (`src/client/Vitrine.luau`). Premier personnage concerné : Zoro.
+
 ## Lots suivants
 **À définir.** Exemple donné : un lot sur le thème DBZ, avec une évolution « 10 Goku + 20 Vegeta → Vegeto ».

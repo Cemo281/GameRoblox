@@ -1,0 +1,232 @@
+{
+	"source": "Players:CreateHumanoidModelFromDescription(Instance.new('HumanoidDescription'), R15), en Play (serveur) le 2026-10-28. Le rig Roblox utilise des AnimationConstraint (+ BallSocketConstraint) a la place des Motor6D : c0 = Attachment0.CFrame, c1 = Attachment1.CFrame (equivalent Motor6D, comme Humanoid:BuildRigFromAttachments).",
+	"repere": "Roblox : Y = haut, le perso regarde vers -Z, sa droite est +X. CFrame = 12 composantes {x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22}. Pieces : cframe relative a HumanoidRootPart.",
+	"blender": {
+		"correspondance": "Blender (x, y, z) = (-xR, zR, yR + hauteurHRP) ; inverse : Roblox (x, y, z) = (-xB, zB - hauteurHRP, yB). Matrice A = ((-1,0,0),(0,0,1),(0,1,0)), la meme que dans le skill (R6 : hauteur 3 au lieu de hauteurHRP). Le perso regarde vers -Y, sa droite est -X, pieds a Z = 0, 1 unite = 1 stud.",
+		"hauteurHRP": 3.192435,
+		"articulations": {
+			"Root": [0.0, 0.0, 2.192435],
+			"Waist": [0.0, 0.0, 2.592426],
+			"Neck": [0.0, 0.0, 4.290462],
+			"LeftShoulder": [0.971604, 0.0, 4.038941],
+			"LeftElbow": [1.471657, 0.0, 3.265123],
+			"LeftWrist": [1.471658, 0.0, 2.458127],
+			"RightShoulder": [-0.971604, 0.0, 4.038941],
+			"RightElbow": [-1.472137, 0.0, 3.265008],
+			"RightWrist": [-1.472137, 0.0, 2.458127],
+			"LeftHip": [0.5, 0.0, 2.192429],
+			"LeftKnee": [0.5, 0.0, 1.271683],
+			"LeftAnkle": [0.5, -2e-06, 0.26201],
+			"RightHip": [-0.5, -1.9e-05, 2.192429],
+			"RightKnee": [-0.5, 2.5e-05, 1.271858],
+			"RightAnkle": [-0.5, 7.4e-05, 0.26201]
+		},
+		"centres": {
+			"HumanoidRootPart": [0.0, 0.0, 3.192435],
+			"LowerTorso": [0.0, 0.0, 2.392401],
+			"UpperTorso": [0.0, 0.0, 3.441428],
+			"Head": [0.0, 0.0, 4.866263],
+			"LeftUpperArm": [1.472137, 0.0, 3.620017],
+			"LeftLowerArm": [1.472137, 0.0, 2.990302],
+			"LeftHand": [1.472129, 0.0, 2.32656],
+			"RightUpperArm": [-1.472138, 0.0, 3.620017],
+			"RightLowerArm": [-1.472137, 0.0, 2.990302],
+			"RightHand": [-1.472137, 0.0, 2.32656],
+			"LeftUpperLeg": [0.5, 0.0, 1.72103],
+			"LeftLowerLeg": [0.5, 0.0, 0.858496],
+			"LeftFoot": [0.5, -1e-06, 0.155997],
+			"RightUpperLeg": [-0.5, 4.6e-05, 1.72103],
+			"RightLowerLeg": [-0.5, 0.0, 0.858496],
+			"RightFoot": [-0.5, -3e-06, 0.155997]
+		}
+	},
+	"pieces": {
+		"HumanoidRootPart": {
+			"classe": "Part",
+			"taille": [2.0, 2.0, 1.0],
+			"cframe": [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LowerTorso": {
+			"classe": "MeshPart",
+			"taille": [1.991412, 0.400653, 1.004],
+			"cframe": [0.0, -0.800034, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"UpperTorso": {
+			"classe": "MeshPart",
+			"taille": [1.943208, 1.698032, 1.004],
+			"cframe": [0.0, 0.248993, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"Head": {
+			"classe": "MeshPart",
+			"taille": [1.158978, 1.182013, 1.160638],
+			"cframe": [0.0, 1.673828, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftUpperArm": {
+			"classe": "MeshPart",
+			"taille": [1.001067, 1.241598, 1.001867],
+			"cframe": [-1.472137, 0.427582, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftLowerArm": {
+			"classe": "MeshPart",
+			"taille": [1.001067, 1.117512, 1.001867],
+			"cframe": [-1.472137, -0.202133, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftHand": {
+			"classe": "MeshPart",
+			"taille": [0.984267, 0.315766, 1.028267],
+			"cframe": [-1.472129, -0.865875, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightUpperArm": {
+			"classe": "MeshPart",
+			"taille": [1.001067, 1.241598, 1.001867],
+			"cframe": [1.472138, 0.427582, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightLowerArm": {
+			"classe": "MeshPart",
+			"taille": [1.001067, 1.117512, 1.001867],
+			"cframe": [1.472137, -0.202133, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightHand": {
+			"classe": "MeshPart",
+			"taille": [0.984267, 0.315766, 1.028267],
+			"cframe": [1.472137, -0.865875, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftUpperLeg": {
+			"classe": "MeshPart",
+			"taille": [0.992844, 1.362932, 0.972702],
+			"cframe": [-0.5, -1.471405, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftLowerLeg": {
+			"classe": "MeshPart",
+			"taille": [0.992844, 1.300664, 0.9728],
+			"cframe": [-0.5, -2.333939, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftFoot": {
+			"classe": "MeshPart",
+			"taille": [1.008874, 0.311994, 1.001067],
+			"cframe": [-0.5, -3.036438, -1e-06, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightUpperLeg": {
+			"classe": "MeshPart",
+			"taille": [0.992844, 1.362932, 0.972702],
+			"cframe": [0.5, -1.471405, 4.6e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightLowerLeg": {
+			"classe": "MeshPart",
+			"taille": [0.992844, 1.300664, 0.9728],
+			"cframe": [0.5, -2.333939, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightFoot": {
+			"classe": "MeshPart",
+			"taille": [1.008874, 0.311994, 1.001067],
+			"cframe": [0.5, -3.036438, -3e-06, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		}
+	},
+	"motors": {
+		"Root": {
+			"parent": "LowerTorso",
+			"part0": "HumanoidRootPart",
+			"part1": "LowerTorso",
+			"c0": [0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, -0.199972, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"Waist": {
+			"parent": "UpperTorso",
+			"part0": "LowerTorso",
+			"part1": "UpperTorso",
+			"c0": [0.0, 0.200025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, -0.849, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"Neck": {
+			"parent": "Head",
+			"part0": "UpperTorso",
+			"part1": "Head",
+			"c0": [0.0, 0.849034, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, -0.575804, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftShoulder": {
+			"parent": "LeftUpperArm",
+			"part0": "UpperTorso",
+			"part1": "LeftUpperArm",
+			"c0": [-0.971604, 0.597513, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.500534, 0.418923, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftElbow": {
+			"parent": "LeftLowerArm",
+			"part0": "LeftUpperArm",
+			"part1": "LeftLowerArm",
+			"c0": [0.00048, -0.354894, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.000479, 0.274824, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftWrist": {
+			"parent": "LeftHand",
+			"part0": "LeftLowerArm",
+			"part1": "LeftHand",
+			"c0": [0.000479, -0.532175, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.000471, 0.131573, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightShoulder": {
+			"parent": "RightUpperArm",
+			"part0": "UpperTorso",
+			"part1": "RightUpperArm",
+			"c0": [0.971604, 0.597513, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [-0.500534, 0.418923, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightElbow": {
+			"parent": "RightLowerArm",
+			"part0": "RightUpperArm",
+			"part1": "RightLowerArm",
+			"c0": [-1e-06, -0.355009, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.274709, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightWrist": {
+			"parent": "RightHand",
+			"part0": "RightLowerArm",
+			"part1": "RightHand",
+			"c0": [0.0, -0.532175, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.131573, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftHip": {
+			"parent": "LeftUpperLeg",
+			"part0": "LowerTorso",
+			"part1": "LeftUpperLeg",
+			"c0": [-0.5, -0.199972, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.471393, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftKnee": {
+			"parent": "LeftLowerLeg",
+			"part0": "LeftUpperLeg",
+			"part1": "LeftLowerLeg",
+			"c0": [0.0, -0.449347, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.413189, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"LeftAnkle": {
+			"parent": "LeftFoot",
+			"part0": "LeftLowerLeg",
+			"part1": "LeftFoot",
+			"c0": [0.0, -0.596486, -2e-06, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.106015, -2e-06, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightHip": {
+			"parent": "RightUpperLeg",
+			"part0": "LowerTorso",
+			"part1": "RightUpperLeg",
+			"c0": [0.5, -0.199972, -1.9e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.471394, -6.5e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightKnee": {
+			"parent": "RightLowerLeg",
+			"part0": "RightUpperLeg",
+			"part1": "RightLowerLeg",
+			"c0": [0.0, -0.449172, -2.1e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.413359, 2.5e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		},
+		"RightAnkle": {
+			"parent": "RightFoot",
+			"part0": "RightLowerLeg",
+			"part1": "RightFoot",
+			"c0": [0.0, -0.596486, 7.4e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+			"c1": [0.0, 0.106015, 7.7e-05, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+		}
+	}
+}

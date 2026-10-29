@@ -194,6 +194,24 @@ local function installerOutilTest()
 	outil.Parent = ServerStorage
 end
 
+-- Studio uniquement : BindableFunction qui ajoute un personnage précis à l'inventaire (test d'un nouveau modèle).
+-- Renvoie l'uid, ou nil si l'Id est inconnu, les données pas chargées ou l'inventaire plein.
+local function installerOutilDonner()
+	local outil = Instance.new("BindableFunction")
+	outil.Name = "TestDonnerPersonnage"
+	outil.OnInvoke = function(player: Player, id: string, etoiles: number?): string?
+		if typeof(id) ~= "string" or not Personnages.ParId[id] then
+			return nil
+		end
+		local uid = DataService.AjouterPersonnage(player, id, etoiles or Economie.EtoilesMin)
+		if uid then
+			InterfaceService.EnvoyerInventaire(player)
+		end
+		return uid
+	end
+	outil.Parent = ServerStorage
+end
+
 function GachaService.Init()
 	for _, machine in CollectionService:GetTagged(TAG_MACHINE) do
 		installerMachine(machine)
@@ -206,6 +224,7 @@ function GachaService.Init()
 
 	if RunService:IsStudio() then
 		installerOutilTest()
+		installerOutilDonner()
 	end
 end
 

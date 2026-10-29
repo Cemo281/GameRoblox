@@ -18,6 +18,8 @@ local TEXTE_BASE_LIBRE = "Base libre"
 local COULEUR_EMPLACEMENT = Color3.fromRGB(235, 235, 235)
 local COULEUR_VERROUILLE = Color3.fromRGB(110, 110, 110)
 local TAILLE_PERSONNAGE = Vector3.new(3, 5, 3)
+local TAG_VITRINE = "PersonnageVitrine"
+local VITRINE_PAUSE = 2 -- secondes entre deux animations de vitrine
 
 local proprietaires: { [Model]: Player } = {}
 local basesParJoueur: { [Player]: Model } = {}
@@ -75,7 +77,70 @@ local function orientationVersAllee(emplacement: BasePart, position: Vector3): C
 	return CFrame.new(position)
 end
 
--- Modèle 3D animé (ReplicatedStorage.ModelesPersonnages.<Id>, rangé par le skill /perso-r6), ou nil.
+local function chargerPiste(animator: Animator, animationId: unknown): AnimationTrack?
+	if typeof(animationId) ~= "string" then
+		return nil
+	end
+	local animation = Instance.new("Animation")
+	animation.AnimationId = animationId
+	local piste = animator:LoadAnimation(animation)
+	piste.Looped = false
+	piste.Priority = Enum.AnimationPriority.Action
+	return piste
+end
+
+-- Joue `piste` jusqu'à sa dernière image et l'y fige (la pose de repos du rig n'est pas la pose neutre).
+-- Renvoie false si le modèle a disparu entre-temps.
+local function jouerEtFiger(modele: Model, piste: AnimationTrack, precedente: AnimationTrack?): boolean
+	piste:Play(0)
+	if precedente then
+		precedente:Stop(0)
+	end
+	-- longueur inconnue tant que l'animation publiée n'est pas chargée
+	while piste.Length == 0 do
+		if not modele.Parent then
+			return false
+		end
+		task.wait(0.1)
+	end
+	task.wait(math.max(0, piste.Length - piste.TimePosition - 0.05))
+	piste:AdjustSpeed(0)
+	piste.TimePosition = piste.Length * 0.999
+	return modele.Parent ~= nil
+end
+
+-- Vitrine d'un personnage posé : Idle, pause, Action, pause, Signature, pause, en boucle (VITRINE_PAUSE secondes).
+-- Un personnage sans Action ni Signature joue seulement son Idle en boucle.
+local function animerVitrine(modele: Model, animator: Animator)
+	local idle = chargerPiste(animator, modele:GetAttribute("AnimationIdle"))
+	if not idle then
+		return
+	end
+	local action = chargerPiste(animator, modele:GetAttribute("AnimationAction"))
+	local signature = chargerPiste(animator, modele:GetAttribute("AnimationSignature"))
+	if not (action and signature) then
+		idle.Looped = true
+		idle.Priority = Enum.AnimationPriority.Idle
+		idle:Play()
+		return
+	end
+	local cycle = { idle, action, signature }
+	local precedente: AnimationTrack? = nil
+	while modele.Parent do
+		for _, piste in cycle do
+			if not jouerEtFiger(modele, piste, precedente) then
+				return
+			end
+			precedente = piste
+			task.wait(VITRINE_PAUSE)
+			if not modele.Parent then
+				return
+			end
+		end
+	end
+end
+
+-- Modèle 3D animé (ReplicatedStorage.ModelesPersonnages.<Id>, rangé par le skill /perso-roblox), ou nil.
 -- Renvoie le support de l'étiquette et la hauteur de l'étiquette au-dessus de ce support.
 local function creerModele(emplacement: BasePart, id: string): (Model?, BasePart?, number)
 	local dossier = ReplicatedStorage:FindFirstChild("ModelesPersonnages")
@@ -93,15 +158,14 @@ local function creerModele(emplacement: BasePart, id: string): (Model?, BasePart
 	modele:PivotTo(orientationVersAllee(emplacement, position))
 	modele.Parent = emplacement
 
-	local animationId = modele:GetAttribute("AnimationIdle")
-	local controleur = modele:FindFirstChildOfClass("AnimationController")
+	-- Animator dans un AnimationController (persos sans Humanoid) ou dans le Humanoid (persos habilles :
+	-- un Humanoid et un AnimationController dans le meme modele se bloquent)
+	local controleur = modele:FindFirstChildOfClass("AnimationController") or modele:FindFirstChildOfClass("Humanoid")
 	local animator = controleur and controleur:FindFirstChildOfClass("Animator")
-	if typeof(animationId) == "string" and animator then
-		local animation = Instance.new("Animation")
-		animation.AnimationId = animationId
-		local piste = animator:LoadAnimation(animation)
-		piste.Looped = true
-		piste:Play()
+	if animator then
+		-- le client (module Vitrine) y affiche sabres et effets a partir des marqueurs des animations
+		CollectionService:AddTag(modele, TAG_VITRINE)
+		task.spawn(animerVitrine, modele, animator)
 	end
 
 	return modele, modele.PrimaryPart, taille.Y - sousPivot + 1.5

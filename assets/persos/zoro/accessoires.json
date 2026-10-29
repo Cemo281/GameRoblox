@@ -1,0 +1,248 @@
+{
+	"repere": "Roblox, relatif au HumanoidRootPart, pose de repos (bras le long du corps), sans rotation : le Handle doit garder l'orientation du monde",
+	"accessoires": [
+		{
+			"nom": "Acc_Bandana",
+			"fbx": "acc_Bandana.fbx",
+			"attachment": "HairAttachment",
+			"centre_boite_roblox": [
+				-0.0,
+				1.7426,
+				0.1148
+			],
+			"decalage_depuis_attachment": [
+				-0.0,
+				-0.4554,
+				0.1148
+			],
+			"taille_roblox": [
+				1.34,
+				1.21,
+				1.5697
+			],
+			"visible_par_defaut": true,
+			"triangles": 1640
+		},
+		{
+			"nom": "Acc_Cheveux",
+			"fbx": "acc_Cheveux.fbx",
+			"attachment": "HairAttachment",
+			"centre_boite_roblox": [
+				0.04,
+				1.3244,
+				0.1388
+			],
+			"decalage_depuis_attachment": [
+				0.04,
+				-0.8736,
+				0.1388
+			],
+			"taille_roblox": [
+				1.6006,
+				0.7317,
+				1.2858
+			],
+			"visible_par_defaut": true,
+			"triangles": 626
+		},
+		{
+			"nom": "Acc_Boucles",
+			"fbx": "acc_Boucles.fbx",
+			"attachment": "FaceCenterAttachment",
+			"centre_boite_roblox": [
+				-0.625,
+				1.3276,
+				0.0
+			],
+			"decalage_depuis_attachment": [
+				-0.625,
+				-0.2704,
+				0.0
+			],
+			"taille_roblox": [
+				0.07,
+				0.24,
+				0.25
+			],
+			"visible_par_defaut": true,
+			"triangles": 24
+		},
+		{
+			"nom": "Haramaki",
+			"fbx": "acc_Haramaki.fbx",
+			"attachment": "WaistCenterAttachment",
+			"centre_boite_roblox": [
+				-0.0,
+				-0.7124,
+				0.0
+			],
+			"decalage_depuis_attachment": [
+				-0.0,
+				0.2876,
+				0.0
+			],
+			"taille_roblox": [
+				2.09,
+				0.58,
+				1.094
+			],
+			"visible_par_defaut": true,
+			"triangles": 896
+		},
+		{
+			"nom": "Manteau",
+			"fbx": "acc_Manteau.fbx",
+			"attachment": "WaistCenterAttachment",
+			"centre_boite_roblox": [
+				-0.0,
+				-1.6224,
+				0.0016
+			],
+			"decalage_depuis_attachment": [
+				-0.0,
+				-0.6224,
+				0.0016
+			],
+			"taille_roblox": [
+				3.0387,
+				1.74,
+				1.9175
+			],
+			"visible_par_defaut": true,
+			"triangles": 884
+		},
+		{
+			"nom": "Echarpe",
+			"fbx": "acc_Echarpe.fbx",
+			"attachment": "WaistCenterAttachment",
+			"centre_boite_roblox": [
+				-0.0,
+				-1.4274,
+				-0.093
+			],
+			"decalage_depuis_attachment": [
+				-0.0,
+				-0.4274,
+				-0.093
+			],
+			"taille_roblox": [
+				2.2438,
+				1.41,
+				1.444
+			],
+			"visible_par_defaut": true,
+			"triangles": 276
+		},
+		{
+			"nom": "Fourreaux",
+			"fbx": "acc_Fourreaux.fbx",
+			"attachment": "WaistCenterAttachment",
+			"centre_boite_roblox": [
+				1.6643,
+				-1.6652,
+				0.3613
+			],
+			"decalage_depuis_attachment": [
+				1.6643,
+				-0.6652,
+				0.3613
+			],
+			"taille_roblox": [
+				1.0119,
+				1.3884,
+				2.1012
+			],
+			"visible_par_defaut": true,
+			"triangles": 276
+		},
+		{
+			"nom": "Acc_Sabres_Hanche",
+			"fbx": "acc_Sabres_Hanche.fbx",
+			"attachment": "WaistCenterAttachment",
+			"centre_boite_roblox": [
+				1.3502,
+				-0.8659,
+				-0.9317
+			],
+			"decalage_depuis_attachment": [
+				1.3502,
+				0.1341,
+				-0.9317
+			],
+			"taille_roblox": [
+				0.8626,
+				0.95,
+				1.1028
+			],
+			"visible_par_defaut": true,
+			"triangles": 264
+		},
+		{
+			"nom": "Acc_Sabre_Droit",
+			"fbx": "acc_Sabre_Droit.fbx",
+			"attachment": "RightGripAttachment",
+			"centre_boite_roblox": [
+				1.472,
+				-0.8624,
+				-1.25
+			],
+			"decalage_depuis_attachment": [
+				-0.0001,
+				0.1613,
+				-1.25
+			],
+			"taille_roblox": [
+				0.4139,
+				0.4139,
+				3.4176
+			],
+			"visible_par_defaut": false,
+			"triangles": 190
+		},
+		{
+			"nom": "Acc_Sabre_Gauche",
+			"fbx": "acc_Sabre_Gauche.fbx",
+			"attachment": "LeftGripAttachment",
+			"centre_boite_roblox": [
+				-1.472,
+				-0.8624,
+				-1.25
+			],
+			"decalage_depuis_attachment": [
+				0.0001,
+				0.1613,
+				-1.25
+			],
+			"taille_roblox": [
+				0.4139,
+				0.4139,
+				3.4176
+			],
+			"visible_par_defaut": false,
+			"triangles": 190
+		},
+		{
+			"nom": "Acc_Sabre_Bouche",
+			"fbx": "acc_Sabre_Bouche.fbx",
+			"attachment": "FaceFrontAttachment",
+			"centre_boite_roblox": [
+				-1.13,
+				1.2976,
+				-0.63
+			],
+			"decalage_depuis_attachment": [
+				-1.13,
+				-0.3004,
+				-0.03
+			],
+			"taille_roblox": [
+				3.4176,
+				0.4139,
+				0.4139
+			],
+			"visible_par_defaut": false,
+			"triangles": 190
+		}
+	],
+	"triangles_total": 5456
+}

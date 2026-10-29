@@ -1,0 +1,181 @@
+{
+	"source": "Calibre le 2026-10-28 sur ServerStorage.Gabarits.MannequinR15 (Studio) et assets/persos/_mannequin/mannequin.blend (Blender) : +30 deg sur X, Y puis Z de chaque Motor6D (15 x 3 cas, clones ancres + captures par axe), memes rotations sur les os Rig_R15. Les 45 cas convertis sont identiques a 1e-5 (position et rotation de la piece) ; pose test identique a 0,002 pres ; translation de Root verifiee.",
+
+	"studio": {
+		"formule": "Part1.CFrame = Part0.CFrame * C0 * Transform * C1:Inverse(). C0 et C1 sont sans rotation : au repos, les axes de Transform sont ceux du perso.",
+		"axes": "+X = droite du perso, +Y = haut, +Z = arriere (le perso regarde vers -Z). Rotation positive = regle de la main droite.",
+		"effet_general": {
+			"+X": "un membre qui pend part vers l'AVANT ; la tete et le torse basculent vers l'ARRIERE",
+			"+Y": "la face avant de la piece tourne vers la GAUCHE du perso (sens anti-horaire vu de dessus)",
+			"+Z": "le bout de la piece part vers la DROITE du perso : membre droit ecarte, membre gauche rapproche du corps, tete et torse penches vers la GAUCHE du perso"
+		},
+		"keyframesequence": "Pose (nommee comme Part1, hierarchie de l'arbre des Motor6D) : Pose.CFrame = Transform du Motor6D."
+	},
+
+	"blender": {
+		"os": "Rig_R15 : un os par piece (meme nom), tous verticaux, roll 0, tete de l'os a l'articulation. Os vers le HAUT : LowerTorso, UpperTorso, Head (et HumanoidRootPart). Os vers le BAS : bras, mains, jambes, pieds.",
+		"axes_locaux": {
+			"os_vers_le_haut": "X = -X Roblox (gauche du perso), Y = +Y Roblox (haut), Z = -Z Roblox (avant)",
+			"os_vers_le_bas": "X = -X Roblox (gauche du perso), Y = -Y Roblox (bas), Z = +Z Roblox (arriere)"
+		},
+		"rotation_mode": "XYZ (pose_bone.rotation_euler)"
+	},
+
+	"conversion_blender_vers_studio": {
+		"matrice": "Transform (rotation) = B * R_os * B, avec R_os = pose_bone.matrix_basis (3x3) et B = diag(-1, -1, +1) pour un os vers le bas, diag(-1, +1, -1) pour un os vers le haut.",
+		"translation": "Transform.Position = B * pose_bone.location (utile pour Root / LowerTorso : rebond, accroupi).",
+		"angles": {
+			"os_vers_le_bas": "Studio X = -Blender X ; Studio Y = -Blender Y ; Studio Z = +Blender Z",
+			"os_vers_le_haut": "Studio X = -Blender X ; Studio Y = +Blender Y ; Studio Z = -Blender Z"
+		},
+		"euler": "rotation_euler XYZ (a, b, c) en Blender -> Transform = CFrame.Angles(0, 0, sZ*c) * CFrame.Angles(0, sY*b, 0) * CFrame.Angles(sX*a, 0, 0), avec (sX, sY, sZ) = (-1, -1, +1) os vers le bas, (-1, +1, -1) os vers le haut. Verifie sur l'epaule gauche (20, -35, 15).",
+		"studio_vers_blender": "meme formule dans l'autre sens (B est son propre inverse) : R_os = B * Transform * B, location = B * Transform.Position."
+	},
+
+	"articulations": {
+		"Root": {
+			"os": "LowerTorso (vers le haut)", "part0": "HumanoidRootPart", "part1": "LowerTorso",
+			"mouvements": {
+				"pencher tout le corps en avant": {"studio": "X-", "blender": "X+"},
+				"pencher tout le corps en arriere": {"studio": "X+", "blender": "X-"},
+				"tourner vers SA gauche": {"studio": "Y+", "blender": "Y+"},
+				"incliner vers SA gauche": {"studio": "Z+", "blender": "Z-"},
+				"descendre (rebond, accroupi)": {"studio": "Position Y-", "blender": "location Y-"},
+				"avancer": {"studio": "Position Z-", "blender": "location Z+"}
+			},
+			"limites": "rebond <= 0,5 stud (skill)"
+		},
+		"Waist": {
+			"os": "UpperTorso (vers le haut)", "part0": "LowerTorso", "part1": "UpperTorso",
+			"mouvements": {
+				"pencher le buste en avant": {"studio": "X-", "blender": "X+"},
+				"pencher le buste en arriere": {"studio": "X+", "blender": "X-"},
+				"tourner le buste vers SA gauche": {"studio": "Y+", "blender": "Y+"},
+				"incliner le buste vers SA gauche": {"studio": "Z+", "blender": "Z-"}
+			}
+		},
+		"Neck": {
+			"os": "Head (vers le haut)", "part0": "UpperTorso", "part1": "Head",
+			"mouvements": {
+				"baisser la tete (menton vers la poitrine)": {"studio": "X-", "blender": "X+"},
+				"lever la tete": {"studio": "X+", "blender": "X-"},
+				"tourner la tete vers SA gauche": {"studio": "Y+", "blender": "Y+"},
+				"pencher la tete vers SA gauche": {"studio": "Z+", "blender": "Z-"}
+			},
+			"limites": "+/- 25 deg sur chaque axe (skill /perso-roblox)"
+		},
+		"RightShoulder": {
+			"os": "RightUpperArm (vers le bas)", "part0": "UpperTorso", "part1": "RightUpperArm",
+			"pivot": "(0,972, 0,847) du HRP, decale de 0,5 vers l'interieur par rapport au centre du bras",
+			"mouvements": {
+				"lever le bras vers l'avant": {"studio": "X+", "blender": "X-"},
+				"bras vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"ecarter le bras sur le cote (vers l'exterieur)": {"studio": "Z+", "blender": "Z+"},
+				"rapprocher / croiser devant le corps": {"studio": "Z-", "blender": "Z-"},
+				"rotation autour du bras (face avant vers SA gauche, le bras avance un peu a cause du pivot decale)": {"studio": "Y+", "blender": "Y-"}
+			}
+		},
+		"LeftShoulder": {
+			"os": "LeftUpperArm (vers le bas)", "part0": "UpperTorso", "part1": "LeftUpperArm",
+			"pivot": "(-0,972, 0,847) du HRP, decale de 0,5 vers l'interieur",
+			"mouvements": {
+				"lever le bras vers l'avant": {"studio": "X+", "blender": "X-"},
+				"bras vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"ecarter le bras sur le cote (vers l'exterieur)": {"studio": "Z-", "blender": "Z-"},
+				"rapprocher / croiser devant le corps": {"studio": "Z+", "blender": "Z+"},
+				"rotation autour du bras (face avant vers SA gauche, le bras recule un peu a cause du pivot decale)": {"studio": "Y+", "blender": "Y-"}
+			}
+		},
+		"RightElbow": {
+			"os": "RightLowerArm (vers le bas)", "part0": "RightUpperArm", "part1": "RightLowerArm",
+			"mouvements": {"plier le coude (avant-bras vers l'avant / le haut)": {"studio": "X+", "blender": "X-"}},
+			"limites": "plier seulement : studio X de 0 a +150 deg (blender X de 0 a -150), aucune rotation sur Y et Z, jamais d'angle negatif"
+		},
+		"LeftElbow": {
+			"os": "LeftLowerArm (vers le bas)", "part0": "LeftUpperArm", "part1": "LeftLowerArm",
+			"mouvements": {"plier le coude (avant-bras vers l'avant / le haut)": {"studio": "X+", "blender": "X-"}},
+			"limites": "plier seulement : studio X de 0 a +150 deg (blender X de 0 a -150), aucune rotation sur Y et Z"
+		},
+		"RightWrist": {
+			"os": "RightHand (vers le bas)", "part0": "RightLowerArm", "part1": "RightHand",
+			"mouvements": {
+				"plier la main vers l'avant": {"studio": "X+", "blender": "X-"},
+				"plier la main vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"incliner la main vers l'exterieur": {"studio": "Z+", "blender": "Z+"},
+				"tourner la main (face avant vers SA gauche)": {"studio": "Y+", "blender": "Y-"}
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"LeftWrist": {
+			"os": "LeftHand (vers le bas)", "part0": "LeftLowerArm", "part1": "LeftHand",
+			"mouvements": {
+				"plier la main vers l'avant": {"studio": "X+", "blender": "X-"},
+				"plier la main vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"incliner la main vers l'exterieur": {"studio": "Z-", "blender": "Z-"},
+				"tourner la main (face avant vers SA gauche)": {"studio": "Y+", "blender": "Y-"}
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"RightHip": {
+			"os": "RightUpperLeg (vers le bas)", "part0": "LowerTorso", "part1": "RightUpperLeg",
+			"mouvements": {
+				"lever la jambe vers l'avant": {"studio": "X+", "blender": "X-"},
+				"jambe vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"ecarter la jambe (vers l'exterieur)": {"studio": "Z+", "blender": "Z+"},
+				"tourner la jambe (pointe du pied vers SA gauche)": {"studio": "Y+", "blender": "Y-"}
+			}
+		},
+		"LeftHip": {
+			"os": "LeftUpperLeg (vers le bas)", "part0": "LowerTorso", "part1": "LeftUpperLeg",
+			"mouvements": {
+				"lever la jambe vers l'avant": {"studio": "X+", "blender": "X-"},
+				"jambe vers l'arriere": {"studio": "X-", "blender": "X+"},
+				"ecarter la jambe (vers l'exterieur)": {"studio": "Z-", "blender": "Z-"},
+				"tourner la jambe (pointe du pied vers SA gauche)": {"studio": "Y+", "blender": "Y-"}
+			}
+		},
+		"RightKnee": {
+			"os": "RightLowerLeg (vers le bas)", "part0": "RightUpperLeg", "part1": "RightLowerLeg",
+			"mouvements": {"plier le genou (mollet vers l'arriere)": {"studio": "X-", "blender": "X+"}},
+			"limites": "plier seulement : studio X de 0 a -150 deg (blender X de 0 a +150) ; studio X+ = hyperextension interdite ; aucune rotation sur Y et Z"
+		},
+		"LeftKnee": {
+			"os": "LeftLowerLeg (vers le bas)", "part0": "LeftUpperLeg", "part1": "LeftLowerLeg",
+			"mouvements": {"plier le genou (mollet vers l'arriere)": {"studio": "X-", "blender": "X+"}},
+			"limites": "plier seulement : studio X de 0 a -150 deg (blender X de 0 a +150) ; aucune rotation sur Y et Z"
+		},
+		"RightAnkle": {
+			"os": "RightFoot (vers le bas)", "part0": "RightLowerLeg", "part1": "RightFoot",
+			"mouvements": {
+				"relever la pointe du pied": {"studio": "X+", "blender": "X-"},
+				"baisser la pointe du pied": {"studio": "X-", "blender": "X+"},
+				"incliner le pied (bord exterieur vers le haut)": {"studio": "Z+", "blender": "Z+"},
+				"tourner la pointe vers SA gauche": {"studio": "Y+", "blender": "Y-"}
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"LeftAnkle": {
+			"os": "LeftFoot (vers le bas)", "part0": "LeftLowerLeg", "part1": "LeftFoot",
+			"mouvements": {
+				"relever la pointe du pied": {"studio": "X+", "blender": "X-"},
+				"baisser la pointe du pied": {"studio": "X-", "blender": "X+"},
+				"incliner le pied (bord exterieur vers le haut)": {"studio": "Z-", "blender": "Z-"},
+				"tourner la pointe vers SA gauche": {"studio": "Y+", "blender": "Y-"}
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		}
+	},
+
+	"pose_test": {
+		"description": "bras droit leve devant (90 deg), coude droit plie a 90 deg (avant-bras vers le haut), genou gauche plie a 90 deg, epaule gauche (blender 20, -35, 15)",
+		"studio": {"RightShoulder": "CFrame.Angles(rad(90), 0, 0)", "RightElbow": "CFrame.Angles(rad(90), 0, 0)", "LeftKnee": "CFrame.Angles(rad(-90), 0, 0)", "LeftShoulder": "CFrame.Angles(0, 0, rad(15)) * CFrame.Angles(0, rad(35), 0) * CFrame.Angles(rad(-20), 0, 0)"},
+		"blender": {"RightUpperArm": [-90, 0, 0], "RightLowerArm": [-90, 0, 0], "LeftLowerLeg": [90, 0, 0], "LeftUpperArm": [20, -35, 15]},
+		"resultat": "positions des pieces (RightLowerArm, RightHand, LeftHand, LeftFoot) identiques a 0,002 stud, rotations identiques ; captures de 3/4 et de profil identiques"
+	},
+
+	"pieges": [
+		"En mode edition, Motor6D.Transform ne deplace pas les pieces, et changer la CFrame d'une piece reliee deplace tout l'assemblage : pour un clone de previsualisation, ancrer toutes les pieces, desactiver les Motor6D (Enabled = false) puis calculer chaque CFrame avec la formule.",
+		"Sur un modele avec Humanoid, changer Color d'une MeshPart R15 ne se voit pas toujours a l'ecran (apparence en cache) : utiliser un Highlight (31 maximum a l'ecran).",
+		"Les epaules pivotent 0,5 stud a l'interieur du centre du bras : une rotation Y deplace aussi le bras (vers l'avant a droite, vers l'arriere a gauche)."
+	]
+}
