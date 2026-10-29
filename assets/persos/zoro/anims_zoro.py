@@ -18,7 +18,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 DOSSIER = Path(__file__).parent
-RIG = json.loads((DOSSIER.parent / "_mannequin" / "r15_bloc.json").read_text(encoding="utf-8"))
+RIG = json.loads((DOSSIER.parent / "_mannequin" / "v1" / "r15_bloc.json").read_text(encoding="utf-8"))  # zoro est construit sur le mannequin v1
 ACC = json.loads((DOSSIER / "accessoires.json").read_text(encoding="utf-8"))
 FPS = 30
 
