@@ -6,13 +6,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economie = require(ReplicatedStorage.Shared.Economie)
 local GachaConfig = require(ReplicatedStorage.Shared.GachaConfig)
+local ImagesPersonnages = require(ReplicatedStorage.Shared.ImagesPersonnages)
 local Personnages = require(ReplicatedStorage.Shared.Personnages)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
+local Images = require(script.Parent.Images)
 local Ui = require(script.Parent.Ui)
 
 local Inventaire = {}
 
 local TAILLE_CARTE = Vector2.new(140, 184)
+local BORD = ImagesPersonnages.BordCadre * TAILLE_CARTE.X / ImagesPersonnages.TailleCadre.X
+local RAYON_CARTE = 13 -- coins du cadre (26 px à 280 de large)
+local TAILLE_PORTRAIT = Vector2.new(TAILLE_CARTE.X - 2 * BORD, 94)
 
 local panneau: Frame
 local grille: ScrollingFrame
@@ -82,63 +87,107 @@ local function creerCarte(personnage: Remotes.PersonnageInventaire, rebirths: nu
 	local couleur = if rarete then rarete.Couleur else Ui.Couleurs.Texte
 	local pose = personnage.Emplacement ~= nil
 
+	-- Cadre de la rareté (assets/gui/cadres, dessiné au double de cette carte), portrait en haut, textes dessous
+	local cadre = Images.Cadre(definition.Rarete)
 	local carte = Ui.Creer("Frame", {
 		Name = personnage.Uid,
 		LayoutOrder = ordre,
 		BackgroundColor3 = Ui.Couleurs.FondClair,
+		BackgroundTransparency = if cadre then 1 else 0,
 		Parent = grille,
-	}, {
-		Ui.Coins(12),
-		Ui.Contour(couleur, if pose then 3 else 2),
-	})
+	}, { Ui.Coins(RAYON_CARTE) })
+	if cadre then
+		cadre.Parent = carte
+	else
+		Ui.Contour(couleur, 2).Parent = carte
+	end
 
-	Ui.Creer("Frame", {
-		Name = "Bandeau",
-		Size = UDim2.new(1, 0, 0, 26),
-		BackgroundColor3 = couleur,
-		Parent = carte,
-	}, {
-		Ui.Coins(12),
-		Ui.Texte({
-			Size = UDim2.fromScale(1, 1),
-			TextSize = 16,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextStrokeTransparency = 0.5,
-			Text = if rarete then rarete.Nom else definition.Rarete,
-		}),
-	})
+	local images = Images.De(personnage.Id)
+	if images then
+		Ui.Creer("ImageLabel", {
+			Name = "Portrait",
+			Position = UDim2.fromOffset(BORD, BORD),
+			Size = UDim2.fromOffset(TAILLE_PORTRAIT.X, TAILLE_PORTRAIT.Y),
+			BackgroundTransparency = 1,
+			Image = images.Portrait,
+			-- buste rogné au format de la zone (le portrait est carré)
+			ImageRectSize = Vector2.new(512, 512 * TAILLE_PORTRAIT.Y / TAILLE_PORTRAIT.X),
+			ZIndex = 2,
+			Parent = carte,
+		})
+	else
+		Ui.Creer("Frame", {
+			Name = "Portrait",
+			Position = UDim2.fromOffset(BORD + 18, BORD + 14),
+			Size = UDim2.fromOffset(TAILLE_PORTRAIT.X - 36, TAILLE_PORTRAIT.Y - 20),
+			BackgroundColor3 = couleur,
+			ZIndex = 2,
+			Parent = carte,
+		}, {
+			Ui.Coins(12),
+			Ui.Texte({
+				Size = UDim2.fromScale(1, 1),
+				TextSize = 52,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextStrokeTransparency = 0.6,
+				Text = string.sub(definition.Nom, 1, 1),
+			}),
+		})
+	end
+	if definition.Rarete == "Secret" then
+		Images.Reflet(carte, RAYON_CARTE, 3)
+	end
 
-	local function ligne(texte: string, y: number, taille: number, couleurTexte: Color3, police: Enum.Font?)
+	local function ligne(texte: string, y: number, taille: number, couleurTexte: Color3)
 		Ui.Texte({
-			Position = UDim2.fromOffset(8, y),
-			Size = UDim2.new(1, -16, 0, taille + 4),
+			Position = UDim2.fromOffset(BORD, y),
+			Size = UDim2.new(1, -2 * BORD, 0, taille + 4),
 			TextSize = taille,
 			TextColor3 = couleurTexte,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextTruncate = Enum.TextTruncate.AtEnd,
-			Font = police or Ui.Police,
+			TextStrokeTransparency = 0.4,
 			Text = texte,
+			ZIndex = 4,
 			Parent = carte,
 		})
 	end
-	ligne(definition.Nom, 36, 20, Ui.Couleurs.Texte)
-	ligne(Ui.Etoiles(personnage.Etoiles, Economie.EtoilesMax), 62, 18, Ui.Couleurs.Or)
-	ligne(`+{Ui.FormaterRevenu(revenuDe(personnage, rebirths))} $/s`, 86, 16, Ui.Couleurs.Vert)
-	ligne(
-		if pose then `Emplacement {personnage.Emplacement}` else "Dans l'inventaire",
-		108,
-		14,
-		Ui.Couleurs.TexteDiscret,
-		Ui.PoliceTexte
-	)
+	ligne(if rarete then rarete.Nom else definition.Rarete, BORD + 1, 13, couleur)
+	ligne(definition.Nom, 102, 18, Ui.Couleurs.Texte)
+	ligne(Ui.Etoiles(personnage.Etoiles, Economie.EtoilesMax), 122, 14, Ui.Couleurs.Or)
+	ligne(`+{Ui.FormaterRevenu(revenuDe(personnage, rebirths))} $/s`, 137, 13, Ui.Couleurs.Vert)
+
+	if pose then
+		Ui.Creer("Frame", {
+			Name = "Pose",
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.new(1, -BORD + 2, 0, BORD - 2),
+			Size = UDim2.fromOffset(30, 20),
+			BackgroundColor3 = Ui.Couleurs.Or,
+			ZIndex = 4,
+			Parent = carte,
+		}, {
+			Ui.Coins(8),
+			Ui.Texte({
+				Size = UDim2.fromScale(1, 1),
+				TextSize = 14,
+				TextColor3 = Ui.Couleurs.Fond,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				Text = `#{personnage.Emplacement}`,
+				ZIndex = 4,
+			}),
+		})
+	end
 
 	local bouton = Ui.Bouton({
 		Name = "Action",
 		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -10),
-		Size = UDim2.new(1, -20, 0, 34),
+		Position = UDim2.new(0.5, 0, 1, -BORD + 4),
+		Size = UDim2.new(1, -2 * BORD, 0, 24),
+		TextSize = 16,
 		BackgroundColor3 = if pose then Ui.Couleurs.BoutonSecondaire else Ui.Couleurs.Bouton,
 		Text = if pose then "Retirer" else "Poser",
+		ZIndex = 4,
 		Parent = carte,
 	})
 	bouton.Activated:Connect(function()

@@ -7,39 +7,61 @@ local TweenService = game:GetService("TweenService")
 
 local Economie = require(ReplicatedStorage.Shared.Economie)
 local GachaConfig = require(ReplicatedStorage.Shared.GachaConfig)
+local ImagesPersonnages = require(ReplicatedStorage.Shared.ImagesPersonnages)
 local Personnages = require(ReplicatedStorage.Shared.Personnages)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
+local Images = require(script.Parent.Images)
 local Ui = require(script.Parent.Ui)
 
 local Tirage = {}
 
 local DUREE_SUSPENSE = math.min(1.3, GachaConfig.DureeAnimation * 0.45)
 local DUREE_AFFICHAGE = 2.5
-local EPAISSEUR_CONTOUR = 4
+local EPAISSEUR_PULSATION = 10
+local LARGEUR_CARTE = 300
+local RAYON_CARTE = math.round(26 * LARGEUR_CARTE / ImagesPersonnages.TailleCadre.X) -- coins du cadre
 local RARETES_SPECIALES: { [string]: boolean } = { Mythique = true, Secret = true }
 
 local conteneur: Frame
 local echellePop: UIScale
 local contour: UIStroke
+local cadre: ImageLabel
+local carte: Frame
 local portrait: Frame
+local visuel: ImageLabel
 local labelRarete: TextLabel
 local labelInitiale: TextLabel
 local labelNom: TextLabel
 local labelEtoiles: TextLabel
 local labelRevenu: TextLabel
 local labelDestination: TextLabel
+local reflet: CanvasGroup? = nil
 local pulsation: Tween? = nil
 local generation = 0 -- un nouveau tirage interrompt l'animation en cours
 
-local function afficherPersonnage(personnage: Personnages.Personnage)
+-- Pendant le suspense : silhouette du perso ; à la révélation : sa grille Idle animée.
+-- Sans images : bloc coloré avec l'initiale.
+local function afficherPersonnage(personnage: Personnages.Personnage, revele: boolean)
 	local rarete = GachaConfig.RaretesParId[personnage.Rarete]
 	local couleur = if rarete then rarete.Couleur else Ui.Couleurs.Texte
 	contour.Color = couleur
-	portrait.BackgroundColor3 = couleur
+	cadre.Image = ImagesPersonnages.Cadres[personnage.Rarete] or ""
 	labelRarete.TextColor3 = couleur
 	labelRarete.Text = if rarete then rarete.Nom else personnage.Rarete
-	labelInitiale.Text = string.sub(personnage.Nom, 1, 1)
 	labelNom.Text = personnage.Nom
+
+	local images = Images.De(personnage.Id)
+	portrait.Visible = images == nil
+	visuel.Visible = images ~= nil
+	if images and revele then
+		Images.Animer(visuel, personnage.Id)
+	elseif images then
+		Images.Arreter(visuel)
+		visuel.Image = images.Silhouette
+	else
+		portrait.BackgroundColor3 = couleur
+		labelInitiale.Text = string.sub(personnage.Nom, 1, 1)
+	end
 end
 
 local function texteCentre(nom: string, ordre: number, hauteur: number, taille: number, couleur: Color3): TextLabel
@@ -58,7 +80,11 @@ function Tirage.Init(ecran: ScreenGui)
 		Name = "Tirage",
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.45),
-		Size = UDim2.fromOffset(300, 400),
+		-- proportions du cadre de carte (280 × 368)
+		Size = UDim2.fromOffset(
+			LARGEUR_CARTE,
+			math.round(LARGEUR_CARTE * ImagesPersonnages.TailleCadre.Y / ImagesPersonnages.TailleCadre.X)
+		),
 		BackgroundTransparency = 1,
 		Visible = false,
 		ZIndex = 10,
@@ -66,34 +92,66 @@ function Tirage.Init(ecran: ScreenGui)
 	})
 	Ui.Adapter(conteneur)
 
-	contour = Ui.Contour(Ui.Couleurs.Contour, EPAISSEUR_CONTOUR)
+	-- Carte : cadre de la rareté, contenu par-dessus, reflet Secret encore au-dessus (ajouté à la révélation)
+	contour = Ui.Contour(Ui.Couleurs.Contour, 0)
 	echellePop = Ui.Creer("UIScale", {})
-	local carte = Ui.Creer("Frame", {
+	carte = Ui.Creer("Frame", {
 		Name = "Carte",
 		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Ui.Couleurs.Fond,
+		BackgroundTransparency = 1,
 		Parent = conteneur,
 	}, {
-		Ui.Coins(18),
+		Ui.Coins(RAYON_CARTE),
 		contour,
 		echellePop,
-		Ui.Marges(16),
+	})
+	cadre = Ui.Creer("ImageLabel", {
+		Name = "Cadre",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		ZIndex = 1,
+		Parent = carte,
+	})
+	local contenu = Ui.Creer("Frame", {
+		Name = "Contenu",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Parent = carte,
+	}, {
+		Ui.Marges(18),
 		Ui.Creer("UIListLayout", {
-			Padding = UDim.new(0, 8),
+			Padding = UDim.new(0, 4),
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 		}),
 	})
 
 	labelRarete = texteCentre("Rarete", 1, 28, 24, Ui.Couleurs.Texte)
-	labelRarete.Parent = carte
+	labelRarete.TextStrokeTransparency = 0.4
+	labelRarete.Parent = contenu
 
-	-- Emplacement du futur visuel du personnage (initiale en attendant les modèles 3D)
+	-- Visuel : silhouette puis grille Idle animée (assets/gui/<Id>) ; bloc coloré + initiale si le perso n'a pas d'images
+	local zoneVisuel = Ui.Creer("Frame", {
+		Name = "ZoneVisuel",
+		LayoutOrder = 2,
+		Size = UDim2.fromOffset(200, 200),
+		BackgroundTransparency = 1,
+		Parent = contenu,
+	})
+	visuel = Ui.Creer("ImageLabel", {
+		Name = "Visuel",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		Parent = zoneVisuel,
+	})
 	portrait = Ui.Creer("Frame", {
 		Name = "Portrait",
-		LayoutOrder = 2,
-		Size = UDim2.fromOffset(180, 180),
-		Parent = carte,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(170, 170),
+		Parent = zoneVisuel,
 	}, {
 		Ui.Coins(16),
 		Ui.Creer("UIGradient", {
@@ -111,14 +169,18 @@ function Tirage.Init(ecran: ScreenGui)
 	})
 
 	labelNom = texteCentre("Nom", 3, 34, 30, Ui.Couleurs.Texte)
-	labelNom.Parent = carte
+	labelNom.TextStrokeTransparency = 0.4
+	labelNom.Parent = contenu
 	labelEtoiles = texteCentre("Etoiles", 4, 28, 26, Ui.Couleurs.Or)
-	labelEtoiles.Parent = carte
+	labelEtoiles.TextStrokeTransparency = 0.5
+	labelEtoiles.Parent = contenu
 	labelRevenu = texteCentre("Revenu", 5, 22, 20, Ui.Couleurs.Vert)
-	labelRevenu.Parent = carte
-	labelDestination = texteCentre("Destination", 6, 20, 16, Ui.Couleurs.TexteDiscret)
+	labelRevenu.TextStrokeTransparency = 0.5
+	labelRevenu.Parent = contenu
+	labelDestination = texteCentre("Destination", 6, 20, 16, Ui.Couleurs.Texte)
 	labelDestination.Font = Ui.PoliceTexte
-	labelDestination.Parent = carte
+	labelDestination.TextStrokeTransparency = 0.5
+	labelDestination.Parent = contenu
 end
 
 local function pop(depart: number, duree: number)
@@ -146,7 +208,11 @@ function Tirage.Montrer(resultat: Remotes.ResultatTirage)
 	if pulsation then
 		pulsation:Cancel()
 	end
-	contour.Thickness = EPAISSEUR_CONTOUR
+	if reflet then
+		reflet:Destroy()
+		reflet = nil
+	end
+	contour.Thickness = 0
 	labelEtoiles.Text = "?"
 	labelRevenu.Text = ""
 	labelDestination.Text = ""
@@ -156,7 +222,7 @@ function Tirage.Montrer(resultat: Remotes.ResultatTirage)
 	local fin = os.clock() + DUREE_SUSPENSE
 	local pause = 0.05
 	while os.clock() < fin do
-		afficherPersonnage(candidats[math.random(#candidats)])
+		afficherPersonnage(candidats[math.random(#candidats)], false)
 		task.wait(pause)
 		if tirage ~= generation then
 			return
@@ -165,7 +231,10 @@ function Tirage.Montrer(resultat: Remotes.ResultatTirage)
 	end
 
 	-- Révélation
-	afficherPersonnage(definition)
+	afficherPersonnage(definition, true)
+	if definition.Rarete == "Secret" then
+		reflet = Images.Reflet(carte, RAYON_CARTE, 3)
+	end
 	labelEtoiles.Text = Ui.Etoiles(resultat.Etoiles, Economie.EtoilesMax)
 	labelRevenu.Text = `+{Ui.FormaterRevenu(resultat.Revenu)} $/s`
 	labelDestination.Text = if resultat.Emplacement
@@ -174,7 +243,7 @@ function Tirage.Montrer(resultat: Remotes.ResultatTirage)
 	pop(1.25, 0.35)
 	if RARETES_SPECIALES[definition.Rarete] then
 		local infos = TweenInfo.new(0.35, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 3, true)
-		local tween = TweenService:Create(contour, infos, { Thickness = EPAISSEUR_CONTOUR * 3 })
+		local tween = TweenService:Create(contour, infos, { Thickness = EPAISSEUR_PULSATION })
 		pulsation = tween
 		tween:Play()
 	end

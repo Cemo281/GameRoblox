@@ -6,6 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local Hud = require(script.Hud)
+local Images = require(script.Images)
 local Inventaire = require(script.Inventaire)
 local Notifications = require(script.Notifications)
 local Tirage = require(script.Tirage)
@@ -19,6 +20,7 @@ local ecran = Ui.Creer("ScreenGui", {
 	Parent = Players.LocalPlayer:WaitForChild("PlayerGui"),
 })
 
+Images.Init()
 Hud.Init(ecran)
 Inventaire.Init(ecran)
 Tirage.Init(ecran)

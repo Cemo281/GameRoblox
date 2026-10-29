@@ -1,0 +1,57 @@
+{
+	"taille": [
+		280,
+		368
+	],
+	"carte_inventaire": [
+		140,
+		184
+	],
+	"zone_interieure": {
+		"position": [
+			14,
+			14
+		],
+		"taille": [
+			252,
+			340
+		],
+		"note": "le portrait se pose ici (largeur de la zone, en haut)"
+	},
+	"secret_reflet": "bande diagonale centree : la faire defiler de -1 a +1 largeur de carte (Position X), dans un cadre ClipsDescendants",
+	"couleurs": {
+		"Commun": [
+			163,
+			162,
+			165
+		],
+		"Rare": [
+			0,
+			120,
+			255
+		],
+		"Legendaire": [
+			255,
+			190,
+			0
+		],
+		"Mythique": [
+			200,
+			0,
+			255
+		],
+		"Secret": [
+			255,
+			40,
+			40
+		]
+	},
+	"ids_roblox": {
+		"Commun.png": 73991991603192,
+		"Rare.png": 90758012188875,
+		"Legendaire.png": 139155695753037,
+		"Mythique.png": 75830200946156,
+		"Secret.png": 78993290810706,
+		"secret_reflet.png": 97681142840985
+	}
+}

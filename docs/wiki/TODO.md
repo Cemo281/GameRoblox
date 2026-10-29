@@ -3,6 +3,132 @@
 Suivi des tâches de développement. Les décisions de game design en attente sont dans [Questions ouvertes](Questions-ouvertes.md).
 
 ## En cours
+### Modération (avertissement Roblox reçu, 2026-10-29)
+- [x] Décalque du ventre (nombril, traits du bassin) retiré de `ModelesPersonnages.nami` ; `ventre_nami.png` supprimé, `peindre_ventre.py` archivé
+- [x] Bikini remplacé par le haut couvrant rayé (géométrie d'origine) ; nombril et ligne du ventre retirés de l'atlas `tex_corps_nami.png` ; export 4 808 triangles
+- [x] Détails du ventre : décision de ne remettre aucun détail anatomique (nombril, traits du bassin = cause probable de l'avertissement) ; à la place, décalque d'ombre neutre `ombre_torse_nami.png` (`peindre_ombre_torse.py` : ombre sous le haut, côtés) envoyé (118639795987019) et posé (`UpperTorso.OmbreTorse`)
+- [x] Réimport : 9 Vet_<Piece> remplacés (haut couvrant, texture 85250372065604)
+- [x] Bug corrigé : dans `ModelesPersonnages.nami`, HumanoidRootPart était en (0, 2, 0) et le corps en (-2, 3,44, 300) ; au clonage, les Motor6D recalaient le corps mais pas les pièces soudées (vêtements décalés en jeu). HRP replacé d'après Root (écart des 15 Motor6D au repos : 0), modèle ramené à l'origine ; clone vérifié (vêtements et accessoires : écart 0)
+- [ ] Supprimer les images déjà envoyées (Creator Dashboard, manuel) : ventre 108726701111437, 117000828854926, 113918571546651 ; textures d'atlas avec bikini 119937557598628, 99672583625574
+- [x] Rig de la nouvelle nami relevé dans Studio (`rig_nami.json`) ; `anims_nami.py` (IK, pieds plantés, bras dirigés par directions, vérifications) ; `apercu_studio.py` (copies figées posées dans `Workspace.Apercu_Anim`)
+- [x] 4. `nami_Idle` (90 images, 13 clés, 3 marqueurs) validée ✋ ; KeyframeSequence dans `RBX_ANIMSAVES.nami` (14 keyframes) ; ancienne Idle R6 renommée `nami_Idle_ancien` ; `vers_studio.py`
+- [x] 4. `nami_Action` (105 images, 13 clés, marqueurs VFX Nuage 15 / Etincelles 30 / Eclair 55) validée ✋ ; KeyframeSequence (14 keyframes) — abattu = arc vers le bas (rotation du bras sur lui-même impossible : pivot d'épaule décalé de 0,5)
+- [x] 4. `nami_Signature` (105 images, 10 clés, marqueurs Montrer Acc_Carte 15 / VFX Pieces 40 / Cacher Acc_Carte 75) validée ✋ ; KeyframeSequence (10 keyframes) — saut : corps entier +0,2 depuis la pose aux pieds plantés
+- [x] 4. Aperçu en mode édition sans publier (`RegisterKeyframeSequence` + `Animator:StepAnimations` sur une copie, marqueurs Montrer/Cacher appliqués)
+- [x] 4. Publication (manuel, clic droit → Save to Roblox ; l'éditeur d'animation ne chargeait pas les séquences) : Idle 87321310286727, Action 129343429620585, Signature 88856705155105 — vérifiées conformes (clés, durée, boucle, priorité, marqueurs) ; attributs posés sur `ModelesPersonnages.nami` ; copie `Workspace.nami` supprimée. (Un premier ID 124402299654762 n'est pas une animation valide : à ignorer)
+- [x] 5. VFX dans `ModelesPersonnages.nami.VFX` (format lu par `src/client/Vitrine.luau`) : Pieces_Brillent (Duree 0,5, étincelles dorées sur la bourse), Nuage (Duree 2,2, fumée gris foncé étalée, 3 studs devant au-dessus), Etincelles (Burst 25, bâton), Eclair (Duree 0,35 : 4 Beam en zigzag du nuage au sol + flash + anneau au sol), Pieces (Burst 20 pièces + 12 éclats) ; texture `vfx/piece.png` (`vfx_nami.py`) 91715201786333, anneau de zoro réutilisé ; aperçus Studio aux images des marqueurs (éclair, pièces, bourse)
+- [ ] Retouches demandées après test :
+  - [x] Bâton (Clima-Tact) allongé ×1,6 (2,22 → 3,56 studs, embouts reportés, soudures refaites)
+  - [x] Bras droit au repos à 45° (coude 45, poignet 30 : bâton toujours vertical) ; 3 animations recalculées (Action : marqueurs Charge 16 et Rafales 56 en plus) ; KeyframeSequence corrigées sur place (bras droit des clés en pose de repos : Idle 13, Action 4, Signature 10 ; marqueurs Charge 16 / Rafales 56 ajoutés) — à republier
+  - [x] Bourse remplacée par un vrai sachet (`bourse()` : révolution plissée, col serré, collerette dans le poing, cordon et 2 bouts) ; export `accessoires_nami.fbx` (1 460 triangles) importé, Handle remplacée ; soudure calculée pour qu'il pende quand la main le lève (REL_BOURSE), vérifiée
+  - [x] Textures `vfx/eclair.png` 88432637509015, `vfx/arc.png` 116921766737586
+  - [x] VFX Charge (Duree 1,35 : arcs `arc.png` aux 2 bouts et au centre du bâton, lueur, étincelles), Nuage (pièce-zone 6 × 0,8 × 4,5 : fumée noire étalée + éclairs internes, Duree 2,7), Rafales (Duree 1 : éclairs `eclair.png` en salves dans une zone 5 × 4 + flashs et anneaux au sol), sachet rebranché ; aperçus figés (images 30 et 57) et cycle complet en mouvement dans Studio
+  - [x] Bug en jeu « la bourse affiche la carte, la Signature n'affiche rien » : la logique Montrer/Cacher était bonne (journal client en Play), mais la bourse pendait dans l'avant-bras levé (on n'en voyait qu'un bout plat) et la carte était vue par la tranche. Prises refaites sur les poses figées (Idle 30, Signature 30) : bourse debout sur le poing (×1,3), carte dressée devant la main, dessin vers l'avant (×1,5) ; vérifié sur une copie (écart 0)
+  - [x] Pièces qui jaillissent de la bourse pendant les secousses (Idle 30-45) : émetteur `VFX_Pieces` (texture pièce, gravité) ajouté à l'effet `Pieces_Brillent` (Duree 0,5, déjà déclenché à l'image 30 : pas de republication), ~53 particules max
+  - [x] Effet `Pieces` de la Signature retiré (dossier `VFX.Pieces` et émetteurs `HumanoidRootPart.VFX_Pieces` supprimés ; le marqueur VFX Pieces de l'animation publiée est ignoré par Vitrine)
+  - [x] Republiées : Idle 101809439483044, Action 75447177403978, Signature 123951473389227 — vérifiées conformes (coude 45, marqueurs Charge / Rafales), attributs mis à jour
+- [ ] 7. Bilan ; tester la vitrine en jeu (Play) ; images d'interface refaites depuis Studio et envoyées (2026-10-29, voir Assets GUI)
+### Mannequin v2 « blocs arrondis » (skill `/perso-roblox`, fichiers dans `assets/persos/_mannequin/`)
+Version 1 (boîtes nettes + Shirt/Pants, tête classique) archivée dans `assets/persos/_mannequin/v1/` ; `r15_bloc.json`, `zones_vetements.json` et `axes_r15.json` restent en place (lus par les scripts de `zoro`).
+- [x] 1. Relevé du R15 en blocs (mode édition, `releve_brut.json`) : corps identique à la v1 à 2 mm près, tête dynamique 1,159 × 1,182 × 1,161 ; `rig_r15.py` → `r15_bloc.json` v2 (symétrisé, écart du relevé 0,000015) ; modèle supprimé
+- [x] `anims_zoro.py` pointé sur `_mannequin/v1/r15_bloc.json` (zoro est construit sur la v1)
+- [x] 2. `construire_mannequin.py` → `mannequin.blend` v2 : 15 pièces arrondies (biseau 0,15 / 3 segments, 0,126 sur mains et pieds, normales durcies), cylindre de jointure aux coudes et genoux, tête superellipsoïde (1,24 en haut, 1,08 en bas, 1,182 de haut), atlas 1024² (tête en haut, croix par pièce à 45 px/stud), `uv_mannequin.json` (grille de la face), armature `Rig_R15` (os verticaux comme la v1), parentage rigide ; 3 712 + 3 000 triangles
+- [x] 2. `peindre_mannequin.py` → `tex_corps_mannequin.png` (peau + face de test), `controle_uv.png` (damier) ; dépliage vérifié
+- [x] 2. Captures face / profil / 3/4 / dos + planche Gojo + pose test (coude droit, genou gauche à 90°) : pivots justes, pas de trou
+- [ ] 2. ✋ validation
+- [ ] 3. Export `mannequin.fbx`, import (manuel), assemblage Studio, comparaison des captures ✋
+- [ ] 4. Calibration des articulations (Studio + Blender), `axes_r15.json`, pose test ✋
+- [ ] 5. `ServerStorage.Gabarits.MannequinR15` remplacé, clones supprimés, bilan
+### Assets GUI (images d'interface rendues depuis Blender, fichiers dans `assets/gui/`)
+- [x] 1. `assets/gui/rendu_gui.py` (`rendre(id)`, MCP Blender) : copie du .blend dans un dossier temporaire, studio photo commun (fond transparent, 3 soleils, EEVEE, Standard, contour Freestyle silhouette + contour extérieur), 3/4 pris du côté droit du perso (azimut 30°)
+  - [x] `portrait.png` 512² (buste 3/4, image de l'Idle dans `POSES_PORTRAIT`, sinon la plus éloignée de l'image 0)
+  - [x] `pied.png` 1024² (plein pied, contre-plongée de 8°, marge 6 %)
+  - [x] `silhouette.png` 512² (alpha du portrait, noir pur, bord durci)
+  - [x] `idle_sheet.png` 1024² (4×4 images de 256², cadrage commun aux 16, raccord fin → début vérifié)
+  - [x] `infos.json` (images, durée, ordre, fps conseillé)
+  - [x] Lecture des poses JSON (perso-roblox) vérifiée sur `zoro` (pose, raccord 0, image expressive auto = 38), rendus de zoro non lancés
+- [x] 2. `assets/gui/cadres.py` (Pillow) : 5 cadres 280×368, `secret_reflet.png`, `apercu.png`, `cadres/infos.json` (zone intérieure du portrait)
+- [x] 3. Test sur `nami` (pose 40 : orbe levé près du visage ; 13 s de rendu) : images montrées
+- [x] 3. ✋ Style validé par l'utilisateur (2026-10-29)
+- [x] Rendre `zoro` (`rendre("zoro")`, 18 s, pose 38)
+- [x] `zoro` : les bras croisés de l'Idle cachent le visage sur `pied.png` (même caméra au-dessus des yeux) → pose dédiée (décision) : main droite posée sur les poignées, bras gauche le long du corps (`assets/gui/pose_gui_zoro.py` → `anims/zoro_PoseGUI.json`, recherche en grille sur `bras_dirige`, 29 s ; le solveur L-BFGS-B restait bloqué). La grille reste l'Idle réelle (visage caché pendant les bras croisés)
+- [x] 4. Envoi sur Roblox (`upload_image` du MCP Studio) : nami (portrait 110078464763952, pied 97800145793498, silhouette 125258690878522, idle_sheet 134326278156812) et cadres (Commun 73991991603192, Rare 90758012188875, Legendaire 139155695753037, Mythique 75830200946156, Secret 78993290810706, secret_reflet 97681142840985) ; IDs dans les `infos.json` (`ids_roblox`, conservé par les scripts quand ils réécrivent le fichier)
+- [x] 4. Envoi de `zoro` (portrait 122981940555502, pied 80949230946055, silhouette 117718428690224, idle_sheet 83426259296376), IDs dans `assets/gui/zoro/infos.json`
+- [x] Contrôle « tous » (2026-10-29) : aucun nouveau perso à rendre (seuls `nami` et `zoro` ont un .blend, déjà rendus ; les 9 autres n'ont pas de modèle). nami et zoro : fond transparent (coins alpha 0), rien de coupé en haut du portrait ni sur les bords du plein pied et des 16 cases, raccord de boucle 0
+- [x] Cadrage du portrait sur la tête du rig (décision) : centre sur l'os `Head` à 0,625 stud du cou, image de 4,75 studs, caméra à 8,75 studs ; même zoom pour tous, alerte si le bord haut est touché. nami et zoro re-rendus (29 s), planche comparée, rien de coupé
+- [x] Métadonnées PNG de Blender désactivées (date, chemin local) : rendus identiques à l'octet près
+- [x] Renvoi des portraits et silhouettes : nami portrait 110253584605339, silhouette 73798628894301 ; zoro portrait 140034364207144, silhouette 112226033450017 (pied et idle_sheet inchangés au pixel près : IDs conservés)
+- [ ] Images d'interface de `nami` refaites (2026-10-29) :
+  - [x] `rendu_gui.py` : source `assets/persos/<Id>/<Id>.blend` acceptée ; textures en chemin relatif (`//`) rattachées au dossier de l'original (sinon magenta) ; accessoires montrés / cachés selon les marqueurs `Montrer` / `Cacher` de l'Idle, comme `Vitrine.luau` ; refuse un perso dont les images viennent de Studio
+  - [x] Rendu Blender de `nami.blend` fait puis écarté : ce n'est pas la vraie nami. Décision : la référence est `ModelesPersonnages.nami` dans Studio (corps R15 en blocs de Roblox, tête classique + décalque `face` 7948257917, cheveux du catalogue 4232058809, bâton `Part` Deep orange ; seuls les `Vet_*` et accessoires viennent de Blender) ; images rendues depuis Studio (choix de l'utilisateur)
+  - [x] `assets/gui/plateau_studio.luau` (MCP, en Play côté client : 34 plateaux = 17 poses de l'Idle publiée × fond noir / gris, perso tourné pour que le soleil du jeu vienne de 35° à sa droite avant, cadrages de `rendu_gui.py`, passage de chauffe) + `assets/gui/rendu_studio.py` (détourage par différence des deux fonds, reprojection exacte des captures vers la caméra cible, plein pied en 2 bandes, cadrage sur l'alpha, contour sombre, silhouette, grille, `infos.json`) ; 38 captures, 24 s de traitement
+  - [x] Vérifié : coins transparents ; rien de coupé (haut du portrait, bords du plein pied et des 16 cases, bâton et bourse entiers) ; raccord de l'Idle 0 ; écart case 15 → 0 (1,85) sous l'écart moyen entre cases (3,44). Éclairage = celui du jeu (peau plus claire que les rendus Blender), tête classique plus grosse que celle de zoro au même zoom (même règle de cadrage)
+  - [x] Bug en jeu corrigé : les 4 embouts du bâton (`Acc_Baton.Part`) étaient soudés à ≈ 480 studs du bâton ; ramenés sur son axe (bagues ±1,49, boules ±2,10), soudures refaites ; place enregistrée
+  - [x] Envoi sur Roblox (`upload_image`) : portrait 140496050097409, pied 114044211519143, silhouette 111957893757960, idle_sheet 122462618381607 ; `ids_roblox` et `src/shared/ImagesPersonnages.luau` mis à jour
+  - [ ] Supprimer les anciennes images de nami (Creator Dashboard, manuel) : 110253584605339, 97800145793498, 73798628894301, 134326278156812
+  - [x] Vérifié en Play : carte d'inventaire de nami avec le nouveau portrait ; silhouette, plein pied et grille chargés (`IsLoaded`) et affichés sur un écran de test provisoire (supprimé). Révélation du tirage non rejouée (tirage aléatoire ; même module `Images` que la carte)
+- [ ] (optionnel) Grille idle de `zoro` lisible : croiser les bras plus bas dans `zoro_Idle` (change l'animation du jeu, republication manuelle)
+- [x] Images installées en jeu (demande « installes tout ça in game ») :
+  - [x] `src/shared/ImagesPersonnages.luau` (IDs) et `src/client/Images.luau` (cadre, grille Idle animée, reflet Secret, préchargement), skill `/nouveau-module`
+  - [x] Inventaire : carte 140×184 = cadre de la rareté, portrait rogné au buste, rareté, nom, étoiles, revenu, badge `#N` si posé, bouton ; bloc + initiale sans images ; reflet sur les Secret
+  - [x] Tirage : carte 300×394 (proportions du cadre), cadre de chaque candidat, silhouettes pendant le suspense, grille Idle animée à la révélation, reflet Secret dès la révélation (le DelayTime du TweenInfo retardait le premier passage), pulsation Mythique / Secret
+  - [x] selene OK ; testé en Play : 27 cartes avec cadre, 8 portraits, images chargées (AssetFetchStatus Success), révélation zoro animée (≈ 4 images/s), reflet Secret ; 5 persos de test donnés à cemobozo (luffy_gear2, robin, franky, nami, zoro)
+- [ ] Textes de rareté peu lisibles sur un cadre de la même couleur (Mythique sur violet) : passer en blanc avec contour coloré ? (à voir à l'œil)
+- [ ] Silhouettes du suspense : vérifier à l'œil qu'elles se voient sur le haut sombre des cadres
+### Personnage `nami` v2 (skill `/perso-roblox`, Commun, fichiers dans `assets/persos/nami/`)
+Refonte de l'ancien modèle R6 (section plus bas). Premier perso construit sur le mannequin v2 « blocs arrondis ».
+- [x] Inventaire de l'existant ; référence copiée dans `assets/references/nami.png`
+- [x] 1. Fiche reformulée ✋ validée
+- [x] 2. Copie du mannequin → `nami.blend`
+- [x] 2. Blockout (`construire_nami.py` : `cheveux()`, `tenue()`, `accessoires()`) ; bâton perpendiculaire à l'avant-bras (vertical et planté au sol coude plié à 90°)
+- [x] 2. Normales des mèches corrigées (étaient vers l'intérieur : invisibles dans Roblox) ; contrôle par volume signé
+- [x] 2. Atlas unique `tex_corps_nami.png` (une MeshPart = une texture : tête + cheveux, torse + haut + nappe du dos) : `uv_nami.py` (`atlas()`, `ombrage()` : occlusion par lancers de rayons), `peindre_nami.py` (face, cel-shading 3 tons + liserés des mèches, pois, jean surpiqué, tatouage) ; accessoires dans `tex_acc_nami.png` (carte au trésor dessinée)
+- [x] 2. Racine des cheveux lisse (calotte qui rentre sous la peau au lieu d'être coupée en marches)
+- [x] 2. Accessoires séparés `Acc_Baton` (visible), `Acc_Bourse`, `Acc_Carte` (cachés, attribut `VisibleParDefaut`)
+- [x] 2. Premier modèle final montré (14 399 triangles) ; retours : cheveux en « dreadlocks », tête pas assez Roblox, corps trop arrondi (« bouée »), visage à refaire d'après une image de référence
+- [x] 2. Retouches : corps à biseau 0,05 (au lieu de 0,15), tête en bloc arrondi 1,2 × 1,16 × 1,182 (face plate projetée à 380 px/stud), cheveux en nappes lisses (`nappe()`, pointes en dents de scie) + frange et mèches avant en rubans plats, cheveux peints (anneau de lumière, sillons, liserés), grands yeux ambre façon référence
+- [ ] 2. Modèle final v2 ✋ (10 411 triangles, Head 2 659)
+- [x] Essai « tout depuis le Creator Store » (`Workspace.Test_Nami_Store`, en (-14, y, 300)) : 5 modèles Nami trouvés, 4 piégés (scripts cachés « LightConfig », « CoreSkyboxSystem », « Runtime », supprimés) ; seul propre : 8225914709 (R6, tenue de Wano). Coiffure propre : « Silk Orange Hair » 5361730648. Vêtements du catalogue avatar introuvables via le MCP (le Creator Store ne les contient pas)
+- [x] Décision : mélange. Avatar R15 vide (`Gabarits.MannequinR15`) + tête, visage, coiffure et bâton (Clima-Tact) de la Nami du store (8225914709) + vêtements 3D de Blender
+- [x] `Workspace.Test_Nami_Store.Nami_Mix` monté (peau, tête/visage/coiffure de A soudés à Head, bâton soudé à RightHand)
+- [x] Export `fbx/vetements_nami.fbx` (`export_vetements.py` : 9 maillages Vet_<Piece>, 3 728 triangles, texture intégrée) + `vetements_nami.json` (tailles, décalages), vérifié par réimport
+- [x] Import de `vetements_nami.fbx` dans Studio (manuel) : tailles exactes, sans rotation, texture 106676499903452 ; Vet_<Piece> posés sur `Nami_Mix.Vetements` (CFrame = pièce * décalage, WeldConstraint)
+- [ ] Captures validées ✋ (face et 3/4 faites ; la texture met quelques secondes à s'afficher en mode édition)
+- [ ] Tatouage de l'épaule gauche (Decal sur LeftUpperArm, image à envoyer)
+- [x] Retouches d'après l'image de référence n° 2 : haut rayé (vert foncé / blanc / vert clair, arqué en deux bonnets, forme couvrante gardée), ceinture noire cloutée portée de travers + boucle ronde (`LowerTorso_Ceinture`, `LowerTorso_Clous`, pastilles fixes hors rangement), export refait (4 880 triangles)
+- [x] Décalque du ventre `ventre_nami.png` (`peindre_ventre.py` : nombril, ligne médiane, traits du bassin, taille, clavicules) envoyé (108726701111437), posé sur `Nami_Mix.UpperTorso` (face avant)
+- [x] Haut remplacé par un vrai bikini (demande de l'utilisateur, la fiche disait l'inverse) : 2 triangles rayés bombés (`nappe()`), tour de cou, bande dans le dos, anneau ; aucune ombre de poitrine. Décalque du ventre refait (ombre sous les triangles) : 117000828854926. Export 5 312 triangles
+- [x] Bikini agrandi (triangles 0,82 de large, pointe à 4,05), bas arrondi, détails du tissu peints (ombrage, plis, liseré, surpiqûres) ; pas de détails anatomiques de poitrine (refusé : règles Roblox). Décalque du ventre : 113918571546651. Export 5 512 triangles
+- [x] Réimport (bikini + ceinture + rayures), 9 Vet_<Piece> remplacés (texture 119937557598628)
+- [x] Bug : peau visible aux pieds (pied de l'avatar 1,009 x 1,001 x 0,312, bride à 0,5) → chaussures fermées 1,07 x 1,07 x 0,35 + semelle + talon + bride ; réimportées, texture remise sur celle des autres vêtements, capture : plus de peau
+- [x] Captures validées ✋ (« ok »)
+- [x] 6. Finition : Humanoid sans nom ni barre de vie (Animator dedans, pas d'AnimationController), HumanoidRootPart ancré et invisible = PrimaryPart, autres pièces non ancrées, collisions coupées ; bâton converti en Accessory `Acc_Baton` (Handle + pièces soudées, `VisibleParDefaut` = true) ; 31 pièces vérifiées dans l'assemblage de HumanoidRootPart (copie temporaire dans le Workspace)
+- [x] 6. Rangement : ancien modèle R6 renommé `ModelesPersonnages.nami_ancien` (garde `AnimationIdle`), nouveau = `ModelesPersonnages.nami` ; `Workspace.Test_Nami_Store` supprimé
+- [ ] Enregistrer la place (manuel)
+- [x] Export `fbx/accessoires_nami.fbx` (`exporter_accessoires()` : Acc_Bourse 336 triangles, Acc_Carte 228, texture tex_acc_nami.png) + `accessoires_nami.json` (décalages par rapport à LeftHand), vérifié par réimport. Bug corrigé : l'export effaçait les objets sources du même nom (renommés le temps de l'export)
+- [ ] Import de `accessoires_nami.fbx` (manuel), Accessory + soudure à LeftHand, cachés par défaut
+- [ ] Proposer de reporter les retouches de style (biseau 0,05, tête en bloc) dans le mannequin v2 et le skill `/perso-roblox`
+- [ ] 3. Export `corps_nami.fbx` + vérification par réimport
+- [ ] 3. Import Studio (manuel), assemblage R15 (15 Motor6D, soudures, textures) ✋
+- [ ] 4. `nami_Idle` « Compter le butin » (90 images, boucle) ✋
+- [ ] 4. `nami_Action` « Coup de tonnerre » (105 images) ✋
+- [ ] 4. `nami_Signature` « Carte au trésor » (105 images) ✋
+- [ ] 4. KeyframeSequence dans `RBX_ANIMSAVES.nami`, publication (manuel), attributs, vérification des IDs
+- [x] 5. VFX dans `ModelesPersonnages.nami.VFX` (format lu par `src/client/Vitrine.luau`) : Pieces_Brillent (Duree 0,5, étincelles dorées sur la bourse), Nuage (Duree 2,2, fumée gris foncé étalée, 3 studs devant au-dessus), Etincelles (Burst 25, bâton), Eclair (Duree 0,35 : 4 Beam en zigzag du nuage au sol + flash + anneau au sol), Pieces (Burst 20 pièces + 12 éclats) ; texture `vfx/piece.png` (`vfx_nami.py`) 91715201786333, anneau de zoro réutilisé ; aperçus Studio aux images des marqueurs (éclair, pièces, bourse)
+- [ ] Retouches demandées après test :
+  - [x] Bâton (Clima-Tact) allongé ×1,6 (2,22 → 3,56 studs, embouts reportés, soudures refaites)
+  - [x] Bras droit au repos à 45° (coude 45, poignet 30 : bâton toujours vertical) ; 3 animations recalculées (Action : marqueurs Charge 16 et Rafales 56 en plus) ; KeyframeSequence corrigées sur place (bras droit des clés en pose de repos : Idle 13, Action 4, Signature 10 ; marqueurs Charge 16 / Rafales 56 ajoutés) — à republier
+  - [x] Bourse remplacée par un vrai sachet (`bourse()` : révolution plissée, col serré, collerette dans le poing, cordon et 2 bouts) ; export `accessoires_nami.fbx` (1 460 triangles) importé, Handle remplacée ; soudure calculée pour qu'il pende quand la main le lève (REL_BOURSE), vérifiée
+  - [x] Textures `vfx/eclair.png` 88432637509015, `vfx/arc.png` 116921766737586
+  - [x] VFX Charge (Duree 1,35 : arcs `arc.png` aux 2 bouts et au centre du bâton, lueur, étincelles), Nuage (pièce-zone 6 × 0,8 × 4,5 : fumée noire étalée + éclairs internes, Duree 2,7), Rafales (Duree 1 : éclairs `eclair.png` en salves dans une zone 5 × 4 + flashs et anneaux au sol), sachet rebranché ; aperçus figés (images 30 et 57) et cycle complet en mouvement dans Studio
+  - [x] Bug en jeu « la bourse affiche la carte, la Signature n'affiche rien » : la logique Montrer/Cacher était bonne (journal client en Play), mais la bourse pendait dans l'avant-bras levé (on n'en voyait qu'un bout plat) et la carte était vue par la tranche. Prises refaites sur les poses figées (Idle 30, Signature 30) : bourse debout sur le poing (×1,3), carte dressée devant la main, dessin vers l'avant (×1,5) ; vérifié sur une copie (écart 0)
+  - [x] Pièces qui jaillissent de la bourse pendant les secousses (Idle 30-45) : émetteur `VFX_Pieces` (texture pièce, gravité) ajouté à l'effet `Pieces_Brillent` (Duree 0,5, déjà déclenché à l'image 30 : pas de republication), ~53 particules max
+  - [x] Effet `Pieces` de la Signature retiré (dossier `VFX.Pieces` et émetteurs `HumanoidRootPart.VFX_Pieces` supprimés ; le marqueur VFX Pieces de l'animation publiée est ignoré par Vitrine)
+  - [x] Republiées : Idle 101809439483044, Action 75447177403978, Signature 123951473389227 — vérifiées conformes (coude 45, marqueurs Charge / Rafales), attributs mis à jour
+- [ ] 7. Bilan ; tester la vitrine en jeu (Play) ; images d'interface refaites depuis Studio et envoyées (2026-10-29, voir Assets GUI)
+- [x] 6. Finition, ancien modèle renommé `nami_ancien`, nouveau rangé dans `ModelesPersonnages.nami`
+- [x] 6. Anciens fichiers `assets/blender/nami/` rangés dans `assets/archives/nami/` (`git mv`) ; source de `assets/gui/nami/infos.json` mise à jour
+- [x] 7. Images d'interface re-rendues depuis le nouveau modèle (`assets/gui/nami/`, voir Assets GUI)
 ### Personnage `zoro` (skill `/perso-roblox`, Mythique, fichiers dans `assets/persos/zoro/`)
 - [x] Prérequis : mannequin (`assets/persos/_mannequin/`, `ServerStorage.Gabarits.MannequinR15`) présent, référence lue
 - [x] Sabres sur la hanche **droite** (validé) : la main droite dégaine du même côté, la main gauche en travers du corps ; la Signature range à droite
@@ -59,7 +185,7 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 - [ ] 9. KeyframeSequences + marqueurs, publication des 3 animations (manuel), attributs `AnimationIdle` / `AnimationAction` / `AnimationSignature`
 - [ ] Tester un export par skinning rigide (poids 1 sur un os), cf. leçon de `nami`
 
-### Personnage `nami` (skill `/perso-r6`, fichiers dans `assets/blender/nami/`)
+### Personnage `nami` — ancien modèle R6 (skill `/perso-r6`, fichiers archivés dans `assets/archives/nami/`, remplacé par la v2)
 - [x] Fiche validée
 - [x] Version 1 : modèle, rig, animation `nami_Idle`, export FBX (jugée pas assez belle avant import)
 - [x] Version 2 : gabarit R6 standard (boîtes + tête Roblox), cheveux en mèches, visage plus détaillé, bâton tenu dans le poing (1 988 triangles)
@@ -107,7 +233,7 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 
 ### Interface
 - [ ] Tester l'interface sur mobile (émulateur d'appareil de Studio)
-- [ ] Remplacer l'initiale de la carte de tirage par le visuel du personnage (modèles 3D)
+- [x] Remplacer l'initiale de la carte de tirage par le visuel du personnage (images rendues, voir « Assets GUI ») ; les persos sans modèle gardent l'initiale
 - [ ] Boutons des futures mécaniques (déblocage d'emplacement, machine, rebirth) quand leurs valeurs seront définies
 
 ### Boucle de base

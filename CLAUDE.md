@@ -23,13 +23,14 @@ Règles détaillées : voir le wiki (`docs/wiki/`). Résumé : tirage gratuit �
 - `GachaService` : ProximityPrompt sur chaque `MachineRNG`, tirage serveur (propriétaire, distance, cooldown = `DureeAnimation`). En Studio : `ServerStorage.TestTirage` (BindableFunction) pour tester, `ServerStorage.TestDonnerPersonnage` (player, id, étoiles) pour ajouter un perso précis à l'inventaire.
 - `InterfaceService` : lien avec l'interface client. Envoie inventaire, résultat de tirage, collectes, notifications ; RemoteFunctions `Poser` / `Retirer` validées (type, possession, cadence).
 - `RevenuService` : revenu chaque seconde → `ArgentNonCollecte`, collecte au toucher du `Collecteur` ; attributs du Player `ArgentNonCollecte` / `RevenuParSeconde` pour le HUD.
-Config partagée (données uniquement) : `src/shared/Personnages.luau`, `GachaConfig.luau`, `Economie.luau` (formule de revenu).
+Config partagée (données uniquement) : `src/shared/Personnages.luau`, `GachaConfig.luau`, `Economie.luau` (formule de revenu), `ImagesPersonnages.luau` (IDs des images d'interface).
 `src/shared/Remotes.luau` : noms et types de toutes les remotes (`ReplicatedStorage.Remotes`, créées d'un coup par le serveur). Ajouter une remote = l'ajouter au type **et** à la liste `EVENEMENTS` / `FONCTIONS`.
 
 ## Code client
 `src/client/init.client.luau` crée le ScreenGui `Interface` (construit en code, pas dans Studio) et branche les remotes :
 - `Ui` : construction d'éléments, couleurs, police, `Ui.Adapter` (UIScale selon la taille d'écran, base 1100 × 650), format des nombres (`1,23K`).
-- `Hud` (argent, revenu, à collecter, « +X $ »), `Tirage` (carte suspense puis révélation, dans `GachaConfig.DureeAnimation`), `Inventaire` (grille, Poser / Retirer), `Notifications`.
+- `Hud` (argent, revenu, à collecter, « +X $ »), `Tirage` (carte suspense puis révélation, dans `GachaConfig.DureeAnimation` : cadre de la rareté, silhouettes pendant le suspense, grille Idle animée à la révélation, reflet pour Secret), `Inventaire` (grille de cartes avec cadre et portrait, Poser / Retirer), `Notifications`.
+- `Images` : cadres de rareté, portraits, grille Idle animée (`ImageRectOffset`, une boucle Heartbeat), reflet Secret (CanvasGroup), préchargement. IDs dans `src/shared/ImagesPersonnages.luau`, recopiés des `assets/gui/*/infos.json` (`ids_roblox`) ; un perso sans images garde le bloc coloré avec son initiale.
 - `Vitrine` : sur les modèles tagués `PersonnageVitrine`, applique les marqueurs des animations jouées par le serveur (`Montrer` / `Cacher` un accessoire, `VFX` du dossier `VFX` du modèle : Mode `Burst` → Emit(`Quantite`), `Duree` → allumé `Duree` s, `<Nom>_Fin` éteint). Côté client car `Emit` n'est pas répliqué.
 - Police `FredokaOne` : certains symboles (✕) n'existent pas, vérifier à l'écran.
 
