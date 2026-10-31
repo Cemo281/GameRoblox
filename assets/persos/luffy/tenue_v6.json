@@ -1,0 +1,98 @@
+{
+	"Chemise_Torse": {
+		"piece": "UpperTorso",
+		"texture": "chemise",
+		"taille": [
+			2.1597,
+			2.2003,
+			1.2362
+		],
+		"decalage": [
+			0.0021,
+			-0.1716,
+			0.0013
+		],
+		"triangles": 10812
+	},
+	"Chemise_MancheD": {
+		"piece": "RightUpperArm",
+		"texture": "chemise",
+		"taille": [
+			1.3005,
+			1.4218,
+			1.304
+		],
+		"decalage": [
+			-0.0025,
+			-0.0301,
+			0.0015
+		],
+		"triangles": 9120
+	},
+	"Chemise_MancheG": {
+		"piece": "LeftUpperArm",
+		"texture": "chemise",
+		"taille": [
+			1.305,
+			1.4218,
+			1.2693
+		],
+		"decalage": [
+			0.006,
+			-0.0301,
+			0.0016
+		],
+		"triangles": 9120
+	},
+	"Ceinture": {
+		"piece": "LowerTorso",
+		"texture": "bas",
+		"taille": [
+			2.0236,
+			1.301,
+			1.2537
+		],
+		"decalage": [
+			-0.0,
+			-0.4426,
+			-0.1091
+		],
+		"triangles": 6504
+	},
+	"Short_JambeD": {
+		"piece": "RightUpperLeg",
+		"texture": "bas",
+		"taille": [
+			1.429,
+			1.4126,
+			1.3822
+		],
+		"decalage": [
+			-0.0012,
+			-0.0273,
+			0.0097
+		],
+		"triangles": 8512
+	},
+	"Short_JambeG": {
+		"piece": "LeftUpperLeg",
+		"texture": "bas",
+		"taille": [
+			1.4266,
+			1.4128,
+			1.4101
+		],
+		"decalage": [
+			-0.0056,
+			-0.0275,
+			0.006
+		],
+		"triangles": 8512
+	},
+	"_images": {
+		"chemise": "rbxassetid://71632760269286",
+		"bas": "rbxassetid://109932566809619",
+		"torse": "rbxassetid://75774906927040",
+		"_note": "chemise : texture envoyee par l'import 3D du 31/10 ; meshes importes tournes de 180 deg autour de Y : CFrame = Piece.CFrame * CFrame.new(decalage) * CFrame.Angles(0, math.pi, 0)"
+	}
+}

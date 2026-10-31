@@ -1,0 +1,72 @@
+{
+	"Vet_UpperTorso_Chemise": {
+		"piece": "UpperTorso",
+		"taille": [
+			1.9828,
+			2.485,
+			1.3103
+		],
+		"decalage": [
+			-0.0014,
+			-0.352,
+			-0.006
+		],
+		"triangles": 4736
+	},
+	"Vet_RightUpperArm_Manche": {
+		"piece": "RightUpperArm",
+		"taille": [
+			1.1901,
+			1.41,
+			1.2957
+		],
+		"decalage": [
+			0.065,
+			0.07,
+			0.008
+		],
+		"triangles": 1564
+	},
+	"Vet_LeftUpperArm_Manche": {
+		"piece": "LeftUpperArm",
+		"taille": [
+			1.1901,
+			1.41,
+			1.2957
+		],
+		"decalage": [
+			-0.065,
+			0.07,
+			0.008
+		],
+		"triangles": 1564
+	},
+	"Vet_RightLowerArm_Poignet": {
+		"piece": "RightLowerArm",
+		"taille": [
+			1.1029,
+			0.3647,
+			1.1458
+		],
+		"decalage": [
+			0.0215,
+			-0.0796,
+			0.0
+		],
+		"triangles": 1008
+	},
+	"Vet_LeftLowerArm_Poignet": {
+		"piece": "LeftLowerArm",
+		"taille": [
+			1.1029,
+			0.3647,
+			1.1458
+		],
+		"decalage": [
+			-0.0215,
+			-0.0796,
+			0.0
+		],
+		"triangles": 1008
+	}
+}

@@ -1,0 +1,89 @@
+{
+	"_note": "Reconstruction du modele luffy (Studio, mode edition). CreateHumanoidModelFromDescription ignore les accessoires en mode edition : chaque article est charge avec InsertService:LoadAsset puis Humanoid:AddAccessory.",
+	"corps": {
+		"rig": "R15",
+		"parties": "blocs par defaut (IDs 0)",
+		"peau": "#E8B48C (HeadColor, TorsoColor, LeftArmColor, RightArmColor, LeftLegColor, RightLegColor)"
+	},
+	"accessoires_catalogue": [
+		{
+			"nom": "strawhat",
+			"article": "Pirate Straw Hat",
+			"id": 13043540601,
+			"type": "Hat",
+			"reglage": "Handle.Size = origine x1,1 ; HatAttachment.Position = origine x1,1 - (0, 0,08, 0) (chapeau un peu plus haut, au-dessus des meches) ; origines en attributs TailleOrigine / AttacheOrigine"
+		},
+		{
+			"nom": "Black Spiky Hair",
+			"article": "Black Spiky Hair",
+			"id": 13832918624,
+			"type": "Hair",
+			"reglage": "taille d'origine"
+		},
+		{
+			"nom": "cutesandals",
+			"article": "Sandals (Blizzei)",
+			"id": 13753582199,
+			"type": "Chaussures en couches (WrapLayer)"
+		}
+	],
+	"visage": {
+		"source": "modele Toolbox 16939724553 « Luffy (Time skip)(3D CLOTHING) » (domaine public), copie de l'Accessory Luffy",
+		"nom": "Visage",
+		"attachment": "FaceCenterAttachment",
+		"mesh": "rbxassetid://14943927431",
+		"texture": "rbxassetid://14943927493",
+		"etat": "visage Toolbox garde ; essai visage_luffy_rire.png (rbxassetid://111985977929747, pas encore servi par Roblox) abandonne",
+		"reglage": "centre sur la tete comme sur le modele Toolbox : FaceCenterAttachment du Handle abaissee de 0,094 (le point d'attache R15 est 0,094 sous le centre de la tete)"
+	},
+	"decal_torse": {
+		"piece": "UpperTorso",
+		"face": "Front",
+		"nom": "Torse_Luffy",
+		"texture": "rbxassetid://75774906927040",
+		"source": "assets/persos/luffy/torse_luffy_anime.png (peindre_torse_anime.py)",
+		"etat": "masque (Transparency = 1) : remplace par Shirt_Abdos ; remettre Transparency = 0 pour revenir a notre decalque"
+	},
+	"tenue_sur_mesure": {
+		"dossier": "luffy.Tenue",
+		"source": "assets/persos/luffy/tenue_v6.json (tailles, decalages, textures) ; fbx/tenue_v6.fbx importe a la main (Import 3D)",
+		"soudure": "MeshPart.Size = taille ; CFrame = Piece.CFrame * CFrame.new(decalage) * CFrame.Angles(0, math.pi, 0) ; WeldConstraint Part0 = piece, Part1 = MeshPart",
+		"meshes": {
+			"Chemise_Torse": "rbxassetid://114832946906277",
+			"Chemise_MancheD": "rbxassetid://104664837854811",
+			"Chemise_MancheG": "rbxassetid://88307857533299",
+			"Ceinture": "rbxassetid://122159598500955",
+			"Short_JambeD": "rbxassetid://99453386134200",
+			"Short_JambeG": "rbxassetid://70677533932657"
+		},
+		"textures": {
+			"chemise": "rbxassetid://71632760269286",
+			"bas": "rbxassetid://109932566809619"
+		},
+		"note": "Ceinture v6 remise (l'echarpe Toolbox est dans ServerStorage.Sauvegarde_luffy)"
+	},
+	"echarpe": {
+		"source": "modele Toolbox 16939724553, Accessory « Accessory (Meshes/UGC_Pack6_LowPoly_Cloak.004Accessory) » (ceinture + echarpe en une piece)",
+		"nom": "Echarpe",
+		"attachment": "WaistCenterAttachment",
+		"mesh": "rbxassetid://16756058309",
+		"texture": "rbxassetid://16756057908",
+		"pose": "Humanoid:AddAccessory sur un clone ; supprimer l'AccessoryWeld herite (vers le Torso R6 du modele Toolbox)",
+		"etat": "retiree (rangee dans ServerStorage.Sauvegarde_luffy) : la Ceinture v6 est remise"
+	},
+	"shirt_abdos": {
+		"source": "modele Toolbox 16939724553, Shirt « Clothing »",
+		"nom": "Shirt_Abdos",
+		"ShirtTemplate": "http://www.roblox.com/asset/?id=13497309617",
+		"contenu": "abdos + cicatrice en X sur le torse, muscles sur les bras"
+	},
+	"cheveux_chapeau": {
+		"source": "modele Toolbox 16939724553, Accessory « Hat.002Accessory » (cheveux + chapeau en une piece)",
+		"nom": "CheveuxChapeau",
+		"attachment": "HairAttachment",
+		"mesh": "rbxassetid://12678766775",
+		"pose": "Humanoid:AddAccessory sur un clone, soudures heritees supprimees",
+		"remplace": "strawhat 13043540601 et Black Spiky Hair 13832918624 (ranges dans ServerStorage.Sauvegarde_luffy : strawhat_luffy, Black Spiky Hair_luffy)",
+		"reglage": "meme place que sur le modele Toolbox : Handle a (0,005 ; 0,388 ; 0,099) du centre de la tete (attache abaissee de 0,0104)"
+	}
+}

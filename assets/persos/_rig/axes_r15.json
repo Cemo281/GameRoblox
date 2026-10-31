@@ -1,0 +1,178 @@
+{
+	"source": "Calibre le 2026-10-29 dans Studio (mode edition) sur l'avatar R15 par defaut (Players:CreateHumanoidModelFromDescription, voir r15.json) : +30 deg sur X, Y puis Z de chacune des 15 articulations (45 cas calcules sur des clones ancres + captures d'un clone par axe), puis pose test. Resultats identiques a l'ancienne calibration du mannequin blocs (assets/persos/_mannequin/axes_r15.json, qui garde aussi la conversion Blender).",
+
+	"convention": {
+		"articulations": "AnimationConstraint (pas de Motor6D). C0 = Attachment0.CFrame, C1 = Attachment1.CFrame, tous sans rotation : au repos, les axes de Transform sont ceux du perso.",
+		"formule": "Part1.CFrame = Part0.CFrame * C0 * Transform * C1:Inverse()",
+		"axes": "+X = droite du perso, +Y = haut, +Z = arriere (le perso regarde vers -Z). Rotation positive = regle de la main droite.",
+		"composition": "Transform = CFrame.Angles(x, y, z) (ordre X puis Y puis Z appliques dans le repere de la piece). Angles en radians dans le code, en degres dans les fiches.",
+		"effet_general": {
+			"+X": "un membre qui pend part vers l'AVANT ; la tete et le torse basculent vers l'ARRIERE",
+			"+Y": "la face avant de la piece tourne vers la GAUCHE du perso (anti-horaire vu de dessus)",
+			"+Z": "le bout de la piece part vers la DROITE du perso : membre droit ecarte, membre gauche rapproche du corps, tete et torse penches vers la GAUCHE du perso"
+		},
+		"keyframesequence": "Une Pose par piece, nommee comme Part1, emboitee selon l'arbre des articulations (HumanoidRootPart > LowerTorso > UpperTorso > Head...). Pose.CFrame = Transform de l'articulation dont la piece est Part1. La Pose HumanoidRootPart reste a l'identite."
+	},
+
+	"articulations": {
+		"Root": {
+			"part0": "HumanoidRootPart", "part1": "LowerTorso",
+			"mouvements": {
+				"pencher tout le corps en avant": "X-",
+				"pencher tout le corps en arriere": "X+",
+				"tourner tout le corps vers SA gauche": "Y+",
+				"incliner tout le corps vers SA gauche": "Z+",
+				"descendre (rebond, accroupi)": "Position Y-",
+				"avancer": "Position Z-"
+			},
+			"limites": "X et Z : +/- 20 deg ; Y libre ; translation : rebond <= 0,5 stud"
+		},
+		"Waist": {
+			"part0": "LowerTorso", "part1": "UpperTorso",
+			"mouvements": {
+				"pencher le buste en avant": "X-",
+				"pencher le buste en arriere": "X+",
+				"tourner le buste vers SA gauche": "Y+",
+				"incliner le buste vers SA gauche": "Z+"
+			},
+			"limites": "X de -45 a +20 deg ; Y +/- 45 deg ; Z +/- 20 deg"
+		},
+		"Neck": {
+			"part0": "UpperTorso", "part1": "Head",
+			"mouvements": {
+				"baisser la tete (menton vers la poitrine)": "X-",
+				"lever la tete": "X+",
+				"tourner la tete vers SA gauche": "Y+",
+				"pencher la tete vers SA gauche": "Z+"
+			},
+			"limites": "+/- 25 deg sur chaque axe"
+		},
+		"RightShoulder": {
+			"part0": "UpperTorso", "part1": "RightUpperArm",
+			"pivot": "(0,972 ; 0,847 ; 0) du HRP, 0,5 stud a l'interieur du centre du bras",
+			"mouvements": {
+				"lever le bras devant": "X+",
+				"bras vers l'arriere": "X-",
+				"ecarter le bras sur le cote (lever lateralement)": "Z+",
+				"rapprocher / croiser devant le corps": "Z-",
+				"rotation autour du bras (face avant vers SA gauche ; le bras avance un peu, pivot decale)": "Y+"
+			},
+			"limites": "X de -60 a +180 deg ; Z de -30 a +180 deg ; Y +/- 60 deg"
+		},
+		"LeftShoulder": {
+			"part0": "UpperTorso", "part1": "LeftUpperArm",
+			"pivot": "(-0,972 ; 0,847 ; 0) du HRP, 0,5 stud a l'interieur du centre du bras",
+			"mouvements": {
+				"lever le bras devant": "X+",
+				"bras vers l'arriere": "X-",
+				"ecarter le bras sur le cote (lever lateralement)": "Z-",
+				"rapprocher / croiser devant le corps": "Z+",
+				"rotation autour du bras (face avant vers SA gauche ; le bras recule un peu, pivot decale)": "Y+"
+			},
+			"limites": "X de -60 a +180 deg ; Z de -180 a +30 deg ; Y +/- 60 deg"
+		},
+		"RightElbow": {
+			"part0": "RightUpperArm", "part1": "RightLowerArm",
+			"mouvements": {"plier le coude (avant-bras vers l'avant, vers le haut si le bras est leve)": "X+"},
+			"limites": "X de 0 a +150 deg, jamais negatif ; Y et Z = 0"
+		},
+		"LeftElbow": {
+			"part0": "LeftUpperArm", "part1": "LeftLowerArm",
+			"mouvements": {"plier le coude (avant-bras vers l'avant, vers le haut si le bras est leve)": "X+"},
+			"limites": "X de 0 a +150 deg, jamais negatif ; Y et Z = 0"
+		},
+		"RightWrist": {
+			"part0": "RightLowerArm", "part1": "RightHand",
+			"mouvements": {
+				"plier la main vers l'avant (paume)": "X+",
+				"plier la main vers l'arriere": "X-",
+				"incliner la main vers l'exterieur": "Z+",
+				"tourner la main (face avant vers SA gauche)": "Y+"
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"LeftWrist": {
+			"part0": "LeftLowerArm", "part1": "LeftHand",
+			"mouvements": {
+				"plier la main vers l'avant (paume)": "X+",
+				"plier la main vers l'arriere": "X-",
+				"incliner la main vers l'exterieur": "Z-",
+				"tourner la main (face avant vers SA gauche)": "Y+"
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"RightHip": {
+			"part0": "LowerTorso", "part1": "RightUpperLeg",
+			"mouvements": {
+				"lever la jambe devant": "X+",
+				"jambe vers l'arriere": "X-",
+				"ecarter la jambe (vers l'exterieur)": "Z+",
+				"rapprocher / croiser la jambe": "Z-",
+				"tourner la jambe (pointe du pied vers SA gauche)": "Y+"
+			},
+			"limites": "X de -30 a +120 deg ; Z de -15 a +60 deg ; Y +/- 30 deg"
+		},
+		"LeftHip": {
+			"part0": "LowerTorso", "part1": "LeftUpperLeg",
+			"mouvements": {
+				"lever la jambe devant": "X+",
+				"jambe vers l'arriere": "X-",
+				"ecarter la jambe (vers l'exterieur)": "Z-",
+				"rapprocher / croiser la jambe": "Z+",
+				"tourner la jambe (pointe du pied vers SA gauche)": "Y+"
+			},
+			"limites": "X de -30 a +120 deg ; Z de -60 a +15 deg ; Y +/- 30 deg"
+		},
+		"RightKnee": {
+			"part0": "RightUpperLeg", "part1": "RightLowerLeg",
+			"mouvements": {"plier le genou (mollet vers l'arriere)": "X-"},
+			"limites": "X de 0 a -150 deg, jamais positif (X+ = hyperextension) ; Y et Z = 0"
+		},
+		"LeftKnee": {
+			"part0": "LeftUpperLeg", "part1": "LeftLowerLeg",
+			"mouvements": {"plier le genou (mollet vers l'arriere)": "X-"},
+			"limites": "X de 0 a -150 deg, jamais positif (X+ = hyperextension) ; Y et Z = 0"
+		},
+		"RightAnkle": {
+			"part0": "RightLowerLeg", "part1": "RightFoot",
+			"mouvements": {
+				"relever la pointe du pied": "X+",
+				"baisser la pointe du pied": "X-",
+				"incliner le pied (bord exterieur vers le haut)": "Z+",
+				"tourner la pointe vers SA gauche": "Y+"
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		},
+		"LeftAnkle": {
+			"part0": "LeftLowerLeg", "part1": "LeftFoot",
+			"mouvements": {
+				"relever la pointe du pied": "X+",
+				"baisser la pointe du pied": "X-",
+				"incliner le pied (bord exterieur vers le haut)": "Z-",
+				"tourner la pointe vers SA gauche": "Y+"
+			},
+			"limites": "+/- 30 deg sur chaque axe"
+		}
+	},
+	"limites_source": "Coude et genou : demandes (0 a 150 deg, un seul sens). Cou, poignets, chevilles : skill /perso-roblox. Autres limites : (proposition), pour eviter les poses impossibles ; a ajuster.",
+
+	"mesures": {
+		"methode": "Deplacement du bout de Part1 (bas de la piece pour bras, jambes, mains, pieds ; haut pour torse et tete) dans le repere du HRP, pour +30 deg sur un seul axe, en studs (x droite, y haut, z arriere).",
+		"X": {"bras (epaule)": [0, 0.14, -0.52], "coude": [0, 0.11, -0.42], "hanche": [0, 0.15, -0.58], "genou": [0, 0.14, -0.53], "cou": [0, -0.16, 0.58], "Waist": [0, -0.23, 0.85], "Root": [0, -0.05, 0.2]},
+		"Y": {"RightShoulder": [-0.07, 0, -0.25], "LeftShoulder": [0.07, 0, 0.25], "autres": "bout immobile, face avant tournee de (0,0,-1) a (-0,5 ; 0 ; -0,87)"},
+		"Z": {"RightShoulder": [0.45, 0.39, 0], "LeftShoulder": [0.59, -0.11, 0], "hanches": [0.58, 0.15, 0], "cou": [-0.58, -0.16, 0], "Waist": [-0.85, -0.23, 0]}
+	},
+
+	"pose_test": {
+		"description": "bras droit leve devant (90 deg), coude droit plie a 90 deg, genou gauche plie a 90 deg",
+		"transforms": {"RightShoulder": "CFrame.Angles(rad(90), 0, 0)", "RightElbow": "CFrame.Angles(rad(90), 0, 0)", "LeftKnee": "CFrame.Angles(rad(-90), 0, 0)"},
+		"resultat": "dans le repere du HRP : RightLowerArm (1,47 ; 1,12 ; -0,77) et RightHand (1,47 ; 1,79 ; -0,77) = avant-bras vertical vers le haut, devant le corps ; LeftLowerLeg (-0,50 ; -1,92 ; 0,41) et LeftFoot (-0,50 ; -1,92 ; 1,12) = mollet horizontal vers l'arriere. Capture de profil conforme."
+	},
+
+	"pieges": [
+		"En mode edition, Transform ne deplace pas les pieces, et changer la CFrame d'une piece reliee deplace tout l'assemblage : pour un clone d'apercu, ancrer toutes les pieces, mettre Enabled = false sur les AnimationConstraint, supprimer le LocalScript Animate, puis calculer chaque CFrame avec la formule depuis le HRP.",
+		"L'avatar par defaut apparait presque noir au-dessus de l'eau (contre-jour) : reperer les membres avec des Highlight (31 maximum a l'ecran) et un repere devant la tete.",
+		"Les epaules pivotent 0,5 stud a l'interieur du centre du bras : une rotation Y deplace aussi le bras (vers l'avant a droite, vers l'arriere a gauche).",
+		"Les signes de Z (ecarter) sont opposes entre cote droit et cote gauche ; ceux de X et Y sont les memes des deux cotes."
+	]
+}
