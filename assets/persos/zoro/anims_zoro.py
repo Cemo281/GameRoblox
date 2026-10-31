@@ -17,6 +17,9 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import minimize
 
+sys.path.insert(0, str(Path(__file__).parent.parent / "_anim"))
+import finition  # noqa: E402
+
 DOSSIER = Path(__file__).parent
 RIG = json.loads((DOSSIER.parent / "_mannequin" / "v1" / "r15_bloc.json").read_text(encoding="utf-8"))  # zoro est construit sur le mannequin v1
 ACC = json.loads((DOSSIER / "accessoires.json").read_text(encoding="utf-8"))
@@ -339,9 +342,7 @@ def apercu(nom, cles, images):
 
 
 def lisser(t, easing):
-	if easing == "Linear":
-		return t
-	return t * t * (3 - 2 * t)  # Cubic InOut (approx.)
+	return finition.courbe(t, easing)
 
 
 def slerp_pose(pa, pb, t):
@@ -354,7 +355,10 @@ def slerp_pose(pa, pb, t):
 		b = pb.get(art, (0, 0, 0))
 		ra = R.from_matrix(angles(*np.radians(a[:3]))[:3, :3])
 		rb = R.from_matrix(angles(*np.radians(b[:3]))[:3, :3])
-		r = Slerp([0, 1], R.concatenate([ra, rb]))(t)
+		if 0 <= t <= 1:
+			r = Slerp([0, 1], R.concatenate([ra, rb]))(t)
+		else:  # depassement (courbes Rebond, Elastique de finition.py) : rotation prolongee au-dela de b
+			r = R.from_rotvec((rb * ra.inv()).as_rotvec() * t) * ra
 		# retour en angles CFrame.Angles (Rx*Ry*Rz = 'XYZ' intrinseque)
 		out[art] = tuple(np.degrees(r.as_euler("XYZ")))
 	for art in ARTICULATIONS:
@@ -388,6 +392,18 @@ def verifier_anim(nom, cles, n_images, avec_hanche=True):
 			print(f"  {k}: {v:.3f} (image {i})")
 
 
+def finir(nom, cles, n_images, boucle, priorite, marqueurs, **reglages):
+	"""Version finie (assets/persos/_anim/finition.py) : verifiee sur chaque image, ecrite dans anims/zoro_<Nom>_fini.json."""
+	toutes, gardees = finition.finir(cles, n_images, ARTICULATIONS, boucle=boucle, limites=LIMITES, **reglages)
+	verifier_anim(nom + "_fini", toutes, n_images, avec_hanche=(nom == "Idle"))
+	if nom == "Action":
+		verifier_lames(nom + "_fini", toutes, n_images, depuis={"Right": 15, "Left": 22})
+	elif nom == "Signature":
+		verifier_lames(nom + "_fini", toutes, 44, depuis={"Right": 0, "Left": 0})  # lames rangees au clac (45)
+	ecrire(nom + "_fini", gardees, n_images, boucle, priorite, marqueurs)
+	return toutes
+
+
 def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 	donnees = {
 		"nom": "zoro_" + nom,
@@ -401,7 +417,7 @@ def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 			{
 				"image": f,
 				"temps": round(f / FPS, 4),
-				"easing": e,
+				"easing": finition.vers_roblox(e),
 				"poses": {art: {"angles": [round(float(v), 2) for v in p.get(art, (0, 0, 0))[:3]], "cframe": vers_douze(transform(p, art))} for art in ARTICULATIONS},
 			}
 			for f, p, e in cles
@@ -443,6 +459,8 @@ def idle():
 	]
 	verifier_anim("Idle", cles, 120)
 	ecrire("Idle", cles, 120, True, "Idle", [])
+	# bras croises (20-90) et retour le long du manteau (98-120) : gardes exacts, ils suivent le buste qui respire
+	finir("Idle", cles, 120, True, "Idle", [], contacts={a: [(20, 90), (98, 120)] for a in ("RightShoulder", "RightElbow", "RightWrist", "LeftShoulder", "LeftElbow", "LeftWrist")})
 	apercu("Idle", cles, [0, 10, 20, 38, 74, 96])
 	return cles
 
@@ -653,8 +671,9 @@ def action():
 	print("75 ouverture en X, bond")
 	p75 = construire(corps(n, root_pos=(0, -0.15, -0.45), waist=(6, 0, 0), neck=(-2, 0, 0)), {"Right": dict(main=(2.0, -0.2, -1.2), lame=(0.6, -0.3, -0.75)), "Left": dict(main=(-2.0, -0.2, -1.2), lame=(-0.6, -0.3, -0.75))})
 	cles = [
-		(0, n, "Cubic"), (10, p10, "Cubic"), (15, p15, "Cubic"), (19, p19, "Cubic"), (22, p22, "Cubic"), (30, p30, "Cubic"), (40, g, "Cubic"),
-		(46, p46, "Cubic"), (50, p50, "Cubic"), (56, p56, "Cubic"), (62, p62, "Cubic"), (70, p70, "Cubic"), (75, p75, "Cubic"),
+		# Sortie : degainages et entailles partent d'un coup et freinent en fin de geste
+		(0, n, "Cubic"), (10, p10, "Sortie"), (15, p15, "Cubic"), (19, p19, "Sortie"), (22, p22, "Cubic"), (30, p30, "Cubic"), (40, g, "Cubic"),
+		(46, p46, "Sortie"), (50, p50, "Cubic"), (56, p56, "Sortie"), (62, p62, "Cubic"), (70, p70, "Sortie"), (75, p75, "Cubic"),
 		(85, g, "Cubic"), (105, g, "Cubic"),
 	]
 	marqueurs = [
@@ -667,6 +686,7 @@ def action():
 	verifier_anim("Action", cles, 105, avec_hanche=False)
 	verifier_lames("Action", cles, 105, depuis={"Right": 15, "Left": 22})
 	ecrire("Action", cles, 105, False, "Action", marqueurs)
+	finir("Action", cles, 105, False, "Action", marqueurs, secousses=[(50, 8, 2.5), (62, 8, 2.5), (75, 16, 4.0)])
 	apercu("Action", cles, [10, 15, 19, 22, 30, 40, 46, 50, 56, 62, 70, 75, 105])
 	return cles
 
@@ -701,7 +721,7 @@ def signature():
 	p45 = construire(corps(p25, root_pos=(0, -0.1, 0), waist=(-6, -18, 0), neck=(-4, -8, 0)), {"Right": dict(main=(1.45, -0.72, -1.0), lame=LAMES_RANGEES), "Left": dict(main=(1.0, -0.6, -1.3), lame=LAMES_RANGEES)})
 	print("55 yeux fermes, tete baissee")
 	p55 = corps(n, waist=(-3, 0, 0), neck=(-8, 0, 0))
-	cles = [(0, g, "Cubic"), (15, p15, "Cubic"), (25, p25, "Cubic"), (45, p45, "Cubic"), (55, p55, "Cubic"), (75, n, "Cubic")]
+	cles = [(0, g, "Cubic"), (15, p15, "Cubic"), (25, p25, "Entree"), (45, p45, "Cubic"), (55, p55, "Cubic"), (75, n, "Cubic")]  # Entree : les lames accelerent jusqu'au clac
 	marqueurs = [
 		{"image": 15, "nom": "Cacher", "valeur": "Acc_Sabre_Bouche"},
 		{"image": 45, "nom": "Cacher", "valeur": "Acc_Sabre_Droit"},
@@ -712,6 +732,7 @@ def signature():
 	verifier_anim("Signature", cles, 75, avec_hanche=False)
 	verifier_lames("Signature", cles, 44, depuis={"Right": 0, "Left": 0})
 	ecrire("Signature", cles, 75, False, "Action", marqueurs)
+	finir("Signature", cles, 75, False, "Action", marqueurs, secousses=[(45, 8, 2.0)])
 	apercu("Signature", cles, [0, 15, 25, 45, 55, 75])
 	# raccords : image 0 = derniere image de l'Action, image 75 = image 0 de l'Idle
 	for nom_a, im_a, im_b in (("Action", 105, 0), ("Idle", 0, 75)):

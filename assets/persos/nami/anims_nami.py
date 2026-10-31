@@ -18,6 +18,9 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import minimize
 
+sys.path.insert(0, str(Path(__file__).parent.parent / "_anim"))
+import finition  # noqa: E402
+
 DOSSIER = Path(__file__).parent
 RIG = json.loads((DOSSIER / "rig_nami.json").read_text(encoding="utf-8"))
 FPS = 30
@@ -280,9 +283,7 @@ def main_hanche(pose, cote, cible, tolerance=0.08):
 
 
 def lisser(t, easing):
-	if easing == "Linear":
-		return t
-	return t * t * (3 - 2 * t)  # Cubic InOut (approx.)
+	return finition.courbe(t, easing)
 
 
 def slerp_pose(pa, pb, t):
@@ -294,7 +295,10 @@ def slerp_pose(pa, pb, t):
 		b = pb.get(art, (0, 0, 0))
 		ra = R.from_matrix(angles(*np.radians(a[:3]))[:3, :3])
 		rb = R.from_matrix(angles(*np.radians(b[:3]))[:3, :3])
-		r = Slerp([0, 1], R.concatenate([ra, rb]))(t)
+		if 0 <= t <= 1:
+			r = Slerp([0, 1], R.concatenate([ra, rb]))(t)
+		else:  # depassement (courbes Rebond, Elastique de finition.py) : rotation prolongee au-dela de b
+			r = R.from_rotvec((rb * ra.inv()).as_rotvec() * t) * ra
 		out[art] = tuple(np.degrees(r.as_euler("XYZ")))
 	for art in ARTICULATIONS:
 		cle = art + "Pos"
@@ -326,6 +330,14 @@ def verifier_anim(nom, cles, n_images):
 			print(f"  {k}: {v:.3f} (image {i})")
 
 
+def finir(nom, cles, n_images, boucle, priorite, marqueurs, **reglages):
+	"""Version finie (assets/persos/_anim/finition.py) : verifiee sur chaque image, ecrite dans anims/nami_<Nom>_fini.json."""
+	toutes, gardees = finition.finir(cles, n_images, ARTICULATIONS, boucle=boucle, limites=LIMITES, **reglages)
+	verifier_anim(nom + "_fini", toutes, n_images)
+	ecrire(nom + "_fini", gardees, n_images, boucle, priorite, marqueurs)
+	return toutes
+
+
 def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 	donnees = {
 		"nom": "nami_" + nom,
@@ -339,7 +351,7 @@ def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 			{
 				"image": f,
 				"temps": round(f / FPS, 4),
-				"easing": e,
+				"easing": finition.vers_roblox(e),
 				"poses": {art: {"angles": [round(float(v), 2) for v in p.get(art, (0, 0, 0))[:3]], "cframe": vers_douze(transform(p, art))} for art in ARTICULATIONS},
 			}
 			for f, p, e in cles
@@ -434,6 +446,7 @@ def idle():
 	]
 	verifier_anim("Idle", cles, 90)
 	ecrire("Idle", cles, 90, True, "Idle", marqueurs)
+	finir("Idle", cles, 90, True, "Idle", marqueurs)
 	apercu("Idle", cles, [0, 15, 24, 36, 65, 78], lambda i: ["Acc_Baton"] + (["Acc_Bourse"] if 15 <= i < 65 else []))
 	return cles
 
@@ -464,7 +477,7 @@ def action():
 		(32, tour[2], "Linear"),
 		(38, tour[3], "Linear"),
 		(45, leve, "Cubic"),
-		(50, elan, "Cubic"),
+		(50, elan, "Entree"),  # le baton accelere jusqu'au sol
 		(55, abat, "Cubic"),
 		(63, abat, "Cubic"),
 		(75, replante, "Cubic"),
@@ -484,6 +497,7 @@ def action():
 	print("baton leve (axe)", np.round(cfs["Acc_Baton"][:3, 0], 2), "main", np.round(cfs["RightHand"][:3, 3], 2))
 	verifier_anim("Action", cles, 105)
 	ecrire("Action", cles, 105, False, "Action", marqueurs)
+	finir("Action", cles, 105, False, "Action", marqueurs, secousses=[(55, 14, 3.5)])
 	apercu("Action", cles, [0, 15, 26, 50, 55, 75], lambda i: ["Acc_Baton"])
 	return cles
 
@@ -507,8 +521,8 @@ def signature():
 		(0, n, "Cubic"),
 		(15, lit, "Cubic"),
 		(30, avec(lit, Neck=(-14, 10, -8)), "Cubic"),
-		(35, accroupi, "Cubic"),
-		(40, saut, "Cubic"),
+		(35, accroupi, "Sortie"),  # impulsion du saut
+		(40, saut, "Entree"),  # retombee
 		(46, accroupi, "Cubic"),
 		(54, lit, "Cubic"),
 		(66, avec(lit, Neck=(-8, 4, -4)), "Cubic"),
@@ -522,6 +536,7 @@ def signature():
 	]
 	verifier_anim("Signature", cles, 105)
 	ecrire("Signature", cles, 105, False, "Action", marqueurs)
+	finir("Signature", cles, 105, False, "Action", marqueurs, secousses=[(46, 8, 1.5)])
 	apercu("Signature", cles, [0, 15, 35, 40, 75], lambda i: ["Acc_Baton"] + (["Acc_Carte"] if 15 <= i < 75 else []))
 	return cles
 

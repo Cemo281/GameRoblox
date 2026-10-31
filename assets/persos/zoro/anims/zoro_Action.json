@@ -332,7 +332,7 @@
 		{
 			"image": 10,
 			"temps": 0.3333,
-			"easing": "Cubic",
+			"easing": "Linear",
 			"poses": {
 				"Root": {
 					"angles": [
@@ -976,7 +976,7 @@
 		{
 			"image": 19,
 			"temps": 0.6333,
-			"easing": "Cubic",
+			"easing": "Linear",
 			"poses": {
 				"Root": {
 					"angles": [
@@ -2264,7 +2264,7 @@
 		{
 			"image": 46,
 			"temps": 1.5333,
-			"easing": "Cubic",
+			"easing": "Linear",
 			"poses": {
 				"Root": {
 					"angles": [
@@ -2908,7 +2908,7 @@
 		{
 			"image": 56,
 			"temps": 1.8667,
-			"easing": "Cubic",
+			"easing": "Linear",
 			"poses": {
 				"Root": {
 					"angles": [
@@ -3552,7 +3552,7 @@
 		{
 			"image": 70,
 			"temps": 2.3333,
-			"easing": "Cubic",
+			"easing": "Linear",
 			"poses": {
 				"Root": {
 					"angles": [
