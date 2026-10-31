@@ -1,0 +1,52 @@
+{
+	"Hub_CerisierA": {
+		"taille_roblox": [
+			12.418,
+			10.612,
+			12.381
+		],
+		"centre_au_dessus_du_sol": 5.306,
+		"triangles": 7028
+	},
+	"Hub_CerisierB": {
+		"taille_roblox": [
+			12.636,
+			10.398,
+			12.827
+		],
+		"centre_au_dessus_du_sol": 5.199,
+		"triangles": 7124
+	},
+	"Hub_Torii": {
+		"taille_roblox": [
+			22.4,
+			16.84,
+			2.4
+		],
+		"centre_au_dessus_du_sol": 8.42,
+		"triangles": 4248
+	},
+	"Hub_LanternePierre": {
+		"taille_roblox": [
+			3.9,
+			6.185,
+			3.5
+		],
+		"centre_au_dessus_du_sol": 3.093,
+		"triangles": 2542,
+		"feu": {
+			"bas": 3.11,
+			"hauteur": 1.15,
+			"rayon": 0.62
+		}
+	},
+	"Hub_Chochin": {
+		"taille_roblox": [
+			1.8,
+			1.9,
+			1.8
+		],
+		"centre_au_dessus_du_sol": 0.95,
+		"triangles": 840
+	}
+}

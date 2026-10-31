@@ -3,6 +3,103 @@
 Suivi des tâches de développement. Les décisions de game design en attente sont dans [Questions ouvertes](Questions-ouvertes.md).
 
 ## En cours
+### Décor du Hub, style animé « sanctuaire de festival » (place Studio, pièces seulement, sans Blender)
+- [x] Sauvegarde du Hub actuel dans `ServerStorage.Sauvegarde_AvantDecorHub`
+- [x] Sol : plateau, place centrale et chemins en SmoothPlastic pastel (tons moyens : l'éclairage brûle les teintes claires), bordure du plateau ouverte aux chemins, liserés et dalles rondes sur les chemins
+- [x] Centre : estrade à gradins autour du piédestal (piédestal passé en SmoothPlastic doré + liseré Neon), 4 lanternes, cœur lumineux flottant à y = 36 (orbites, étincelles, rayon)
+- [x] Torii vermillon à l'arrivée des 7 chemins + 2 lanternes de pierre chacun
+- [x] Stands façon yatai (toit rayé, lambrequin, chochin, noren, caisses) ; couleurs des comptoirs / enseignes adoucies
+- [x] 12 cerisiers (pétales en particules), 2 bancs circulaires, 7 bancs autour de la place
+- [x] Cadre du panneau de classements (toit noir, linteau vermillon, cadre doré)
+- [x] Captures et vérification (passages libres, 846 pièces dans `Hub.Decor`)
+- [x] Wiki : section « Direction artistique » dans `Hub.md` + journal
+- [ ] Valider la direction artistique (utilisateur) et enregistrer la place (Ctrl+S, hors git)
+- [x] Éclairage (place Studio, hors Rojo) : OutdoorAmbient 249,201,255 → 190,172,206 ; ColorCorrection luminosité 0,10 → 0,02, contraste 0,25 → 0,12, saturation 0,10 → 0,18, teinte 255,248,250 ; Bloom intensité 1 → 0,6, seuil 2 → 1,6 (bases plus lisibles aussi)
+- [x] Blender (accord reçu) : `assets/hub/decor_hub.py` (lancé en arrière-plan, sans toucher le Blender ouvert) → `fbx/decor_hub.fbx`, `palette_hub.png`, `decor_hub.json`, `apercu/ensemble.png` : CerisierA / B (≈ 4 300 tri.), Torii courbé (4 248), LanternePierre (2 542), Chochin (840) ; ombrage peint dans une palette en dégradés, sans traits noirs
+- [x] Cerisier v2 (retour : « trop chewing-gum, pas assez arbre ») : tronc noueux fourchu en 4 branches et 8 rameaux visibles, touffes séparées et étagées en dôme (dessous aplati, bosselées, facettes peintes), rose moins bonbon ; ≈ 7 100 triangles
+- [ ] Import de `assets/hub/fbx/decor_hub.fbx` dans Studio (manuel)
+- [ ] Remplacer les pièces provisoires par les MeshParts (torii, lanternes de pierre, cerisiers, chochin), gabarits dans `ServerStorage.Gabarits.DecorHub`
+- [x] `src/client/DecorAnime.luau` : tags `DecorTournant` (orbites, attribut `Vitesse`) et `DecorFlottant` (cœur, `Amplitude`, `Periode`), testé en Play
+
+### Calibration R15 pour `/perso-catalogue` (Studio seulement, fichiers dans `assets/persos/_rig/`)
+- [x] Avatar R15 de test créé en mode édition (`CreateHumanoidModelFromDescription`) : articulations = AnimationConstraint, pas de Motor6D
+- [x] Relevé des 15 articulations et 16 pièces → `r15.json` (identique à `_mannequin/releve_brut.json`)
+- [x] 45 cas (+30° X/Y/Z) et pose test → `axes_r15.json` (mêmes signes que la calibration du mannequin)
+- [ ] Chaîne JSON → KeyframeSequence → aperçu sur clones (coucou du bras droit, 2 s)
+- [ ] Vérification dans l'éditeur d'animation (manuel)
+- [ ] Ranger l'avatar dans `ServerStorage.Gabarits.AvatarTestR15`, supprimer le reste
+
+### Personnage `luffy` (skill `/perso-catalogue`, Mythique, fichiers dans `assets/persos/luffy/`)
+- [x] 1. Fiche reformulée et validée (référence prioritaire : chemise à manches courtes, revers blancs ; chapeau sur la tête)
+- [x] 2. Recherche catalogue → `catalogue.md` + `catalogue/planche*.png`
+- [x] 2b. Choix : catalogue (chapeau, cheveux, viande) + modèle Toolbox 16939724553 (visage, écharpe, short avec revers et sandales)
+- [x] 4. Chemise sur mesure dans Blender : `chemise_luffy.py` + `peindre_chemise_luffy.py` → `chemise_luffy.blend`, `fbx/chemise_luffy.fbx`, `chemise_luffy.json` (tailles, décalages)
+- [x] 4. Chemise v2 détaillée (image fournie) : plis en relief, manches évasées froissées, ourlet ondulé, col roulé, revers ; ombrage cuit (Cycles, `cuisson/`) + plis peints ; 7 112 triangles, texture 2048
+- [x] Chemise v3 : col roulé retiré, chemise allongée jusqu'au bas de LowerTorso (ourlet -1,02), ouverture élargie (0,30 → 0,50), 5 boutons, traits noirs effilés le long des plis, aplats d'ombre plus francs
+- [x] Chemise v4 : traits noirs le long des plis retirés (pas naturels), contours en rouge sombre au lieu de presque noir ; `tex_chemise_luffy.png` repeinte
+- [x] Texture rechargée dans `chemise_luffy.blend`, `fbx/chemise_luffy.fbx` réexporté (7 120 triangles, tailles inchangées)
+- [x] Chemise v5 : 3 boutons au lieu de 5, ourlet à -1,32 (sous l'écharpe, haut des cuisses), manches longues jusqu'au coude + poignets à revers sur LowerArm (milieu de l'avant-bras) ; recuisson (2 min 45 s), 5 pièces, 9 880 triangles, `chemise_luffy.json` à jour
+- [ ] Dans Studio : vérifier que le bas de la chemise (rigide sur UpperTorso) ne traverse pas trop les cuisses pendant les animations
+- [ ] **Chemise refaite de zéro** (sur le vrai corps R15 exporté de Studio, les anciens fichiers `chemise_luffy*` restent jusqu'à validation) :
+  - [x] Corps R15 bloc de `Workspace.AvatarTestR15` sélectionné dans Studio (15 MeshParts, sans HumanoidRootPart)
+  - [x] Nouveau fichier `chemise_r15.blend` : copie de `chemise_luffy.blend` sans la chemise v5 (mannequin en blocs + torse peint seulement)
+  - [x] Abdos retirés ; mannequin « Roblox parfait » (torse 2 × 2,1 × 1, hanches = tronc, bras 1 × 2,1 alignés en haut sur le torse, jambes 1 × 2,2) ; objet `veste` (LowerTorso + UpperTorso + 2 UpperArm) gonflé de 0,06 stud, matériau `Mat_Veste`
+  - [x] Rig R15 GitHub (`Downloads/Rig15ik.blend`, vrais maillages Roblox, bones + Child Of) utilisé à la place de l'export Studio
+  - [x] Veste sur ce rig : LowerTorso + UpperTorso + 2 UpperArm recousus, gonflés de 0,05 stud (0,08 jugé trop), coupés net (ourlet, bas des manches), Solidify 0,05, `Mat_Veste` rouge ; copie `assets/persos/luffy/chemise_rig15.blend` (sauvegarde cachée `veste_sauvegarde`)
+  - [x] Torse de la veste d'un seul tenant : UpperTorso gonflé prolongé jusqu'au bas du LowerTorso (plus de rebord à la taille) ; version modifiée à la main gardée cachée (`veste_modifiee`)
+  - [x] Réparations (trous de la manche droite, débris sous l'aisselle gauche, manches coupées au ras du flanc et fermées) ; bord en vagues arrondies irrégulières (torse 0,35-0,7 × 0,06-0,12 stud, manches 0,2-0,4 × 0,03-0,06), Solidify sans « even thickness » (pointes) ; copies cachées `veste_avant_reparation*`, `veste_avant_zigzag`
+  - [x] **Chemise v6** (`chemise_v6.py`, d'après la référence fournie) : Chemise_Torse / MancheD / MancheG = copies des pièces du rig (suivent leurs os) ; torse ample ouvert devant (+Y = avant du perso), revers, patte et 4 boutons ; manches évasées au bas effiloché (vagues + déchirures) et plis en relief ; épaisseur 0,035 ; cuisson Cycles (≈ 5 min) + peinture numpy (`tex_chemise_v6.png`, plis peints, bord roulé, grain) ; 10 812 + 2 × 8 160 triangles
+  - [x] Style anime testé (`peindre(anime=True)` → `tex_chemise_v6_anime.png`, 4 aplats) ; rendu peint sauvegardé (`tex_chemise_v6_peint.png`, `chemise_rig15_v6_peint.blend`)
+  - [x] Ceinture + short v6 (`bas_v6.py`, style anime) : écharpe jaune serrée sur le LowerTorso (z 2,19 → 2,59, sous la chemise, visible dans l'ouverture), nœud au centre et 2 pans effilochés ; haut du short resserré sous la chemise (suit LowerTorso) ; short en jean évasé jusqu'au bas de la cuisse (z 1,10), écharpe peinte en 3 épaisseurs horizontales, plis, couture latérale, revers blanc duveteux (suit les UpperLeg) ; cuisson ≈ 5 min 30 ; `tex_bas_v6_anime.png` ; 6 504 + 2 × 8 064 triangles
+  - [ ] Choisir le rendu final de la chemise (peint ou anime) avant export
+  - [ ] Export FBX de la v6 (chemise + ceinture + short) (UV des faces intérieures vers la zone sombre), import et soudure dans Studio
+  - [ ] (ancienne `veste`) son ouverture était percée dans le dos (-Y) : à abandonner au profit de la v6
+  - [ ] Alléger la veste avant export : 207 936 triangles avec l'épaisseur (base subdivisée à 45 000 sommets), limite Roblox par MeshPart bien plus basse
+  - [ ] Faire suivre les manches aux os des bras (aujourd'hui toute la veste suit LowerTorso)
+- [x] Torse peint : `peindre_torse_luffy.py` → `torse_luffy.png` (décalque Front de UpperTorso : pectoraux, abdos, obliques, clavicules, cicatrice en X ; pas de nombril)
+- [x] Torse en style anime : `peindre_torse_anime.py` → `torse_luffy_anime.png` (aplats en croissant, sans contours, X brun déchiqueté (branches effilées, éclats en V, pointes à ±0,46 en partie sous la chemise, branches fines), 4 abdos seuls en ombres et reflets translucides (la peau vient de la skin), pas de nombril) ; aperçu `Decal_Torse` dans `chemise_rig15.blend`
+- [x] Pecs ajoutés au décalque anime (ombre en croissant sous chaque pec, reflet en haut, sillon central) ; image à renvoyer dans Studio (`Torse_Luffy`)
+- [x] Images envoyées (torse 75774906927040, bas 109932566809619 ; chemise : 127883377469673 envoyée par l'import 3D, la 93829095451933 ne se charge pas) ; Decal `Torse_Luffy` sur UpperTorso
+- [x] 4b. `export_v6.py` → `fbx/tenue_v6.fbx` + `tenue_v6.json` ; importé à la main ; 6 pièces soudées dans `luffy.Tenue` (meshes tournés de 180° autour de Y par l'import)
+- [x] Manches v6 allongées à 0,12 sous le bas de UpperArm (`M_BAS` 0,25 → -0,12) et bas effiloché comme le bas du torse (larges vagues douces + 2 déchirures) ; recuisson (≈ 4 min) + `peindre(anime=True)` ; sauvegarde cachée `Chemise_Manche*_avant_allongement`
+- [ ] Réexporter la tenue (`export_v6.py`), réimporter les 2 manches et la texture chemise dans Studio (IDs de `tenue.json` à mettre à jour)
+- [x] Choix du torse : notre décalque (pas les articles du catalogue ni le Shirt Toolbox)
+- [x] 3. Modèle `Workspace.luffy` (R15 blocs, peau #E8B48C, chapeau 13043540601, cheveux 13832918624, sandales 13753582199, visage Toolbox) ; `tenue.json` ; captures face / 3/4 / dos / profil
+- [x] Écharpe : essai de celle du modèle Toolbox, puis retour à la Ceinture v6 (l'écharpe Toolbox est gardée dans `ServerStorage.Sauvegarde_luffy`)
+- [x] Chapeau agrandi ×1,25 et un peu plus bas ; cheveux raccourcis (hauteur ×0,68) : plus rien ne dépasse
+- [x] Abdos : Shirt classique du modèle Toolbox (template 13497309617, abdos + X + muscles des bras) ; notre Decal `Torse_Luffy` masqué
+- [x] Nouvelle chemise (manches plus longues, réimport du 31/10) posée sur `luffy`, `luffy_essaiB`, `luffy_essaiC` ; import gardé dans `ServerStorage.Sauvegarde_luffy.tenue_v6_import2`
+- [x] Tête : visage Toolbox, Black Spiky Hair taille d'origine, Pirate Straw Hat ×1,1 posé un peu plus haut (meilleur que 12993465889 et 13146004106, percés par les mèches) ; copies d'essai supprimées
+- [x] Torse : Shirt Toolbox remis (`Shirt_Abdos`), décalque masqué ; tête : pièce cheveux + chapeau du Toolbox (`CheveuxChapeau`, 12678766775) à la place du Pirate Straw Hat et du Black Spiky Hair
+- [ ] (abandonné pour l'instant) visage qui rit `visage_luffy_rire.png` : l'envoi 111985977929747 n'est pas servi par Roblox
+- [ ] Vérifier les sandales (vêtement en couches : invisibles en mode édition) en mode Play
+- [ ] 4. Éléments absents du catalogue (si besoin, Blender seulement avec accord)
+- [ ] 5. Animations `luffy_Idle` / `luffy_Action` / `luffy_Signature` (nouvelle fiche : rire + moulinet, rafale + poing élastique, bras de Haki)
+  - [x] Rig relevé dans Studio (`rig_luffy.json`, AnimationConstraint) ; `anims_luffy.py` (moteur de nami : IK, pieds plantés, `etirer` = translation de l'épaule le long du bras) ; `apercu_studio.py`, `vers_studio.py`
+  - [x] Idle calculée (90 images, 20 clés) : main gauche au bord du chapeau, poing droit sur la hanche (coude sorti en arrière : vrai poing tourné vers l'intérieur impossible avec ce rig), rire, moulinet 2 tours, étirement en V
+  - [x] Action calculée (150 images) : rafale 11 coups étirés de 1,5, charge genou levé, fente + bras étiré de 3 (poing à 5,7 studs du centre), LowerTorso 0,48 max ; marqueurs Rafale 20 / Charge_Poing 70 / Poing_Elastique 94 / Impact_Final 98
+  - [x] Signature calculée (120 images) : marqueurs Montrer Acc_Haki 30 / Acc_Haki_Main 31, VFX Eclairs_Haki 30 / Onde_Haki 31 / Eclairs_Haki_Fin 90, Cacher 90 / 91
+  - [x] Signature : buste tourné vers sa droite, le poing ne cache plus qu'une partie du visage (validé) ; main gauche sur le biceps = bras croisé (chevauchement ~0,3 avec le torse)
+  - [x] Coordination avec l'autre session : passe `_anim/finition.py` gardée, chaque lancement écrit `luffy_<Nom>.json` (blocage) et `luffy_<Nom>_fini.json` (finie)
+  - [x] KeyframeSequence de blocage `luffy_Idle/Action/Signature` dans `RBX_ANIMSAVES.luffy`, à côté des `*_fini` (comparaison) ; `vers_studio.py` envoie des angles (3× plus court)
+  - [x] Choix : version finie. Les 3 KeyframeSequence officielles `luffy_Idle/Action/Signature` sont construites depuis `luffy_<Nom>_fini.json` (lues par HttpService sur un serveur local, `HttpEnabled` remis à false) ; copies `*_fini` et blocage retirées de `RBX_ANIMSAVES.luffy`
+  - [x] Action : l'épaule reste collée, seul l'avant-bras s'allonge (`etirer` = translation du coude, ressort `RightElbowPos` dans `finition.py`) ; Beams `BrasElastique_*` déplacés au coude (peau entre la manche et l'avant-bras) ; charge : le bras s'allonge vers l'arrière (signe corrigé), retour : dépassement -0,15
+  - [ ] **Prochaine session : bras élastique de `luffy_Action` en cube.** Remplacer le Beam `BrasElastique_*` (ruban plat face caméra) par un cube couleur peau de la largeur du bras (≈ 1 × 1 stud, comme l'avant-bras R15) qui s'étire entre le coude (bas de la manche) et l'avant-bras. Rien n'a été fait de ce côté ; contrainte : pas de script de jeu dans le modèle (taille d'une pièce non animable par KeyframeSequence) → piste à étudier : plusieurs segments de cube répartis le long de l'étirement, chacun soudé/translaté par la même translation de coude, ou mise à l'échelle lue côté client dans `Vitrine.luau` (modifie `src/`, à demander)
+  - [ ] Vérifier `luffy_Action` dans l'Animation Editor (pas encore fait par l'utilisateur)
+  - [ ] Publication (manuel, pas encore faite) → 3 IDs → attributs `AnimationIdle/Action/Signature`, vérification `GetKeyframeSequenceAsync`
+  - [ ] 7. Finition : AnimationController + Animator, ancrage, `ModelesPersonnages.luffy` ; supprimer `ServerStorage.Outil_Apercu_luffy`, `Outil_Seul_luffy`, `Outil_VFX_luffy`, `Outil_KS_luffy`
+  - [ ] Enregistrer la place Studio (Acc_Haki, VFX, Beams, KeyframeSequence n'existent que dans la place, pas dans git)
+  - [ ] KeyframeSequence dans `RBX_ANIMSAVES.luffy` → publication (manuel) → attributs `AnimationIdle/Action/Signature`
+- [ ] 6. Accessoires et VFX (dans `Workspace.luffy`)
+  - [x] `Acc_Viande` : n'existait pas (rien à supprimer)
+  - [x] `Acc_Haki` (coque avant-bras) + `Acc_Haki_Main` (coque main) : 2 accessoires car `Vitrine.luau` ne montre que le `Handle` ; Attachment unique sur la pièce porteuse (sinon le Humanoid les soude à la tête)
+  - [x] `BrasElastique_Right/Left` : Beam couleur peau du pivot d'épaule au haut du bras (invisible au repos, s'étire avec la translation)
+  - [x] Textures `vfx/poing.png` 118675450303720, `vfx/trait.png` 82179997647549 (`vfx_luffy.py`)
+  - [x] VFX Rafale, Charge_Poing (sphère `VFX_ZoneCharge` soudée à la main), Poing_Elastique, Impact_Final, Eclairs_Haki, Onde_Haki ; aperçus rafale, impact, Haki
+  - [x] Vrais éclairs du Haki : planche `vfx/eclairs_haki.png` 4×4 (73977543565746, Flipbook Random) ; `Eclairs_Haki` = crépitement sur l'avant-bras (zone `VFX_ZoneHaki`), grands éclairs autour du buste (`VFX_ZoneHakiLarge`), aura rouge, étincelles ; `Onde_Haki` + salve d'éclairs au sol et flash rouge
+- [ ] 7. Finition (AnimationController, ancrage, `ModelesPersonnages.luffy`)
+- [ ] 8. Bilan ; garder `assets/persos/luffy/` pour `luffy_gear2`
+
 ### Modération (avertissement Roblox reçu, 2026-10-29)
 - [x] Décalque du ventre (nombril, traits du bassin) retiré de `ModelesPersonnages.nami` ; `ventre_nami.png` supprimé, `peindre_ventre.py` archivé
 - [x] Bikini remplacé par le haut couvrant rayé (géométrie d'origine) ; nombril et ligne du ventre retirés de l'atlas `tex_corps_nami.png` ; export 4 808 triangles
@@ -213,6 +310,32 @@ Refonte de l'ancien modèle R6 (section plus bas). Premier perso construit sur l
 - [ ] Vérifier à l'œil dans l'Animation Editor le sens de l'easing Elastic/Out et les axes de la cape
 
 ## À faire
+### Finition des animations (fluidité, impact) — pilote : luffy
+- [x] Diagnostic : pourquoi les animations actuelles paraissent simples (clés communes à tout le corps, 2 easings, poses figées)
+- [x] Module partagé `assets/persos/_anim/finition.py` : cuisson à 30 i/s, easings d'impact, ressorts par articulation (décalage et dépassement), respiration, secousse d'impact, raccords exacts
+- [x] Appliquer à `anims_luffy.py` (Idle, Action, Signature) : version « fini » à côté de la version actuelle
+- [x] Vérifications (pénétrations, LowerTorso ≤ 0,5, raccords) sur chaque image ; contacts exacts (main au chapeau, main sur le biceps)
+- [x] KeyframeSequence `luffy_*_fini` (80, 144, 78 clés) dans `RBX_ANIMSAVES.luffy` (les `luffy_*` du blocage sont construites par l'autre session /perso-catalogue)
+- [ ] Comparer blocage / fini dans l'éditeur d'animation et choisir (manuel)
+- [ ] Relancer `anims_luffy.py Signature` quand la nouvelle signature() est stable (contacts à recaler si le minutage change) dans `ServerStorage.RBX_ANIMSAVES.luffy` pour comparer dans l'éditeur d'animation
+- [ ] Recette d'impact VFX en couches (flash, éclats, onde, poussière, braises) pour les effets de luffy
+- [x] Rendu validé par l'utilisateur (31/10)
+- [x] `finition.finir()` commun (cuisson + allègement) ; nami et zoro branchés (`finir()` dans leurs scripts, courbes d'impact : éclair de nami en `Entree`, saut en `Sortie`/`Entree`, dégainages et entailles de zoro en `Sortie`, clac en `Entree` ; secousses)
+- [x] Vérifié sur chaque image : rien de pire que le blocage (+0,03) sauf zoro Action image 75 (avant-bras dans le torse 0,05, une image, invisible) ; zoro Idle : bras exacts au retour (98-120)
+- [x] KeyframeSequence `nami_*_fini`, `zoro_*_fini` dans `RBX_ANIMSAVES.nami` / `.zoro`
+- [ ] **Reprise 01/11** : revoir les 6 `*_fini` dans l'éditeur d'animation (comparer aux versions publiées), retoucher si besoin
+- [ ] Publier les 6 `*_fini` (manuel) puis remplacer les attributs `AnimationIdle/Action/Signature` de `ModelesPersonnages.nami` et `.zoro` par les nouveaux IDs
+- [x] Étape « Finition » ajoutée aux skills `/perso-catalogue` et `/perso-roblox` (section Animations)
+- [ ] Recette d'impact VFX en couches pour nami et zoro (après luffy)
+
+### Bible d'animation du lot 1 (propositions, artifact du 31/10/2026)
+- [x] Proposer Idle / Action / Signature pour les 11 persos, avec aperçus animés en blocs R15, storyboards et marqueurs (`Montrer` / `Cacher` / `VFX`)
+- [ ] Valider ou corriger les propositions perso par perso (Usopp, Chopper, Franky, Brook, Robin, Jinbei, Sanji, Gear 2)
+- [ ] Reporter les animations validées dans le wiki (`Personnages.md`, section Animations de vitrine)
+- [ ] (code, proposition) Délai aléatoire 0-2 s au lancement des vitrines dans `BaseService` (désynchronisation)
+- [ ] (code, proposition) Effets permanents (attribut `Permanent`) et images rémanentes (marqueur `Echo`) dans `Vitrine.luau`, nécessaires pour Gear 2
+- [ ] (idée) Animation d'entrée en scène quand on pose un perso
+
 ### Mannequin R15 (suites)
 - [ ] Enregistrer la place Studio (mannequin dans `ServerStorage.Gabarits`, hors git) (manuel : Ctrl+S dans Studio)
 - [x] Comparer `zoro.blend` et sa copie non enregistrée (seule différence : image courante 0 / 1) et supprimer la copie

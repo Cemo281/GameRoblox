@@ -53,3 +53,4 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | 7 bases (joueurs) par serveur. |
 | 2026-10-24 | Pas d'îles flottantes : carte au sol, bases reliées au Hub par des chemins. |
 | 2026-10-29 | Animations de vitrine d'un personnage posé : Idle → Action → Signature en boucle, 2 s de pause entre chaque, visibles par tous les joueurs. |
+| 2026-10-31 | Direction artistique du Hub *(v1, à valider)* : sanctuaire de festival animé (torii, stands yatai, cerisiers, cœur lumineux flottant), aplats SmoothPlastic pastel. |
