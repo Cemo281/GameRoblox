@@ -26,29 +26,6 @@
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true
-      },
-      "Baseplate": {
-        "$className": "Part",
-        "$properties": {
-          "Anchored": true,
-          "Color": [
-            0.38823,
-            0.37254,
-            0.38823
-          ],
-          "Locked": true,
-          "CFrame": {
-            "CFrame": {
-              "position": [-14, -10, 0],
-              "orientation": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-            }
-          },
-          "Size": [
-            565,
-            20,
-            565
-          ]
-        }
       }
     },
     "Lighting": {

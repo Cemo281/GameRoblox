@@ -1,0 +1,73 @@
+{
+	"_note": "zoro v2 (Workspace.Essais_Zoro.Zoro_v2) : clone de ReplicatedStorage.ModelesPersonnages.zoro (corps R15 blocs = Rig15ik) + articles du catalogue. En mode edition, chaque article est charge avec InsertService:LoadAsset puis Humanoid:AddAccessory.",
+	"garde_de_l_ancien_zoro": [
+		"Head (classique)",
+		"Acc_Bandana",
+		"Acc_Cheveux",
+		"Acc_Boucles",
+		"Acc_Sabre_Droit / Acc_Sabre_Gauche / Acc_Sabre_Bouche (caches, pour les animations)",
+		"VFX"
+	],
+	"retire_de_l_ancien_zoro": [
+		"Shirt",
+		"Manteau",
+		"Echarpe",
+		"Haramaki",
+		"Fourreaux",
+		"Acc_Sabres_Hanche",
+		"AnimSaves"
+	],
+	"visage": {
+		"decal": "Head.face",
+		"texture": "rbxassetid://104714971486473",
+		"fichier": "assets/persos/zoro/visage_zoro_2.png",
+		"source": "visage_source_2.png (image fournie, oeil gauche ferme et cicatrice), traitee par visage_zoro_v2.py 2 : fond peau transparent, echelle 0,9 en hauteur et 1,08 en largeur, yeux a 53 % de la hauteur (haut des paupieres contre le bord du bandana, sourcils caches)",
+		"essais_precedents": {
+			"import (Decal 11147423022 du Zoro importe, visage_zoro_import.png)": "rbxassetid://90527329904045",
+			"ancien zoro": "rbxassetid://140683552962153",
+			"2 petit (echelle 0,83, yeux a 66 %)": "rbxassetid://107949344776358",
+			"2 agrandi, yeux a 63 %": "rbxassetid://116688447053063",
+			"2 agrandi, yeux a 60 %": "rbxassetid://74078804588270",
+			"2 agrandi, yeux a 56 %": "rbxassetid://89817998052891"
+		}
+	},
+	"vetements_classiques": {
+		"ShirtGraphic": {
+			"nom": "TorseZoro",
+			"source": "assets/persos/zoro/torse_zoro.png (torse_zoro.py : abdos de abdos_source.png detoures en ombre de peau + cicatrice diagonale recousue)",
+			"graphic": "rbxassetid://116058110128484"
+		},
+		"anciens_hauts": {
+			"Shirt Abs Muscles Buff Anime (14603018526, template 14603018481)": "retire (abdos en double), garde dans ServerStorage.Sauvegarde_ZoroShirtAbs",
+			"ShirtGraphic One Piece Zoro Scar with Abs (8188469375)": "remplace par TorseZoro"
+		},
+		"Pants": {
+			"source": "assets/persos/zoro/pants_zoro_v2.png (pants_zoro_v2.py : torse transparent, bande verte gardee)",
+			"template": "rbxassetid://71238576091435"
+		}
+	},
+	"accessoires_catalogue": [
+		{
+			"nom": "Green Swordsman Wano Cloak",
+			"article": "Pirate Green Swordsman Wano Cloak",
+			"id": 14039522574,
+			"type": "Taille",
+			"reglage": "taille d'origine"
+		},
+		{
+			"nom": "Haramaki",
+			"article": "Green Waistband (nom d'origine Meshes/zooroAccessory)",
+			"id": 12691863985,
+			"type": "Taille",
+			"reglage": "taille d'origine ; WaistCenterAttachment.Position.Y = -0,66 (origine -0,2225) : haut de la bande au-dessus de la robe, moitie basse cachee dedans ; origines en attributs TailleOrigine / AttacheOrigine"
+		},
+		{
+			"nom": "Acc_Sabres_Hanche",
+			"article": "Zoro Triple Katana V2 (nom officiel)",
+			"id": 15257730645,
+			"type": "Taille",
+			"reglage": "taille d'origine ; renomme Acc_Sabres_Hanche (attribut VisibleParDefaut = true) : cache au degainage (Action, image 15) et remontre au rengainage (Signature, image 45) par les marqueurs des animations publiees"
+		}
+	],
+	"en_jeu": "ReplicatedStorage.ModelesPersonnages.zoro = copie de Zoro_v2 (2026-10-31) ; ancien modele garde sous ModelesPersonnages.zoro_ancien ; animations publiees de l'ancien reutilisees (attributs AnimationIdle/Action/Signature)"
+}

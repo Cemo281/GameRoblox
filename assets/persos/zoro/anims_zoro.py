@@ -305,33 +305,6 @@ def chercher_bras(pose, cote, y_cible, z_cible, tolerance=0.0, avances=(0.0, 0.1
 	return meilleur
 
 
-def bras_croises(base):
-	"""Avant-bras croises devant le torse, a l'horizontale : le droit dessous et plus pres du torse,
-	le gauche par-dessus et devant. Les blocs de 1 stud se recouvrent au milieu, comme un croisement."""
-	pose = dict(base)
-	pose["Waist"] = (6, 0, 0)  # le torse se redresse (et recule : place pour les avant-bras)
-	pose["Neck"] = (6, 0, 0)  # menton releve : regard dur, de haut, visage degage au-dessus des bras
-	f1, pose, info_d = chercher_bras(pose, "Right", -0.05, -1.05, tolerance=0.05, descentes=(0.0, 0.1, 0.2))
-	print("bras droit", info_d)
-	f2, pose, info_g = chercher_bras(pose, "Left", 0.25, -1.45, tolerance=0.05, descentes=(0.0, 0.1, 0.2))
-	print("bras gauche", info_g)
-	return pose, f1 + f2
-
-
-def bras_devant(base):
-	"""Pose de passage : bras leves devant et un peu ecartes, coudes plies, epaules avancees
-	(les mains passent devant les poignees et le torse)."""
-	p = dict(base)
-	# bras d'abord ecartes et un peu leves : la main droite contourne les poignees par l'exterieur
-	p["RightShoulder"] = (35, 0, 34)
-	p["LeftShoulder"] = (35, 0, -34)
-	p["RightElbow"] = (40, 0, 0)
-	p["LeftElbow"] = (40, 0, 0)
-	p["RightShoulderPos"] = (0.08, 0.02, -0.15)
-	p["LeftShoulderPos"] = (-0.08, 0.02, -0.15)
-	return p
-
-
 def apercu(nom, cles, images):
 	"""Poses completes a quelques images, pour l'apercu Blender et les clones Studio."""
 	sortie = {str(i): {art: vers_douze(transform(pose_a(cles, i), art)) for art in ARTICULATIONS} for i in images}
@@ -395,9 +368,11 @@ def verifier_anim(nom, cles, n_images, avec_hanche=True):
 def finir(nom, cles, n_images, boucle, priorite, marqueurs, **reglages):
 	"""Version finie (assets/persos/_anim/finition.py) : verifiee sur chaque image, ecrite dans anims/zoro_<Nom>_fini.json."""
 	toutes, gardees = finition.finir(cles, n_images, ARTICULATIONS, boucle=boucle, limites=LIMITES, **reglages)
-	verifier_anim(nom + "_fini", toutes, n_images, avec_hanche=(nom == "Idle"))
-	if nom == "Action":
+	verifier_anim(nom + "_fini", toutes, n_images, avec_hanche=False)
+	if nom == "Idle":
 		verifier_lames(nom + "_fini", toutes, n_images, depuis={"Right": 15, "Left": 22})
+	elif nom == "Action":
+		verifier_lames(nom + "_fini", toutes, n_images, depuis={"Right": 0, "Left": 0})
 	elif nom == "Signature":
 		verifier_lames(nom + "_fini", toutes, 44, depuis={"Right": 0, "Left": 0})  # lames rangees au clac (45)
 	ecrire(nom + "_fini", gardees, n_images, boucle, priorite, marqueurs)
@@ -429,42 +404,6 @@ def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 	(DOSSIER / "anims").mkdir(exist_ok=True)
 	(DOSSIER / "anims" / f"zoro_{nom}.json").write_text(json.dumps(donnees, indent="\t", ensure_ascii=False), encoding="utf-8")
 	print("ecrit", f"anims/zoro_{nom}.json", len(cles), "cles")
-
-
-def idle():
-	n = neutre()
-	c, f = bras_croises(n)
-	print("bras croises, cout", round(f, 4), {k: c[k] for k in ("RightShoulder", "RightElbow", "LeftShoulder", "LeftElbow", "RightWrist", "LeftWrist")})
-	cfs = fk(c)
-	print("mains", np.round(cfs["RightHand"][:3, 3], 2), np.round(cfs["LeftHand"][:3, 3], 2))
-
-	def var(base, waist_x, neck_y):
-		p = dict(base)
-		p["Waist"] = (base["Waist"][0] + waist_x, 0, 0)
-		p["Neck"] = (base["Neck"][0], neck_y, 0)
-		return p
-
-	d = bras_devant(n)
-	cles = [
-		(0, n, "Cubic"),
-		(10, d, "Cubic"),
-		(20, var(c, 0, 0), "Cubic"),
-		(38, var(c, 2, -8), "Cubic"),  # inspire, tete vers sa droite
-		(56, var(c, -2, 0), "Cubic"),  # expire
-		(74, var(c, 2, 8), "Cubic"),  # inspire, tete vers sa gauche
-		(90, var(c, 0, 0), "Cubic"),
-		(96, d, "Cubic"),
-		(104, n, "Cubic"),
-		(120, n, "Cubic"),
-	]
-	verifier_anim("Idle", cles, 120)
-	ecrire("Idle", cles, 120, True, "Idle", [])
-	# bras croises (20-90) et retour le long du manteau (98-120) : gardes exacts, ils suivent le buste qui respire
-	finir("Idle", cles, 120, True, "Idle", [], contacts={a: [(20, 90), (98, 120)] for a in ("RightShoulder", "RightElbow", "RightWrist", "LeftShoulder", "LeftElbow", "LeftWrist")})
-	apercu("Idle", cles, [0, 10, 20, 38, 74, 96])
-	return cles
-
-
 
 
 # ---------------------------------------------------------------- sabres tenus, bras vises, pieds plantes
@@ -513,9 +452,10 @@ def bras_lame(pose, cote, f, lame, theta, R_ut, avance=0.0):
 	return p
 
 
-def viser(pose, cote, main=None, lame=None, sabre=True, avances=(0.0, 0.2), poids_main=10.0):
+def viser(pose, cote, main=None, lame=None, sabre=True, avances=(0.0, 0.2), poids_main=10.0, coude=None, tolerance_epaule=0.0):
 	"""Cherche le bras qui amene le centre de la main sur 'main' et la lame dans la direction 'lame',
-	sans que le bras traverse le torse ni que la lame traverse le corps. Grille puis affinage."""
+	sans que le bras traverse le torse ni que la lame traverse le corps. coude = angle voulu (bras tendu) ;
+	tolerance_epaule = recouvrement admis du haut du bras dans le torse (pivot d'epaule a l'interieur du torse). Grille puis affinage."""
 	cfs0 = fk(pose)
 	R_ut = cfs0["UpperTorso"][:3, :3]
 	main = None if main is None else np.array(main, float)
@@ -533,6 +473,8 @@ def viser(pose, cote, main=None, lame=None, sabre=True, avances=(0.0, 0.2), poid
 			return 1e9, None
 		cfs = chaine_bras(cfs0, p, cote)
 		cout = 0.3 * av
+		if coude is not None:
+			cout += 0.004 * (theta - coude) ** 2
 		if main is not None:
 			cout += poids_main * np.sum((cfs[cote + "Hand"][:3, 3] - main) ** 2)
 		if lame is not None:
@@ -540,7 +482,10 @@ def viser(pose, cote, main=None, lame=None, sabre=True, avances=(0.0, 0.2), poid
 		pen = 0.0
 		for bo in (cote + "UpperArm", cote + "LowerArm", cote + "Hand"):
 			pts = points_boite(bo, cfs[bo], 3)
-			pen += dans_boite(pts, "UpperTorso", cfs["UpperTorso"], 0.0) + dans_boite(pts, "LowerTorso", cfs["LowerTorso"], 0.0) + dans_boite(pts, "Head", cfs["Head"], 0.0)
+			torse = dans_boite(pts, "UpperTorso", cfs["UpperTorso"], 0.0)
+			if bo.endswith("UpperArm"):
+				torse = max(0.0, torse - tolerance_epaule)
+			pen += torse + dans_boite(pts, "LowerTorso", cfs["LowerTorso"], 0.0) + dans_boite(pts, "Head", cfs["Head"], 0.0)
 		cout += 200 * pen
 		if sabre:
 			cout += 100 * lame_dans_corps(cfs, cote)
@@ -593,6 +538,125 @@ def planter(pose):
 	return p
 
 
+# ---------------------------------------------------------------- jeu de jambes (Action)
+
+N_IDLE = 150
+N_ACTION = 120
+LARGE = {"Right": (0.25, 0, 0.1, 12), "Left": (-0.25, 0, -0.1, -12)}  # pieds ecartes pour les grands balayages
+FENTE = {"Right": (0.3, 0, 0.45, 20), "Left": (-0.3, 0, -0.85, -10)}  # pied gauche devant, pied droit en arriere
+NEUTRES = {"Right": (0, 0, 0, 0), "Left": (0, 0, 0, 0)}
+# pieds de l'Action par image : {cote: (dx, dy, dz, lacet, tangage)} par rapport au pied de la pose neutre (dy > 0 =
+# en l'air, tangage < 0 = pointe vers le bas) ; entre deux cles au sol, le pied qui se deplace decrit un arc.
+PAS = [
+	(0, NEUTRES, "Cubic"),
+	(8, LARGE, "Cubic"),
+	(46, LARGE, "Sortie"),
+	(53, FENTE, "Cubic"),
+	(92, FENTE, "Cubic"),
+	(106, NEUTRES, "Cubic"),
+	(N_ACTION, NEUTRES, "Cubic"),
+]
+
+
+def pieds_a(image, pas=None):
+	"""Cibles des pieds a une image, interpolees entre les cles de pas (PAS par defaut ; arc de 0,3 x la distance, au plus 0,4 stud)."""
+	pas = pas or PAS
+	for (fa, pa, ea), (fb, pb, _) in zip(pas, pas[1:]):
+		if fa <= image <= fb:
+			t = lisser(0 if fb == fa else (image - fa) / (fb - fa), ea)
+			s = 0 if fb == fa else (image - fa) / (fb - fa)
+			out = {}
+			for c in ("Right", "Left"):
+				a = np.array((list(pa[c]) + [0])[:5], float)
+				b = np.array((list(pb[c]) + [0])[:5], float)
+				v = a + (b - a) * t
+				if a[1] == 0 and b[1] == 0:
+					v[1] = min(0.4, 0.3 * float(np.linalg.norm(b[[0, 2]] - a[[0, 2]]))) * math.sin(math.pi * s)
+				out[c] = v
+			return out
+	return {c: np.array((list(pas[-1][1][c]) + [0])[:5], float) for c in ("Right", "Left")}
+
+
+def cible_pied(cote, v):
+	if PIEDS_REPOS is None:
+		planter(neutre())
+	m = PIEDS_REPOS[cote].copy()
+	dx, dy, dz, lacet, tangage = v
+	m[:3, :3] = angles(0, math.radians(lacet), 0)[:3, :3] @ m[:3, :3] @ angles(math.radians(tangage), 0, 0)[:3, :3]
+	m[:3, 3] += (dx, dy, dz)
+	return m
+
+
+JAMBE = {c: [MOTEURS[c + a] for a in ("Hip", "Knee", "Ankle")] for c in ("Right", "Left")}
+BORNES_JAMBE = [(-90, 90), (-30, 30), (-40, 40), (-150, 0), (-30, 30), (-30, 30), (-30, 30)]
+
+
+def pied_fk(lt, cote, x):
+	(_, _, c0h, c1h), (_, _, c0k, c1k), (_, _, c0a, c1a) = JAMBE[cote]
+	r = np.radians(x)
+	m = lt @ c0h @ angles(r[0], r[1], r[2]) @ np.linalg.inv(c1h)
+	m = m @ c0k @ angles(r[3], 0, 0) @ np.linalg.inv(c1k)
+	return m @ c0a @ angles(r[4], r[5], r[6]) @ np.linalg.inv(c1a)
+
+
+def ik_jambe(lt, cote, cible, x0):
+	cout = lambda x: 50 * np.sum((pied_fk(lt, cote, x)[:3, 3] - cible[:3, 3]) ** 2) + 5 * np.sum((pied_fk(lt, cote, x)[:3, :3] - cible[:3, :3]) ** 2)
+	r = minimize(cout, x0, bounds=BORNES_JAMBE, method="L-BFGS-B", options={"maxiter": 400})
+	return r.x, float(np.linalg.norm(pied_fk(lt, cote, r.x)[:3, 3] - cible[:3, 3]))
+
+
+def poser_jambes(p, pieds, depart=None):
+	"""Remplace hanches, genoux et chevilles de p pour amener les pieds sur leurs cibles ; renvoie (pose, ecart max)."""
+	p = dict(p)
+	lt = MOTEURS["Root"][2] @ transform(p, "Root") @ INV_C1["Root"]
+	pire = 0.0
+	for c in ("Right", "Left"):
+		if depart:
+			x0 = depart[c]
+		else:  # genou flechi : genou tendu, la hauteur du pied ne varie pas au premier ordre
+			hx, hy, hz = p.get(c + "Hip", (0, 0, 0))[:3]
+			x0 = [hx + 12, hy, hz, -25, 12, 0, -hz]
+		x, e = ik_jambe(lt, c, cible_pied(c, pieds[c]), x0)
+		x = [round(float(v), 3) for v in x]
+		p[c + "Hip"], p[c + "Knee"], p[c + "Ankle"] = tuple(x[:3]), (x[3], 0, 0), tuple(x[4:])
+		pire = max(pire, e)
+	return p, pire
+
+
+def deplacer(p, root, image):
+	"""Bassin deplace (x, y, z) et tourne (lacet en degres) ; le Waist compense le lacet pour que le buste (et les bras
+	vises par construire) garde exactement son orientation ; jambes posees sur les pieds de PAS a cette image."""
+	x, y, z, lacet = root
+	ut_avant = fk(p)["UpperTorso"]
+	q = dict(p)
+	q["Root"], q["RootPos"] = (0, lacet, 0), (x, y, z)
+	r_root = angles(0, math.radians(lacet), 0)[:3, :3]
+	q["Waist"] = euler_de(r_root.T @ angles(*np.radians(p.get("Waist", (0, 0, 0))[:3]))[:3, :3])
+	q, ecart = poser_jambes(q, pieds_a(image))
+	ut = fk(q)["UpperTorso"]
+	dep = np.array([x, y, z]) - np.array(p.get("RootPos", (0, 0, 0)))
+	assert np.abs(ut[:3, :3] - ut_avant[:3, :3]).max() < 1e-3 and np.abs(ut[:3, 3] - ut_avant[:3, 3] - dep).max() < 1e-3, "buste deplace"
+	print(f"    image {image} : pieds a {ecart:.3f} stud de leur cible")
+	return q
+
+
+def jambes_suivies(images):
+	"""Apres la cuisson : jambes recalculees a chaque image pour suivre PAS (pieds plantes, arcs, saut)."""
+	depart = None
+	pire = (0.0, -1)
+	sortie = []
+	for i, p in enumerate(images):
+		if i in (0, len(images) - 1):  # raccords exacts avec l'Idle et la Signature
+			q, e = p, 0.0
+		else:
+			q, e = poser_jambes(p, pieds_a(i), depart)
+		depart = {c: [*q[c + "Hip"], q[c + "Knee"][0], *q[c + "Ankle"]] for c in ("Right", "Left")}
+		pire = max(pire, (e, i))
+		sortie.append(q)
+	print(f"--- jambes suivies : pire ecart des pieds {pire[0]:.3f} stud (image {pire[1]})")
+	return sortie
+
+
 # ---------------------------------------------------------------- Action et Signature
 
 
@@ -613,10 +677,20 @@ def ajuster_poignet(p, cote, lame):
 	return resoudre(p, [(cote + "Wrist", 0), (cote + "Wrist", 1), (cote + "Wrist", 2)], cout)[0]
 
 
+BRAS_TENDU = 1.78  # pivot de l'epaule -> centre de la main, coude droit
+
+
 def construire(base, bras):
-	"""bras = {cote: dict(main=..., lame=..., sabre=bool)} ; renvoie la pose avec pieds plantes."""
+	"""bras = {cote: dict(main=... ou dir=..., lame=..., sabre=bool)} ; renvoie la pose avec pieds plantes."""
 	p = planter(base)
 	for cote, spec in bras.items():
+		spec = dict(spec)
+		if "dir" in spec:  # bras tendu : main a BRAS_TENDU du pivot de l'epaule, dans cette direction (monde)
+			d = np.array(spec.pop("dir"), float)
+			pivot = (fk(p)["UpperTorso"] @ MOTEURS[cote + "Shoulder"][2])[:3, 3]
+			spec["main"] = pivot + BRAS_TENDU * d / np.linalg.norm(d)
+			spec.setdefault("coude", 6)
+			spec.setdefault("tolerance_epaule", 0.15)  # bras leve sur le cote : le haut du bras entre un peu dans l'epaule
 		p, info = viser(p, cote, **spec)
 		if spec.get("lame") is not None and spec.get("sabre", True):
 			p = ajuster_poignet(p, cote, spec["lame"])
@@ -624,12 +698,6 @@ def construire(base, bras):
 			info["poignet"] = p[cote + "Wrist"]
 		print("   ", cote, info)
 	return p
-
-
-def garde(n):
-	"""Garde a trois sabres : bras ecartes vers l'avant, lames vers l'exterieur ; genoux flechis, buste penche, regard par en dessous."""
-	b = corps(n, root_pos=(0, -0.2, 0), waist=(-6, 0, 0), neck=(4, 0, 0))
-	return construire(b, {"Right": dict(main=(1.75, 0.25, -1.35), lame=(0.45, 0.6, -0.65)), "Left": dict(main=(-1.75, 0.25, -1.35), lame=(-0.45, 0.6, -0.65))})
 
 
 def verifier_lames(nom, cles, n_images, depuis):
@@ -644,8 +712,16 @@ def verifier_lames(nom, cles, n_images, depuis):
 	print(f"--- lames {nom} (penetration dans le corps, pire image) :", {k: (round(v, 3), i) for k, (v, i) in pire.items()})
 
 
-def action():
-	n = neutre()
+def haki(n, bras=(0.75, -0.62, -0.22), lame=(0.85, 0.45, 0.25), waist=(-5, 0, 0), neck=(-6, 0, 0), root_y=-0.15):
+	"""Pose de la reference : bras tendus vers le bas et l'exterieur, lames vers l'exterieur et le haut (un peu en
+	arriere), sabre a la bouche, buste un peu penche, tete baissee (regard par en dessous). Pieds a leur place."""
+	b = corps(n, root_pos=(0, root_y, 0), waist=waist, neck=neck)
+	miroir = lambda v: (-v[0], v[1], v[2])
+	return construire(b, {"Right": dict(dir=bras, lame=lame), "Left": dict(dir=miroir(bras), lame=miroir(lame))})
+
+
+def degainage(n):
+	"""Les trois sabres : main droite sur les poignees, degaine a droite, puis a gauche, sabre a la bouche."""
 	print("10 main droite sur les poignees")
 	p10 = construire(corps(n, root_pos=(0, -0.05, 0), waist=(0, -10, 0)), {"Right": dict(main=(1.45, -0.72, -1.0), sabre=False)})
 	print("15 degaine (droite)")
@@ -656,38 +732,102 @@ def action():
 	p22 = construire(corps(n, waist=(0, -8, 0)), {"Right": dict(main=(1.6, 0.5, -1.1), lame=(0.4, 0.9, 0.0)), "Left": dict(main=(-1.35, 0.35, -1.5), lame=(-0.3, 0.85, -0.4))})
 	print("30 sabre a la bouche")
 	p30 = construire(corps(n, waist=(0, 0, 0), neck=(-8, 0, 0)), {"Right": dict(main=(0.5, 1.0, -1.15), lame=(0.6, 0.6, 0.5)), "Left": dict(main=(-1.5, 0.35, -1.4), lame=(-0.3, 0.85, -0.4))})
-	print("40 garde")
-	g = garde(n)
-	print("46 armer le coup droit")
-	p46 = construire(corps(n, root_pos=(0, -0.2, 0), waist=(-4, -25, 0), neck=(4, 10, 0)), {"Right": dict(main=(2.0, 0.3, 0.1), lame=(0.6, 0.5, 0.6)), "Left": dict(main=(-1.75, 0.25, -1.3), lame=(-0.45, 0.6, -0.65))})
-	print("50 balayage droit")
-	p50 = construire(corps(n, root_pos=(0, -0.2, 0), waist=(-4, 20, 0), neck=(4, -12, 0)), {"Right": dict(main=(-0.6, 0.15, -1.7), lame=(-0.85, 0.3, -0.45)), "Left": dict(main=(-1.8, 0.2, -0.8), lame=(-0.45, 0.6, -0.65))})
-	print("56 armer le coup gauche")
-	p56 = construire(corps(n, root_pos=(0, -0.2, 0), waist=(-4, 25, 0), neck=(4, -10, 0)), {"Left": dict(main=(-2.0, 0.3, 0.1), lame=(-0.6, 0.5, 0.6)), "Right": dict(main=(-0.3, 0.2, -1.6), lame=(-0.85, 0.3, -0.45))})
-	print("62 balayage gauche")
-	p62 = construire(corps(n, root_pos=(0, -0.2, 0), waist=(-4, -20, 0), neck=(4, 12, 0)), {"Left": dict(main=(0.6, 0.15, -1.7), lame=(0.85, 0.3, -0.45)), "Right": dict(main=(1.8, 0.2, -0.8), lame=(0.45, 0.6, -0.65))})
-	print("70 bras croises, lames en X")
-	p70 = construire(corps(n, root_pos=(0, -0.3, 0), waist=(-8, 0, 0), neck=(2, 0, 0)), {"Right": dict(main=(-0.35, 0.55, -1.35), lame=(-0.5, 0.85, -0.1)), "Left": dict(main=(0.35, 0.75, -1.6), lame=(0.5, 0.85, -0.1))})
-	print("75 ouverture en X, bond")
-	p75 = construire(corps(n, root_pos=(0, -0.15, -0.45), waist=(6, 0, 0), neck=(-2, 0, 0)), {"Right": dict(main=(2.0, -0.2, -1.2), lame=(0.6, -0.3, -0.75)), "Left": dict(main=(-2.0, -0.2, -1.2), lame=(-0.6, -0.3, -0.75))})
+	return p10, p15, p19, p22, p30
+
+
+def idle():
+	"""Degaine les trois sabres, se ramasse, puis ouvre les bras d'un coup : pose haki tenue (la charge monte, le corps
+	vibre). Finit sur la pose haki, qui est l'image 0 de l'Action."""
+	n = neutre()
+	p10, p15, p19, p22, p30 = degainage(n)
+	print("40 ramasse : bras plies, lames vers le bas, tete baissee")
+	p40 = construire(corps(n, root_pos=(0, -0.3, 0), waist=(-12, 0, 0), neck=(-10, 0, 0)), {"Right": dict(main=(1.25, -0.35, -1.15), lame=(0.35, -0.8, -0.45)), "Left": dict(main=(-1.25, -0.35, -1.15), lame=(-0.35, -0.8, -0.45))})
+	print("46 pose haki")
+	h = haki(n)
+	print("80 bras un peu plus hauts et ecartes, tete plus basse")
+	h80 = haki(n, bras=(0.8, -0.52, -0.25), waist=(-7, 0, 0), neck=(-9, 0, 0), root_y=-0.2)
+	print("115 buste qui se gonfle, tete relevee")
+	h115 = haki(n, bras=(0.72, -0.66, -0.2), waist=(-3, 0, 0), neck=(-3, 0, 0), root_y=-0.12)
 	cles = [
-		# Sortie : degainages et entailles partent d'un coup et freinent en fin de geste
-		(0, n, "Cubic"), (10, p10, "Sortie"), (15, p15, "Cubic"), (19, p19, "Sortie"), (22, p22, "Cubic"), (30, p30, "Cubic"), (40, g, "Cubic"),
-		(46, p46, "Sortie"), (50, p50, "Cubic"), (56, p56, "Sortie"), (62, p62, "Cubic"), (70, p70, "Sortie"), (75, p75, "Cubic"),
-		(85, g, "Cubic"), (105, g, "Cubic"),
+		(0, n, "Cubic"),
+		(10, p10, "Sortie"),
+		(15, p15, "Cubic"),
+		(19, p19, "Sortie"),
+		(22, p22, "Cubic"),
+		(30, p30, "Cubic"),
+		(40, p40, "Sortie"),  # Sortie : les bras s'ouvrent d'un coup
+		(46, h, "Cubic"),
+		(80, h80, "Cubic"),
+		(115, h115, "Cubic"),
+		(N_IDLE, h, "Cubic"),
 	]
 	marqueurs = [
 		{"image": 15, "nom": "Cacher", "valeur": "Acc_Sabres_Hanche"}, {"image": 15, "nom": "Montrer", "valeur": "Acc_Sabre_Droit"},
 		{"image": 22, "nom": "Montrer", "valeur": "Acc_Sabre_Gauche"}, {"image": 30, "nom": "Montrer", "valeur": "Acc_Sabre_Bouche"},
-		{"image": 45, "nom": "VFX", "valeur": "Trail_Lames"}, {"image": 80, "nom": "VFX", "valeur": "Trail_Lames_Fin"},
-		{"image": 50, "nom": "VFX", "valeur": "Entaille_Droite"}, {"image": 62, "nom": "VFX", "valeur": "Entaille_Gauche"},
-		{"image": 75, "nom": "VFX", "valeur": "Tornade_Sabres"},
+		{"image": 46, "nom": "VFX", "valeur": "Haki_Explosion"}, {"image": 47, "nom": "VFX", "valeur": "Haki_Aura"},
 	]
-	verifier_anim("Action", cles, 105, avec_hanche=False)
-	verifier_lames("Action", cles, 105, depuis={"Right": 15, "Left": 22})
-	ecrire("Action", cles, 105, False, "Action", marqueurs)
-	finir("Action", cles, 105, False, "Action", marqueurs, secousses=[(50, 8, 2.5), (62, 8, 2.5), (75, 16, 4.0)])
-	apercu("Action", cles, [10, 15, 19, 22, 30, 40, 46, 50, 56, 62, 70, 75, 105])
+	verifier_anim("Idle", cles, N_IDLE, avec_hanche=False)
+	verifier_lames("Idle", cles, N_IDLE, depuis={"Right": 15, "Left": 22})
+	ecrire("Idle", cles, N_IDLE, False, "Idle", marqueurs)
+	finir("Idle", cles, N_IDLE, False, "Idle", marqueurs, secousses=[(46, 14, 4.0), (80, 10, 1.2), (115, 10, 1.2)])
+	apercu("Idle", cles, [10, 22, 30, 40, 46, 80, 115, N_IDLE])
+	return cles
+
+
+def action():
+	"""Grands coups bras tendus a partir de la pose haki : balayage droit, balayage gauche, double coup plongeant en
+	fente (bras leves en V puis abattus), bras croises devant puis ouverture en croix ; retour sur la pose haki."""
+	n = neutre()
+	h = pose_du_json("Idle", N_IDLE)
+	print("9 armer le coup droit : bras droit tendu en arriere")
+	p9 = construire(corps(n, waist=(-4, -35, 0), neck=(-4, 15, 0)), {"Right": dict(dir=(0.85, 0.1, 0.5), lame=(0.3, 0.2, -0.9)), "Left": dict(dir=(-0.75, -0.55, -0.3), lame=(-0.85, 0.45, 0.25))})
+	print("15 balayage droit, bras tendu en travers")
+	p15 = construire(corps(n, waist=(-6, 30, 0), neck=(-4, -15, 0)), {"Right": dict(dir=(-0.55, 0.05, -0.85), lame=(-0.85, 0.1, 0.45)), "Left": dict(dir=(-0.85, -0.45, 0.2), lame=(-0.4, 0.6, 0.7))})
+	print("23 le bras droit remonte devant, par-dessus (il ne repasse pas dans la poitrine)")
+	p23 = construire(corps(n, waist=(-4, 10, 0), neck=(-4, -5, 0)), {"Right": dict(dir=(0.35, 0.65, -0.68), lame=(0.2, 0.3, 0.93)), "Left": dict(dir=(-0.85, -0.45, 0.2), lame=(-0.4, 0.6, 0.7))})
+	print("30 armer le coup gauche")
+	p30 = construire(corps(n, waist=(-4, 35, 0), neck=(-4, -15, 0)), {"Left": dict(dir=(-0.85, 0.1, 0.5), lame=(-0.3, 0.2, -0.9)), "Right": dict(dir=(0.85, -0.3, -0.1), lame=(0.5, 0.8, 0.1))})
+	print("36 balayage gauche")
+	p36 = construire(corps(n, waist=(-6, -30, 0), neck=(-4, 15, 0)), {"Left": dict(dir=(0.55, 0.05, -0.85), lame=(0.85, 0.1, 0.45)), "Right": dict(dir=(0.85, -0.45, 0.2), lame=(0.4, 0.6, 0.7))})
+	print("46 bras leves en V, buste en arriere")
+	p46 = construire(corps(n, waist=(8, 0, 0), neck=(4, 0, 0)), {"Right": dict(dir=(0.55, 0.8, 0.25), lame=(0.5, -0.2, 0.85)), "Left": dict(dir=(-0.55, 0.8, 0.25), lame=(-0.5, -0.2, 0.85))})
+	print("53 double coup plongeant, en fente")
+	p53 = construire(corps(n, waist=(-18, 0, 0), neck=(10, 0, 0)), {"Right": dict(dir=(0.6, -0.55, -0.6), lame=(0.75, 0.6, -0.1)), "Left": dict(dir=(-0.6, -0.55, -0.6), lame=(-0.75, 0.6, -0.1))})
+	print("74 bras croises tendus devant, lames vers le haut")
+	p74 = construire(corps(n, waist=(-8, 0, 0), neck=(2, 0, 0)), {"Right": dict(dir=(-0.35, 0.15, -0.95), lame=(-0.3, 0.8, 0.5)), "Left": dict(dir=(0.35, 0.3, -0.92), lame=(0.3, 0.8, 0.5))})
+	print("101 bras redescendus, lames encore en arriere (elles tournent une fois les bras en bas)")
+	p101 = haki(n, lame=(0.5, 0.35, 0.8))
+	print("80 ouverture en croix, lames en arriere")
+	p80 = construire(corps(n, waist=(-4, 0, 0), neck=(2, 0, 0)), {"Right": dict(dir=(0.95, 0.15, -0.25), lame=(0.3, 0.35, 0.88)), "Left": dict(dir=(-0.95, 0.15, -0.25), lame=(-0.3, 0.35, 0.88))})
+	# root = (x, y, z, lacet) : le bassin tourne, le buste garde l'orientation du blocage (voir deplacer)
+	cles = [
+		(0, h, "Cubic"),
+		(9, deplacer(p9, (0, -0.3, 0.1, -20), 9), "Sortie"),  # Sortie : chaque coup part d'un coup et freine en fin de geste
+		(15, deplacer(p15, (0, -0.4, -0.1, 20), 15), "Cubic"),
+		(23, deplacer(p23, (0, -0.3, 0, 5), 23), "Cubic"),
+		(30, deplacer(p30, (0, -0.3, 0.1, 20), 30), "Sortie"),
+		(36, deplacer(p36, (0, -0.4, -0.1, -20), 36), "Cubic"),
+		(46, deplacer(p46, (0, -0.1, 0.1, 0), 46), "Sortie"),
+		(53, deplacer(p53, (0, -0.7, -0.4, 0), 53), "Cubic"),
+		(66, deplacer(p53, (0, -0.65, -0.35, 0), 66), "Cubic"),
+		(74, deplacer(p74, (0, -0.4, -0.3, 0), 74), "Sortie"),
+		(80, deplacer(p80, (0, -0.55, -0.35, 0), 80), "Cubic"),
+		(94, deplacer(p80, (0, -0.5, -0.3, 0), 94), "Cubic"),
+		(101, deplacer(p101, (0, -0.3, -0.15, 0), 101), "Cubic"),
+		(110, deplacer(h, (0, -0.15, 0, 0), 110), "Cubic"),
+		(N_ACTION, h, "Cubic"),
+	]
+	marqueurs = [
+		{"image": 8, "nom": "VFX", "valeur": "Trail_Lames"}, {"image": 86, "nom": "VFX", "valeur": "Trail_Lames_Fin"},
+		{"image": 14, "nom": "VFX", "valeur": "Entaille_Droite"}, {"image": 35, "nom": "VFX", "valeur": "Entaille_Gauche"},
+		{"image": 52, "nom": "VFX", "valeur": "Entaille_Droite"}, {"image": 53, "nom": "VFX", "valeur": "Entaille_Gauche"},
+		{"image": 80, "nom": "VFX", "valeur": "Tornade_Sabres"},
+	]
+	verifier_anim("Action", cles, N_ACTION, avec_hanche=False)
+	verifier_lames("Action", cles, N_ACTION, depuis={"Right": 0, "Left": 0})
+	ecrire("Action", cles, N_ACTION, False, "Action", marqueurs)
+	finir("Action", cles, N_ACTION, False, "Action", marqueurs, secousses=[(15, 8, 2.5), (36, 8, 2.5), (53, 16, 4.5), (80, 14, 4.0)], retouche=jambes_suivies)
+	apercu("Action", cles, [9, 15, 23, 30, 36, 46, 53, 74, 80, 101])
 	return cles
 
 
@@ -710,9 +850,9 @@ LAMES_RANGEES = (0.1, -0.9, 0.4)
 
 
 def signature():
-	"""Rangement des sabres : part de la garde (derniere image de l'Action), finit sur la pose neutre."""
+	"""Rangement des sabres : part de la pose haki (derniere image de l'Action), finit sur la pose neutre."""
 	n = neutre()
-	g = pose_du_json("Action", 105)
+	g = pose_du_json("Action", N_ACTION)
 	print("15 retire le sabre de la bouche")
 	p15 = construire(corps(g, root_pos=(0, -0.15, 0), waist=(-3, 0, 0), neck=(-4, 0, 0)), {"Right": dict(main=(0.5, 1.0, -1.15), lame=(0.6, 0.6, 0.5))})
 	print("25 ramene les deux sabres vers la hanche droite")
@@ -728,6 +868,7 @@ def signature():
 		# image 46 : l'editeur d'animation fusionne deux marqueurs de meme nom sur la meme image
 		{"image": 46, "nom": "Cacher", "valeur": "Acc_Sabre_Gauche"},
 		{"image": 45, "nom": "Montrer", "valeur": "Acc_Sabres_Hanche"}, {"image": 45, "nom": "VFX", "valeur": "Eclat_Garde"},
+		{"image": 46, "nom": "VFX", "valeur": "Haki_Aura_Fin"},  # l'aura allumee dans l'Idle s'eteint au clac
 	]
 	verifier_anim("Signature", cles, 75, avec_hanche=False)
 	verifier_lames("Signature", cles, 44, depuis={"Right": 0, "Left": 0})
@@ -735,7 +876,7 @@ def signature():
 	finir("Signature", cles, 75, False, "Action", marqueurs, secousses=[(45, 8, 2.0)])
 	apercu("Signature", cles, [0, 15, 25, 45, 55, 75])
 	# raccords : image 0 = derniere image de l'Action, image 75 = image 0 de l'Idle
-	for nom_a, im_a, im_b in (("Action", 105, 0), ("Idle", 0, 75)):
+	for nom_a, im_a, im_b in (("Action", N_ACTION, 0), ("Idle", 0, 75)):
 		a = json.loads((DOSSIER / "anims" / f"zoro_{nom_a}.json").read_text(encoding="utf-8"))
 		b = json.loads((DOSSIER / "anims" / "zoro_Signature.json").read_text(encoding="utf-8"))
 		ca = next(c for c in a["cles"] if c["image"] == im_a)["poses"]

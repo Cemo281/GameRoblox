@@ -1,0 +1,405 @@
+{
+ "tenue_taille": [
+  {
+   "id": 14077243719,
+   "nom": "Pirate Wano Cape Strawhat Anime",
+   "type": "Dos",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 39597,
+   "prix": 140,
+   "mot": "pirate swordsman wano"
+  },
+  {
+   "id": 14039527977,
+   "nom": "Pirate Black Swordsman Wano Cloak",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 21089,
+   "prix": 65,
+   "mot": "pirate swordsman green"
+  },
+  {
+   "id": 14077458498,
+   "nom": "Pirate Wano Cape Anime w/o Strawhat",
+   "type": "Dos",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 14631,
+   "prix": 140,
+   "mot": "pirate swordsman wano"
+  },
+  {
+   "id": 14073107017,
+   "nom": "Green Wano Anime Cape Cloak",
+   "type": "Dos",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 9380,
+   "prix": 140,
+   "mot": "swordsman wano cloak"
+  },
+  {
+   "id": 13979174599,
+   "nom": "Wano Bright Red Anime  Cloak (1.0) ",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 8289,
+   "prix": 65,
+   "mot": "swordsman wano cloak"
+  },
+  {
+   "id": 14039522574,
+   "nom": "Pirate Green Swordsman Wano Cloak",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "BenereV2 And Gang",
+   "verifie": true,
+   "fav": 5269,
+   "prix": 65,
+   "mot": "pirate swordsman green"
+  },
+  {
+   "id": 15419016209,
+   "nom": "Ichigo Waist Cloak",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "chikn ugc",
+   "verifie": false,
+   "fav": 3940,
+   "prix": 65,
+   "mot": "green waist cloak"
+  },
+  {
+   "id": 14909065290,
+   "nom": "Zoro Pirate wano Anime Green",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "Debi Anime",
+   "verifie": false,
+   "fav": 3744,
+   "prix": 70,
+   "mot": "pirate swordsman wano"
+  },
+  {
+   "id": 12140090193,
+   "nom": "Swordsman Outfit Anime",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "Família MedTw",
+   "verifie": false,
+   "fav": 3425,
+   "prix": 90,
+   "mot": "swordsman wano cloak"
+  },
+  {
+   "id": 10318955010,
+   "nom": " Green Thunder Aura - Waist",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "SmoukiH",
+   "verifie": true,
+   "fav": 1843,
+   "prix": 65,
+   "mot": "green kimono waist"
+  },
+  {
+   "id": 14909000730,
+   "nom": "Zoro Pirate wano Anime",
+   "type": "Taille",
+   "itemType": "Asset",
+   "createur": "Debi Anime",
+   "verifie": false,
+   "fav": 1830,
+   "prix": 65,
+   "mot": "pirate swordsman wano"
+  },
+  {
+   "id": 6038026275,
+   "nom": "The Nutcracker - Swordsman",
+   "type": "Dos",
+   "itemType": "Asset",
+   "createur": "huiyunwenhua",
+   "verifie": false,
+   "fav": 1201,
+   "prix": 140,
+   "mot": "swordsman wano cloak"
+  }
+ ],
+ "torse_abs": [],
+ "bottes": [
+  {
+   "id": 18946906231,
+   "nom": "Black Goth Skirt with Leather Boots",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "Tomorrows Players",
+   "verifie": true,
+   "fav": 42559,
+   "prix": 75,
+   "mot": "black leather boots"
+  },
+  {
+   "id": 12559867731,
+   "nom": "1.0 Black Denim Jeans with Combat Boots",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "Ashes Wings",
+   "verifie": false,
+   "fav": 6894,
+   "prix": 75,
+   "mot": "black combat boots"
+  },
+  {
+   "id": 227329973364465,
+   "nom": "Black Boots",
+   "type": "Bundle",
+   "itemType": "Bundle",
+   "createur": "DuckXander",
+   "verifie": true,
+   "fav": 5684,
+   "prix": 60,
+   "mot": "black boots"
+  },
+  {
+   "id": 17440082866,
+   "nom": "BB Urban Y2K Tall Leather LaceUp Buckle Boot Black",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "BLUEBERRY",
+   "verifie": true,
+   "fav": 3797,
+   "prix": 95,
+   "mot": "black leather boots"
+  },
+  {
+   "id": 18937211352,
+   "nom": "1.0 Black Camo Pants with Combat Boots and gun",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "Ashes Wings",
+   "verifie": false,
+   "fav": 1517,
+   "prix": 75,
+   "mot": "black combat boots"
+  },
+  {
+   "id": 12554015498,
+   "nom": "Black Boots",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "RAINBO'S CREATIONS",
+   "verifie": true,
+   "fav": 1452,
+   "prix": 75,
+   "mot": "black boots"
+  },
+  {
+   "id": 16414003205,
+   "nom": "Goth Vkei Leather Boots with Straps (Black)",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "Luka's Workshop",
+   "verifie": true,
+   "fav": 1330,
+   "prix": 75,
+   "mot": "black leather boots"
+  },
+  {
+   "id": 267141383233697,
+   "nom": "♾️ Silver & blue Cyber ninja spiked shoes",
+   "type": "Bundle",
+   "itemType": "Bundle",
+   "createur": "Blue infinity studios",
+   "verifie": false,
+   "fav": 979,
+   "prix": 60,
+   "mot": "black ninja boots"
+  },
+  {
+   "id": 16573283559,
+   "nom": "Combat Boots Black",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "mahaio",
+   "verifie": false,
+   "fav": 734,
+   "prix": 75,
+   "mot": "black combat boots"
+  },
+  {
+   "id": 16909505222,
+   "nom": "Ninja Suit",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "HulaHoopman6",
+   "verifie": true,
+   "fav": 699,
+   "prix": 134,
+   "mot": "black ninja boots"
+  },
+  {
+   "id": 254650526096483,
+   "nom": "Black Boots",
+   "type": "Bundle",
+   "itemType": "Bundle",
+   "createur": "Aura Footwear",
+   "verifie": true,
+   "fav": 617,
+   "prix": 60,
+   "mot": "black boots"
+  },
+  {
+   "id": 15435310227,
+   "nom": "Black Boots",
+   "type": "Pantalon couches",
+   "itemType": "Asset",
+   "createur": "Lana's Luvs",
+   "verifie": false,
+   "fav": 514,
+   "prix": 75,
+   "mot": "black boots"
+  }
+ ],
+ "manteau2": [
+  {
+   "id": 9400749212,
+   "nom": "Yukata(Cherry)",
+   "type": "Pull couches",
+   "itemType": "Asset",
+   "createur": "Dev_R0VER",
+   "verifie": true,
+   "fav": 12626,
+   "prix": 70,
+   "mot": "green yukata"
+  },
+  {
+   "id": 9400752004,
+   "nom": "Yukata Skirt(Cherry)",
+   "type": "Jupe/robe couches",
+   "itemType": "Asset",
+   "createur": "Dev_R0VER",
+   "verifie": true,
+   "fav": 3937,
+   "prix": 65,
+   "mot": "green yukata"
+  },
+  {
+   "id": 12342268042,
+   "nom": "(1.0) Neon Glowing Green Coat",
+   "type": "Veste couches",
+   "itemType": "Asset",
+   "createur": "dvdko",
+   "verifie": true,
+   "fav": 565,
+   "prix": 70,
+   "mot": "dark green coat"
+  },
+  {
+   "id": 14935899417,
+   "nom": "Badlander's Overcoat [1.0] [Green Armor/Dark Coat]",
+   "type": "Veste couches",
+   "itemType": "Asset",
+   "createur": "Foxtrot Arms",
+   "verifie": true,
+   "fav": 454,
+   "prix": 120,
+   "mot": "dark green coat"
+  },
+  {
+   "id": 10088343221,
+   "nom": "Dark Green Tendril Robe",
+   "type": "Chemise couches",
+   "itemType": "Asset",
+   "createur": "rajlo",
+   "verifie": false,
+   "fav": 385,
+   "prix": 60,
+   "mot": "green open robe"
+  },
+  {
+   "id": 14193828868,
+   "nom": "Black & White Yukata",
+   "type": "Veste couches",
+   "itemType": "Asset",
+   "createur": "DuoTale Studios",
+   "verifie": true,
+   "fav": 299,
+   "prix": 125,
+   "mot": "green yukata"
+  },
+  {
+   "id": 79020275676859,
+   "nom": "Off-Shoulder Kimono Yukata Shirt-White",
+   "type": "Chemise couches",
+   "itemType": "Asset",
+   "createur": "Lucky Koi锦鲤",
+   "verifie": false,
+   "fav": 292,
+   "prix": 70,
+   "mot": "green yukata"
+  },
+  {
+   "id": 11256398563,
+   "nom": "Green Cybernetic Militar Long Coat",
+   "type": "Veste couches",
+   "itemType": "Asset",
+   "createur": "Blak's UGC Store",
+   "verifie": true,
+   "fav": 277,
+   "prix": 75,
+   "mot": "green open long coat"
+  },
+  {
+   "id": 133922439408986,
+   "nom": "Traditional Japanese yukata-style Kimono-Pink",
+   "type": "Jupe/robe couches",
+   "itemType": "Asset",
+   "createur": "Lucky Koi锦鲤",
+   "verifie": false,
+   "fav": 238,
+   "prix": 120,
+   "mot": "green yukata"
+  },
+  {
+   "id": 14193823626,
+   "nom": "Ocean Blue Yukata",
+   "type": "Veste couches",
+   "itemType": "Asset",
+   "createur": "DuoTale Studios",
+   "verifie": true,
+   "fav": 235,
+   "prix": 125,
+   "mot": "green yukata"
+  },
+  {
+   "id": 79650802810552,
+   "nom": "Yukata (Kimono) - Winter",
+   "type": "Jupe/robe couches",
+   "itemType": "Asset",
+   "createur": "Haririkuro's house",
+   "verifie": false,
+   "fav": 229,
+   "prix": 115,
+   "mot": "green yukata"
+  },
+  {
+   "id": 92152231887894,
+   "nom": "Traditional Japanese yukata-style Kimono-Blue",
+   "type": "Jupe/robe couches",
+   "itemType": "Asset",
+   "createur": "Lucky Koi锦鲤",
+   "verifie": false,
+   "fav": 172,
+   "prix": 120,
+   "mot": "green yukata"
+  }
+ ]
+}

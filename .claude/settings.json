@@ -23,6 +23,18 @@
       "PowerShell(git commit *)",
       "PowerShell(lune run *)"
     ],
+    "ask": [
+      "mcp__Roblox_Studio__upload_image",
+      "mcp__Roblox_Studio__store_image",
+      "mcp__Roblox_Studio__generate_avatar",
+      "mcp__Roblox_Studio__generate_material",
+      "mcp__Roblox_Studio__generate_mesh",
+      "mcp__Roblox_Studio__generate_procedural_model",
+      "mcp__Roblox_Studio__generate_scene",
+      "mcp__Roblox_Studio__generate_texture",
+      "mcp__Roblox_Studio__auto_setup_avatar",
+      "mcp__Roblox_Studio__insert_asset"
+    ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)"

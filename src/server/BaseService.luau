@@ -20,6 +20,7 @@ local COULEUR_VERROUILLE = Color3.fromRGB(110, 110, 110)
 local TAILLE_PERSONNAGE = Vector3.new(3, 5, 3)
 local TAG_VITRINE = "PersonnageVitrine"
 local VITRINE_PAUSE = 2 -- secondes entre deux animations de vitrine
+local HIT_STOP = 0.06 -- arrêt sur image à chaque marqueur « Impact »
 
 local proprietaires: { [Model]: Player } = {}
 local basesParJoueur: { [Player]: Model } = {}
@@ -92,8 +93,13 @@ end
 -- Joue `piste` jusqu'à sa dernière image et l'y fige (la pose de repos du rig n'est pas la pose neutre).
 -- Renvoie false si le modèle a disparu entre-temps.
 local function jouerEtFiger(modele: Model, piste: AnimationTrack, precedente: AnimationTrack?): boolean
+	if piste.IsPlaying then
+		-- piste encore figée sur sa dernière image (vitrine à une seule animation) : repartir du début
+		piste:Stop(0)
+		piste.TimePosition = 0
+	end
 	piste:Play(0)
-	if precedente then
+	if precedente and precedente ~= piste then
 		precedente:Stop(0)
 	end
 	-- longueur inconnue tant que l'animation publiée n'est pas chargée
@@ -104,14 +110,48 @@ local function jouerEtFiger(modele: Model, piste: AnimationTrack, precedente: An
 		task.wait(0.1)
 	end
 	task.wait(math.max(0, piste.Length - piste.TimePosition - 0.05))
+	-- les arrêts sur image (hit-stop) ont pu retarder la fin
+	while modele.Parent and piste.IsPlaying and piste.TimePosition < piste.Length - 0.05 do
+		task.wait()
+	end
 	piste:AdjustSpeed(0)
 	piste.TimePosition = piste.Length * 0.999
 	return modele.Parent ~= nil
 end
 
+-- Arrêt sur image à chaque marqueur « Impact » (coups de la séquence du sabreur) : attribut HitStop de l'effet
+-- VFX.Impact_<valeur> du modèle (ex. plus long pour l'impact au sol), HIT_STOP sinon.
+local function brancherHitStop(modele: Model, piste: AnimationTrack)
+	piste:GetMarkerReachedSignal("Impact"):Connect(function(valeur: string)
+		local vfx = modele:FindFirstChild("VFX")
+		local effet = vfx and vfx:FindFirstChild(`Impact_{valeur}`)
+		local duree = effet and effet:GetAttribute("HitStop")
+		piste:AdjustSpeed(0)
+		task.delay(if typeof(duree) == "number" then math.clamp(duree, 0, 0.3) else HIT_STOP, function()
+			-- ne pas relancer une piste figée sur sa dernière image
+			if piste.IsPlaying and piste.TimePosition < piste.Length - 0.1 then
+				piste:AdjustSpeed(1)
+			end
+		end)
+	end)
+end
+
 -- Vitrine d'un personnage posé : Idle, pause, Action, pause, Signature, pause, en boucle (VITRINE_PAUSE secondes).
+-- Un personnage avec une AnimationSequence (ex. séquence du sabreur de zoro) la joue seule, en boucle avec pause.
 -- Un personnage sans Action ni Signature joue seulement son Idle en boucle.
 local function animerVitrine(modele: Model, animator: Animator)
+	local sequence = chargerPiste(animator, modele:GetAttribute("AnimationSequence"))
+	if sequence then
+		brancherHitStop(modele, sequence)
+		while modele.Parent do
+			if not jouerEtFiger(modele, sequence, nil) then
+				return
+			end
+			task.wait(VITRINE_PAUSE)
+		end
+		return
+	end
+
 	local idle = chargerPiste(animator, modele:GetAttribute("AnimationIdle"))
 	if not idle then
 		return

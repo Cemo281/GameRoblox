@@ -271,9 +271,13 @@ def alleger(images, articulations, tolerance=0.25, tolerance_pos=0.005, garder=(
 	return gardees
 
 
-def finir(cles, n_images, articulations, boucle=False, limites=None, **reglages):
+def finir(cles, n_images, articulations, boucle=False, limites=None, retouche=None, **reglages):
 	"""Cuisson puis allegement. Renvoie (toutes, gardees) : toutes les images en cles lineaires (pour les verifications
-	du script) et les cles gardees (a ecrire). Premiere et derniere image = celles du blocage."""
+	du script) et les cles gardees (a ecrire). Premiere et derniere image = celles du blocage.
+	retouche(images) -> images : passe propre au personnage apres la cuisson (ex. jambes recalculees image par image
+	pour suivre des pas)."""
 	images = cuire(cles, n_images, articulations, boucle=boucle, limites=limites, **reglages)
+	if retouche:
+		images = retouche(images)
 	toutes = [(i, p, "Linear") for i, p in enumerate(images)]
 	return toutes, [toutes[i] for i in alleger(images, articulations)]

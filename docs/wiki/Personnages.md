@@ -57,6 +57,7 @@ Un personnage posé sur sa case joue en boucle ses animations de vitrine, avec *
 - Pendant une pause, le personnage reste figé sur la dernière image de l'animation (ex. en garde, sabres en main, après l'Action).
 - **Visible par tous** les joueurs (sabres et effets compris).
 - Un personnage qui n'a qu'une animation Idle la joue en boucle, sans pause.
+- Variante **séquence** : un personnage peut avoir une seule longue animation qui remplace le cycle, jouée en boucle avec la même pause de 2 s. Zoro (décision du 03/11/2026) : **séquence du sabreur** de 9,2 s, soit dégainage des trois sabres, charge d'aura verte, combat avec esquives, saut et coupe en X, puis rengainage. Chaque coup marque un bref arrêt sur image (0,06 s). Pas de dégâts : ce n'est qu'une démonstration.
 
 État technique : cycle joué par le serveur (`BaseService`), sabres et effets affichés par chaque client à partir des marqueurs des animations (`src/client/Vitrine.luau`). Premier personnage concerné : Zoro.
 

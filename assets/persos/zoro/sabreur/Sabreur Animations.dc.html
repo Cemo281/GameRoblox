@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#0f1110;color:#e6e9e7;font-family:'IBM Plex Sans',system-ui,sans-serif;}a{color:#7de3a6;}a:hover{color:#a9f0c5;}button{font-family:inherit;}</style>
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="./anims.js"></script>
+<script src="./viewer.js"></script>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+  <header style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;padding:18px 24px 14px;border-bottom:1px solid #232725;">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+      <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em;">Sabreur à trois sabres</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8b938e;">Animations R15 · Roblox</div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8b938e;">Glisser = orbiter · molette = zoom</div>
+  </header>
+
+  <div style="flex:1;display:flex;flex-wrap:wrap;min-height:0;">
+    <nav style="flex:0 0 230px;display:flex;flex-direction:column;gap:2px;padding:14px 10px;border-right:1px solid #232725;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px 8px;">Animations</div>
+      <sc-for list="{{ items }}" as="item" hint-placeholder-count="10">
+        <button onClick="{{ item.select }}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:9px 10px;border-radius:6px;border:none;cursor:pointer;background:{{ item.bg }};color:{{ item.fg }};font-size:13.5px;" style-hover="background:#1b1f1d;">
+          <span>{{ item.label }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;">{{ item.durText }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <main style="flex:1 1 480px;display:flex;flex-direction:column;min-width:0;">
+      <div style="position:relative;flex:1;min-height:440px;">
+        <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;"></canvas>
+        <div style="position:absolute;left:20px;top:16px;display:flex;flex-direction:column;gap:4px;pointer-events:none;">
+          <div style="font-size:22px;font-weight:600;letter-spacing:-0.01em;">{{ current.label }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8b938e;">{{ current.id }}</div>
+        </div>
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:20px;top:16px;padding:6px 12px;border-radius:999px;background:#163524;color:#9ff2c0;font-family:'IBM Plex Mono',monospace;font-size:12px;pointer-events:none;">◆ {{ toast }}</div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;padding:14px 20px 18px;border-top:1px solid #232725;">
+        <div ref="{{ trackRef }}" onPointerDown="{{ onScrubDown }}" style="position:relative;height:30px;cursor:pointer;touch-action:none;">
+          <div style="position:absolute;left:0;right:0;top:13px;height:4px;border-radius:2px;background:#262b28;"></div>
+          <div style="position:absolute;left:0;top:13px;height:4px;border-radius:2px;background:#5fd394;width:{{ progressPct }};"></div>
+          <sc-for list="{{ keyTicks }}" as="k" hint-placeholder-count="0">
+            <div style="position:absolute;top:9px;width:2px;height:12px;margin-left:-1px;background:#59615c;left:{{ k.left }};"></div>
+          </sc-for>
+          <sc-for list="{{ markerTicks }}" as="m" hint-placeholder-count="0">
+            <div title="{{ m.title }}" style="position:absolute;top:0;width:8px;height:8px;margin-left:-4px;transform:rotate(45deg);background:{{ m.color }};left:{{ m.left }};"></div>
+          </sc-for>
+          <div style="position:absolute;top:7px;width:4px;height:16px;margin-left:-2px;border-radius:2px;background:#e6e9e7;left:{{ progressPct }};"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button onClick="{{ togglePlay }}" style="width:40px;height:40px;border-radius:50%;border:none;background:#e6e9e7;color:#0f1110;font-size:14px;cursor:pointer;">{{ playIcon }}</button>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#c4cac6;">{{ timeText }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;gap:2px;padding:2px;border-radius:7px;background:#1b1f1d;">
+              <sc-for list="{{ speeds }}" as="s" hint-placeholder-count="4">
+                <button onClick="{{ s.select }}" style="padding:6px 10px;border:none;border-radius:5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;background:{{ s.bg }};color:{{ s.fg }};">{{ s.label }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ toggleLoop }}" style="padding:7px 12px;border-radius:7px;border:1px solid #2c322f;cursor:pointer;font-size:12.5px;background:{{ loopBg }};color:#e6e9e7;">Boucle</button>
+            <button onClick="{{ toggleTrail }}" style="padding:7px 12px;border-radius:7px;border:1px solid #2c322f;cursor:pointer;font-size:12.5px;background:{{ trailBg }};color:#e6e9e7;">Traînées</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside style="flex:1 0 280px;max-width:340px;display:flex;flex-direction:column;gap:22px;padding:18px 20px;border-left:1px solid #232725;">
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;text-transform:uppercase;letter-spacing:0.08em;">Exporter vers Roblox</div>
+        <button onClick="{{ copyLua }}" style="padding:11px 14px;border-radius:8px;border:none;cursor:pointer;background:#5fd394;color:#0b1a11;font-size:14px;font-weight:600;text-align:left;">{{ copyLabel }}</button>
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ dlLua }}" style="flex:1;padding:9px 10px;border-radius:8px;border:1px solid #2c322f;background:transparent;color:#e6e9e7;cursor:pointer;font-size:12.5px;">Animations .lua</button>
+          <button onClick="{{ dlRuntime }}" style="flex:1;padding:9px 10px;border-radius:8px;border:1px solid #2c322f;background:transparent;color:#e6e9e7;cursor:pointer;font-size:12.5px;">Script marqueurs .lua</button>
+        </div>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;text-transform:uppercase;letter-spacing:0.08em;">Importer</div>
+        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.5;color:#c4cac6;text-wrap:pretty;">
+          <li>Dans Studio, sélectionne le Model R15 de ton personnage dans l'Explorer.</li>
+          <li>Affichage › Barre de commande : colle le script, Entrée.</li>
+          <li>Avatar › Éditeur d'animation › choisis le rig › ⋯ › Charger › <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;">Sabreur_…</span></li>
+          <li>⋯ › Publier sur Roblox, puis récupère l'ID pour ton <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;">Animation</span>.</li>
+          <li>Place le script marqueurs dans StarterPlayerScripts.</li>
+        </ol>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;text-transform:uppercase;letter-spacing:0.08em;">Accessory attendus</div>
+        <sc-for list="{{ accessories }}" as="a" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid #1f2321;">
+            <div style="display:flex;justify-content:space-between;gap:8px;">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#e6e9e7;">{{ a.name }}</span>
+              <span style="font-size:12px;color:{{ a.stateColor }};">{{ a.state }}</span>
+            </div>
+            <div style="font-size:12px;color:#8b938e;">{{ a.att }}</div>
+          </div>
+        </sc-for>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;line-height:1.5;color:#8b938e;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6d756f;text-transform:uppercase;letter-spacing:0.08em;">Marqueurs</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#8fb4ff;flex:none;"></span>Montrer / Cacher — valeur = nom de l'Accessory</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#5fd394;flex:none;"></span>Impact — branche ta hitbox ici</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#f0c46a;flex:none;"></span>Aura / Explosion — déclencheurs VFX</div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;chainCombo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lecture&quot;},&quot;hitStop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lecture&quot;}}">
+class Component extends DCLogic {
+  state = { sel: 0, t: 0, playing: true, speed: 1, loop: true, trail: true, toast: null, copied: false, ready: false };
+  canvasRef = React.createRef();
+  trackRef = React.createRef();
+
+  componentDidMount() {
+    const boot = () => {
+      if (!window.THREE || !THREE.OrbitControls || !window.SABRE || !window.SabreViewer || !this.canvasRef.current) return void (this.bootT = setTimeout(boot, 60));
+      this.viewer = SabreViewer(this.canvasRef.current);
+      window.__sabre = this;
+      this.setState({ ready: true });
+      this.last = performance.now();
+      const tick = now => {
+        this.raf = requestAnimationFrame(tick);
+        this.step(Math.min(0.05, (now - this.last) / 1000));
+        this.last = now;
+      };
+      this.raf = requestAnimationFrame(tick);
+    };
+    boot();
+    this.onMove = e => { if (this.dragging) this.scrubTo(e.clientX); };
+    this.onUp = () => { this.dragging = false; };
+    window.addEventListener('pointermove', this.onMove);
+    window.addEventListener('pointerup', this.onUp);
+  }
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf); clearTimeout(this.bootT); clearTimeout(this.toastT);
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('pointerup', this.onUp);
+    this.viewer && this.viewer.dispose();
+  }
+
+  anim() { return SABRE.ANIMS[this.state.sel]; }
+
+  step(dt) {
+    const a = this.anim(), s = this.state;
+    let t = s.t, hold = this.hitStop > 0;
+    if (hold) this.hitStop -= dt;
+    if (s.playing && !this.dragging && !hold) {
+      const prev = t;
+      t += dt * s.speed;
+      if (t >= a.dur) {
+        const chain = (this.props.chainCombo ?? true) && !s.loop && /^Sabreur_M1_[123]$/.test(a.id);
+        if (chain) { this.fireMarkers(a, prev, a.dur + 1); return this.select(s.sel + 1, true); }
+        if (s.loop) { this.fireMarkers(a, prev, a.dur + 1); t = t % a.dur; this.fireMarkers(a, -1, t); }
+        else { this.fireMarkers(a, prev, a.dur + 1); t = a.dur; this.setState({ playing: false }); }
+      } else this.fireMarkers(a, prev, t);
+    }
+    if (t !== s.t) this.setState({ t });
+    const v = this.viewer;
+    v.setPose(SABRE.sample(a, t));
+    v.setVisible(SABRE.visibility(a, t));
+    v.setTrail(s.trail);
+    const auraM = a.markers.find(m => m[1] === 'Aura');
+    const finM = a.markers.find(m => m[1] === 'Fin');
+    v.setAura(auraM && t >= auraM[0] && t < (finM ? finM[0] : a.dur - 0.2) ? 3 : 0);
+    v.render(s.playing && !this.dragging);
+  }
+
+  fireMarkers(a, from, to) {
+    a.markers.forEach(m => {
+      if (m[0] > from && m[0] <= to && !(m[0] === 0 && from >= 0)) {
+        if (m[1] === 'Impact') { this.viewer.ring(1); if (this.props.hitStop ?? true) this.hitStop = 0.06; }
+        if (m[1] === 'Explosion') this.viewer.ring(2.2);
+        if (m[1] !== 'Montrer' && m[1] !== 'Cacher' || m[0] > 0) this.showToast(m[1] + ' · ' + m[2]);
+      }
+    });
+  }
+  showToast(txt) {
+    clearTimeout(this.toastT);
+    this.setState({ toast: txt });
+    this.toastT = setTimeout(() => this.setState({ toast: null }), 650);
+  }
+
+  select(i, keepPlaying) {
+    this.viewer && this.viewer.clearTrails();
+    this.setState({ sel: i, t: 0, playing: keepPlaying ? true : true });
+    const a = SABRE.ANIMS[i];
+    if (a) this.fireMarkers(a, -1, 0);
+  }
+
+  scrubTo(clientX) {
+    const el = this.trackRef.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    const f = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    this.setState({ t: f * this.anim().dur, playing: false });
+  }
+
+  download(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  renderVals() {
+    const S = window.SABRE, s = this.state;
+    if (!S) return { items: [], current: {}, keyTicks: [], markerTicks: [], speeds: [], accessories: [], progressPct: '0%' };
+    const a = S.ANIMS[s.sel];
+    const vis = S.visibility(a, s.t);
+    const pct = x => (x / a.dur * 100).toFixed(2) + '%';
+    const mColor = n => n === 'Impact' ? '#5fd394' : (n === 'Montrer' || n === 'Cacher') ? '#8fb4ff' : '#f0c46a';
+    const seenM = {};
+    return {
+      canvasRef: this.canvasRef, trackRef: this.trackRef,
+      items: S.ANIMS.map((x, i) => ({
+        label: x.label, durText: x.dur.toFixed(2) + 's' + (x.loop ? ' ↻' : ''),
+        bg: i === s.sel ? '#1f2a24' : 'transparent', fg: i === s.sel ? '#9ff2c0' : '#c4cac6',
+        select: () => this.select(i)
+      })),
+      current: a,
+      toast: s.toast,
+      progressPct: pct(s.t),
+      keyTicks: a.keys.map(k => ({ left: pct(k.t) })),
+      markerTicks: a.markers.filter(m => { const k = m[0].toFixed(3) + mColor(m[1]); if (seenM[k]) return false; return seenM[k] = true; })
+        .map(m => ({ left: pct(m[0]), color: mColor(m[1]), title: m[1] + ' ' + m[2] + ' @ ' + m[0] + 's' })),
+      timeText: s.t.toFixed(2) + ' / ' + a.dur.toFixed(2) + ' s',
+      playIcon: s.playing ? '❚❚' : '▶',
+      togglePlay: () => this.setState(st => {
+        const restart = !st.playing && st.t >= a.dur - 1e-3;
+        if (restart) this.viewer && this.viewer.clearTrails();
+        return { playing: !st.playing, t: restart ? 0 : st.t };
+      }),
+      onScrubDown: e => { this.dragging = true; this.scrubTo(e.clientX); },
+      speeds: [0.1, 0.25, 0.5, 1].map(v => ({ label: v + '×', bg: s.speed === v ? '#2d3632' : 'transparent', fg: s.speed === v ? '#e6e9e7' : '#8b938e', select: () => this.setState({ speed: v }) })),
+      toggleLoop: () => this.setState({ loop: !s.loop }),
+      loopBg: s.loop ? '#1f2a24' : 'transparent',
+      toggleTrail: () => this.setState({ trail: !s.trail }),
+      trailBg: s.trail ? '#1f2a24' : 'transparent',
+      copyLabel: s.copied ? 'Script copié ✓' : 'Copier le script Luau',
+      copyLua: () => {
+        const txt = S.toLuau();
+        const done = () => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); };
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => { this.download('SabreurAnimations.lua', txt); done(); });
+        else { this.download('SabreurAnimations.lua', txt); done(); }
+      },
+      dlLua: () => this.download('SabreurAnimations.lua', S.toLuau()),
+      dlRuntime: () => this.download('SabreurMarqueurs.client.lua', S.RUNTIME),
+      accessories: S.ACCESSORIES.map(x => ({ name: x.name, att: x.att, state: vis[x.name] ? 'visible' : 'caché', stateColor: vis[x.name] ? '#9ff2c0' : '#6d756f' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

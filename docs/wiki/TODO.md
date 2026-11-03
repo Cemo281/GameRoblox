@@ -3,6 +3,108 @@
 Suivi des tâches de développement. Les décisions de game design en attente sont dans [Questions ouvertes](Questions-ouvertes.md).
 
 ## En cours
+### Séquence du sabreur sur la vitrine de zoro (handoff `design_handoff_sabreur_roblox`, sources dans `assets/persos/zoro/sabreur/`)
+Décision (03/11) : la séquence complète (dégainage → aura → combat → rengainage, 9,2 s) devient la vitrine de zoro. Pas de hitbox ni de dégâts tant que les combats ne sont pas conçus. Animations publiées par l'utilisateur.
+- [x] Copier les sources du handoff dans `assets/persos/zoro/sabreur/` (anims.js = source de vérité, visualiseur, captures)
+- [x] `adapter_sequences.py` → `creer_sequences.luau` (format compact, séquence complète reconstruite à partir des 4 clips, vérifiée identique à celle du handoff) : 5 KeyframeSequence dans `ServerStorage.RBX_ANIMSAVES.Sabreur_Apercu`, marqueurs renommés vers `Acc_Sabre_*`, marqueurs `VFX` ajoutés
+- [x] Sauvegarde `ServerStorage.Sauvegarde_ZoroAvantSabreur` ; sabre en bouche retourné (lame vers la droite du perso, comme le handoff ; attribut `RetournePourSabreur`) sur `ModelesPersonnages.zoro`. L'ancien cycle de zoro le montre donc aussi retourné
+- [x] `vfx_sabreur.luau` : effets `Sabreur_Aura` / `_Explosion` / `_Flash` / `_Coupe` / `_Onde_Sol` / `_Esquive` / `_Trail` dans `zoro.VFX` (textures intégrées ou déjà en ligne, aucun envoi)
+- [x] Serveur : attribut `AnimationSequence` (vitrine = séquence en boucle avec pause de 2 s), hit-stop de 0,06 s sur les `Impact`, fin d'animation attendue malgré les arrêts
+- [x] Client `Vitrine` : lumières dans les VFX ; accessoires réinitialisés au début de la séquence
+- [x] Rig d'aperçu `Workspace.Sabreur_Apercu` (à côté de `Essais_Zoro`) : poses 1.0 / 2.5 / 6.88 conformes aux captures du handoff
+- [x] Test en Play avec un clip temporaire (`RegisterAnimationClip`) : boucle, arrêt sur la dernière image, hit-stops, sabres montrés et cachés, aura de 1,45 à 4,2 s. Anneaux et lumières atténués (disque blanc sur le sable)
+- [x] Chargement impossible dans l'Éditeur d'animation : il lit `<rig>.AnimSaves`, pas `ServerStorage.RBX_ANIMSAVES` → séquences copiées dans `Sabreur_Apercu.AnimSaves` (générateur corrigé) ; séquence jouée en boucle en mode édition sur le rig (`_G.ApercuSabreurConnexion`)
+- [x] Sabres sortis jugés « jouets » : `agrandir_sabres.luau` (relançable, échelle 1,4 par rapport à l'attribut `TailleOrigine`) → 3,5 → 4,9 studs sur `ModelesPersonnages.zoro` et `Sabreur_Apercu` ; prise en main et attachments des traînées mis à l'échelle ; boucle d'aperçu arrêtée
+- [ ] Validation de la nouvelle taille des sabres ✋
+- [x] Séquence complète publiée par l'utilisateur : rbxassetid://111964374713605 → attribut `AnimationSequence` de `ModelesPersonnages.zoro`
+- [x] Marqueurs perdus à la publication (un seul marqueur de chaque nom par image clé) : flash ×2, tornade de la coupe X, 2 `Cacher` à 0 (sans effet, sabres cachés par défaut) → `Vitrine` déclenche `<Marqueur>_<Valeur>` ; effets `Explosion_Aura`, `Impact_Sol`, `Impact_CoupeX` ajoutés (zoro, aperçu, `vfx_sabreur.luau`)
+- [x] Test en Play avec l'animation publiée : flash 1,83 et 6,52 s, aura 1,45-4,2 s, sabres conformes
+- [ ] **VFX v2 « plus stylé et énervé » + charge d'aura façon image de référence (03/11)**
+  - [x] Charge d'aura v2 dans `anims.js` (ramassé 0,28, ouverture bras à l'horizontale lames dans l'axe 0,4, lévitation +1,3 à +1,5 en ondulant, tête baissée, retombée lourde 2,75) ; `regenerer_luau.js` (Node, = SABRE.toLuau(), vérifié identique avant modification)
+  - [x] Générateur : plus de marqueurs `VFX` doublés, effets nommés d'après les marqueurs de gameplay (`Aura_Debut`, `Impact_Sol`…)
+  - [x] `vfx_sabreur.luau` v2 : aura (flammes vertes et rouges, éclairs verts et rouges sur les 3 lames, œil rouge et sa traînée, braises, fumée sombre), explosion (double onde, éclairs, lignes d'impact manga, braises, flash), coups (arc, étoile, onde, lignes, éclats, traits de vitesse), impact au sol (onde, poussière, débris), coupe en X (arcs croisés), esquives (image rémanente verte), traînées blanc → vert sur les 3 lames. Textures déjà en ligne seulement ; celle des éclairs de luffy est sombre, remplacée par celle de nami
+  - [x] `Vitrine` : modes `Eteindre`, flash des lumières en `Burst`, secousse de caméra, image rémanente ; bug corrigé (marqueurs rebranchés à chaque cycle → effets multipliés)
+  - [x] Serveur : hit-stop par coup (attribut `HitStop` : 0,07 pour les contres, 0,12 pour l'impact au sol et la coupe en X)
+  - [x] Testé en Play avec l'animation publiée actuelle (ancienne pose d'aura) : 1 fantôme par esquive sur 2 cycles, aucune erreur ; coupe en X et poussière du sol atténuées (trop blanches, cachaient zoro)
+  - [x] Republiée par l'utilisateur : rbxassetid://84002114579729 (lévitation présente, 22 marqueurs) → `ModelesPersonnages.zoro.AnimationSequence`
+  - [x] `RBX_ANIMSAVES` : 3 dossiers `Sabreur_Apercu` (celui de l'éditeur, vide ; le mien ; celui de la migration) → seul celui de la migration est gardé ; le générateur réutilise désormais ce dossier et ne crée plus `<rig>.AnimSaves`
+  - [x] Aura invisible en plein jour (additif pur délavé sur le sable) → LightEmission 0,35, Brightness 3, flammes plus opaques et plus saturées ; poussière de l'explosion allégée. Vérifié en Play : éclairs verts nets sur les lames
+  - [ ] Revoir en Play l'aura finale (flammes du corps, éclairs rouges) : le Play ne démarrait plus depuis le MCP (fenêtre ouverte dans Studio ?)
+  - [ ] Validation par l'utilisateur ✋, Ctrl+S
+- [ ] Joueur arrivé en cours de séquence : sabres en main cachés jusqu'au cycle suivant (≤ 11 s), à corriger si gênant
+- [ ] Validation visuelle de la séquence et des VFX par l'utilisateur ✋, puis Ctrl+S dans Studio
+- [x] Wiki (Personnages, journal), CLAUDE.md, selene
+- [ ] Supprimer le dossier du handoff (`Downloads/design_handoff_sabreur_roblox`) ✋ : tout est copié dans `assets/persos/zoro/sabreur/`
+- [ ] Inventaire Studio : un zoro de test ajouté pendant l'essai (uid 32), à recycler ou à garder
+
+### Personnage `zoro` v2 (rig `assets/rig/Rig15ik.blend` + catalogue, comme luffy ; fichiers dans `assets/persos/zoro/`)
+- [x] Inspection de Rig15ik (R15 blocs arrondis, 16 pièces, armature `__Rig` 29 os)
+- [x] 2. Recherche dans le catalogue → `catalogue.md` + planches `catalogue/*.png`
+- [x] Essais tour 1 (4 tenues sur R15 blocs, `Workspace.Essais_Zoro`, captures `essais/tour1_*.jpg`) : « Black Bandana » 14142673354 = masque sur la bouche (écarté) ; bandana caché par les cheveux volumineux ; variante Wano (cape 14073107017, visage 101561478701972) écartée
+- [x] Choix de l'utilisateur : tête de l'ancien zoro (visage, bandana, cheveux, boucles), Pants (pantalon + bottes) de l'ancien zoro ; robe de C (Wano Cloak 14039522574 + Green Waistband 12691863985), abdos de C (Shirt 14603018526 + T-Shirt cicatrice 8188469375), katanas de C (Triple Katana V2 15257730645)
+- [x] `Workspace.Essais_Zoro.Zoro_v2` : clone de `ModelesPersonnages.zoro` sans Shirt / Manteau / Echarpe / Haramaki / Fourreaux / Acc_Sabres_Hanche, + articles ci-dessus (sabres en main Acc_Sabre_Droit/Gauche/Bouche gardés pour les animations)
+- [x] Torse noir : le Pants de l'ancien zoro peint le torse en noir (caché avant par son Shirt) → `pants_zoro_v2.py` → `pants_zoro_v2.png` (torse transparent, bande verte du haramaki gardée), envoyé : rbxassetid://71238576091435
+- [x] PantsTemplate 71238576091435 appliqué à `Zoro_v2` en mode édition
+- [x] Captures `essais/v2_face|trois_quarts|dos|profil.jpg` ✋ (haramaki presque caché par la robe ; katanas très longs vers l arrière)
+- [x] Rig15ik = rig R15 « blocs » par défaut de Studio exporté (métadonnées `__RigMeta` du plugin d'export de rig) : pas d'import FBX nécessaire, le même rig s'obtient dans Studio ; Blender sert aux animations
+- [x] Haramaki (Green Waistband) remonté et allongé : dépasse de 0,3 stud au-dessus de la robe, le reste caché dedans (capture `essais/v2_face_haramaki.jpg`) ; katanas gardés tels quels (décision)
+- [x] 3. `tenue.json` (tous les IDs du Zoro_v2)
+- [x] Haramaki remis à sa taille d origine, seulement remonté (haut au-dessus de la robe, moitié basse cachée) ; visage du `Workspace.Zoro` importé (Decal 11147423022) posé sur `Zoro_v2.Head.face`
+- [x] Visage : fond peau opaque du Decal importé (teinte différente du torse) et yeux sous le bandana → `visage_zoro_v2.py` (fond transparent, yeux à 67 % de la hauteur) → rbxassetid://90527329904045 ; capture `essais/v2_visage.jpg`
+- [x] Visage final : image fournie `visage_source_2.png` → `visage_zoro_v2.py 2` → `visage_zoro_2.png` → rbxassetid://107949344776358 (capture `essais/v2_visage_2.jpg`) ; script généralisé (sources `import` et `2`)
+- [x] Visage agrandi (hauteur x0,9 → 1,08 en largeur, yeux à 63 %) → rbxassetid://116688447053063 (capture `essais/v2_visage_2_grand.jpg`) ; essai intermédiaire x0,98 abandonné : bouche coupée par le bas de la tête
+- [x] Visage remonté (yeux à 60 %, sourcils en partie sous le bandana) → rbxassetid://74078804588270 (capture `essais/v2_visage_2_haut.jpg`)
+- [x] Visage remonté encore (yeux à 56 %, juste sous le bord du bandana) → rbxassetid://89817998052891 (capture `essais/v2_visage_2_haut2.jpg`)
+- [x] Visage remonté (yeux à 53 %, paupières contre le bandana) → rbxassetid://104714971486473 (capture `essais/v2_visage_2_haut3.jpg`)
+- [x] Comparaison : copie `Essais_Zoro.Zoro_ancien` (clone de `ModelesPersonnages.zoro`, aligné sur le torse : ses pièces stockées ne suivent pas ses Motor6D) à droite de `Zoro_v2` ; `C_Bandeau` déplacé en x = 9 (capture `essais/comparaison_v2_ancien.jpg`)
+- [x] Katanas du catalogue renommés `Acc_Sabres_Hanche` (VisibleParDefaut = true) : cachés au dégainage, remontrés au rengainage par les marqueurs des animations publiées de l'ancien zoro (mêmes IDs, même côté de la hanche)
+- [x] `ModelesPersonnages.zoro` remplacé par une copie de `Zoro_v2` ; ancien gardé en `ModelesPersonnages.zoro_ancien` (à supprimer par l'utilisateur quand validé)
+- [x] Testé en Play sur Emplacement1 : Action avec les 3 sabres en main, katanas de hanche cachés puis revenus au repos (captures `essais/play_action.jpg`, `essais/play_repos.jpg`)
+- [x] Torse : abdos de l'image fournie (`abdos_source.png`) + cicatrice diagonale recousue → `torse_zoro.py` → `torse_zoro.png` → ShirtGraphic `TorseZoro` rbxassetid://116058110128484 sur `ModelesPersonnages.zoro` et `Zoro_v2` ; ancien Shirt d'abdos rangé dans `ServerStorage.Sauvegarde_ZoroShirtAbs`
+- [ ] Validation du torse par l'utilisateur ✋ (moitié basse des abdos cachée par le haramaki)
+- [x] Skin de `essais/play_action.jpg` validé par l'utilisateur (03/11)
+- [ ] **Cicatrice de poitrine en géométrie 3D (03/11, aucune image envoyée à Roblox)** : `cicatrice_zoro.luau` (relançable)
+  - [x] Inspecter `ModelesPersonnages.zoro` (UpperTorso, Shirt / ShirtGraphic en place)
+  - [x] Écrire le script : bourrelet diagonal épaule gauche → hanche droite + points de suture, soudés à UpperTorso, sans collision
+  - [x] Lancé sur `ModelesPersonnages.zoro` et `Essais_Zoro.Zoro_v2` : Model `Cicatrice` (24 pièces)
+  - [x] Skin de `play_action.jpg` rétabli : Shirt catalogue 14603018526 (template 14603018481) remis sur les deux modèles, ShirtGraphic `TorseZoro` (116058110128484, envoyé avant le ban) rangé dans `ServerStorage.Sauvegarde_TorseZoroGraphic`
+  - [ ] Validation de la cicatrice par l'utilisateur ✋ puis Ctrl+S dans Studio
+  - [ ] Vérifier en Play que la cicatrice suit les animations (Weld sur UpperTorso)
+- [x] Calibration du Shirt sur le corps « Blocky » (gabarit à bandes numérotées) : chaque face de bras 64 × 128 couvre tout le bras (haut 0-59 px, avant-bras 59-113, main 113-128), faces standard
+- [x] Bras et dos musclés style manga : `bras_zoro.py` → `shirt_zoro_v2.png` (deltoïdes, biceps, triceps, avant-bras, veines, trapèzes, omoplates, dorsaux, dentelés ; devant du torse transparent sous `TorseZoro`) ; 1er essai vu sur le clone `Calib_Bras` (rbxassetid://130523563613580, avec jointures des mains, retirées depuis)
+- [ ] Studio fermé pendant les essais : vérifier que `TorseZoro` est toujours sur `ModelesPersonnages.zoro` / `Zoro_v2`, renvoyer `shirt_zoro_v2.png`, le poser en Shirt sur les deux, vérifier dos et profil, supprimer `Essais_Zoro.Calib_Bras`, Ctrl+S
+- [ ] Validation du mouvement par l'utilisateur ✋ (sabres en main = anciens modèles, à harmoniser avec les gardes dorées si besoin)
+- [ ] 4. Éléments faits main (à décider après l'assemblage : sabres séparés pour l'Action, etc.)
+- [ ] 5-7. Animations, VFX, finition (reprise de `anims_zoro.py` sur le nouveau rig)
+- [ ] **Idle et Action refaites (31/10, image de référence : Zoro bras tendus vers le bas, lames chargées de haki, sabre à la bouche)**
+  - [x] Idle (150 images, 11 clés, finie 73 clés) : bras croisés retirés ; dégainage des 3 sabres (repris de l'ancienne Action) 0-30, ramassé 40, ouverture explosive en pose haki 46 (mains à ±2,3 stud, coudes 7-8°, lames vers l'extérieur et le haut), variations 80 / 115, fin sur la pose haki (plus de boucle) ; marqueurs Cacher/Montrer 15-30, VFX `Haki_Explosion` 46 / `Haki_Aura` 47
+  - [x] `viser` : paramètres `coude` (bras tendu) et `tolerance_epaule` (le haut du bras levé sur le côté entre toujours un peu dans le coin du torse, ~0,1-0,2) ; `construire` accepte `dir=` (direction du bras depuis le pivot de l'épaule)
+  - [x] Action (120 images, 15 clés, finie 108 clés) : armé 9 / balayage droit 15 / passage par-dessus 23 / armé 30 / balayage gauche 36 / bras en V 46 / double coup plongeant en fente 53 / bras croisés tendus 74 / ouverture en croix 80 / bras redescendus lames en arrière 101 / pose haki 120 ; pieds écartés puis fente (écart max 0,11) ; marqueurs Trail_Lames 8-86, Entaille_Droite 14 et 52, Entaille_Gauche 35 et 53, Tornade_Sabres 80
+  - [x] Signature recalculée (part de la pose haki) ; marqueur `Haki_Aura_Fin` 46 ; raccords Idle→Action, Action→Signature, Signature→Idle : écart 0
+  - [x] Vérifications : aucune lame dans le corps (Idle, Action, Signature) ; recouvrement épaule 0,22 sur la pose haki tenue, 0,32 pendant 3-4 images autour de l'Action 98 (à juger à l'œil)
+  - [x] `apercu_studio.py` (zoro, rig Motor6D) : copies figées dans `Workspace.Apercu_Anim`, accessoires montrés d'après les marqueurs du cycle
+  - [ ] Aperçu des poses clés dans Studio ✋ (place à ouvrir dans Studio)
+  - [ ] KeyframeSequence dans Studio, aperçu, publication (manuel) et attributs
+  - [ ] VFX haki (aura verte sur les lames, éclairs) ; marqueurs Entaille / Tornade replacés
+  - [ ] Images d'interface de zoro à refaire (la grille Idle montre encore les bras croisés)
+
+### Île volante (place Studio, script `assets/ile/construire_ile.luau`)
+- [x] Sauvegarde `ServerStorage.Sauvegarde_AvantIleVolante` (Wall, Wall_Grass, Base, Baseplate retirés du Workspace)
+- [x] `Workspace.Ile` : sol d'herbe r = 265 (dessus y = 1), touffes au bord, muret bas style Hub, dessous en strates de terre / pierre avec rochers et pointes, cristaux dorés, 48 murs invisibles (818 objets)
+- [x] Muret, touffes et murs invisibles orientés le long du bord (corrigé dans le script)
+- [x] Correction d'orientation appliquée dans Studio
+- [x] Anneau de murs invisibles vérifié par requêtes de zone (720 points derrière le muret : 0 trou ; aucun mur devant le muret)
+- [ ] Tester en Play : longer le bord, sauter sur le muret
+- [x] `Baseplate` retiré de `default.project.json` (Rojo ne le recrée plus)
+- [x] Wiki (Concept, journal) et CLAUDE.md
+- [x] Décision (utilisateur) : la mer
+- [x] Mer : `assets/ile/construire_mer.luau`, eau du Terrain à y = -380 sur 8192 × 8192 studs (5 s), WaterColor 16,84,170, Reflectance 0,6, Transparency 0,15
+- [ ] Vérifier en Play (graphismes au max) la bande plus claire vue depuis le bord : en mode édition, l'eau proche est plus claire que l'eau lointaine avec une limite nette (distance d'affichage du terrain, ni Transparency, ni Reflectance, ni Atmosphere n'y changent rien)
+- [x] Décor du dessus (retour : « ça fait vide ») : `assets/ile/decorer_ile.luau` → `Ile.Decor`, 3 132 pièces ; 2 bosquets, 2 étangs, 2 belvédères, 1 jardin de pierres entre les bases ; 12 cerisiers, 10 bambouseraies, 10 lanternes, 110 buissons, 45 rochers, 70 massifs de fleurs, 260 touffes, 60 taches d'herbe ; cerisiers et lanternes clonés du Hub
+- [x] Vérifié : aucune pièce du décor dans `BaseJoueur`, sur les chemins ou près de l'apparition
+- [ ] Tester en Play : collisions (bambous, bancs, pierres de l'étang) et fluidité (fleurs et touffes ≈ 1 700 pièces : à réduire si le jeu rame sur mobile)
+- [ ] Enregistrer la place (Ctrl+S, hors git)
+
 ### Décor du Hub, style animé « sanctuaire de festival » (place Studio, pièces seulement, sans Blender)
 - [x] Sauvegarde du Hub actuel dans `ServerStorage.Sauvegarde_AvantDecorHub`
 - [x] Sol : plateau, place centrale et chemins en SmoothPlastic pastel (tons moyens : l'éclairage brûle les teintes claires), bordure du plateau ouverte aux chemins, liserés et dalles rondes sur les chemins
@@ -13,12 +115,17 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 - [x] Cadre du panneau de classements (toit noir, linteau vermillon, cadre doré)
 - [x] Captures et vérification (passages libres, 846 pièces dans `Hub.Decor`)
 - [x] Wiki : section « Direction artistique » dans `Hub.md` + journal
-- [ ] Valider la direction artistique (utilisateur) et enregistrer la place (Ctrl+S, hors git)
+- [x] Valider la direction artistique (utilisateur, 31/10 : validée après la passe « moins de rose »)
+- [ ] Enregistrer la place (Ctrl+S, hors git)
 - [x] Éclairage (place Studio, hors Rojo) : OutdoorAmbient 249,201,255 → 190,172,206 ; ColorCorrection luminosité 0,10 → 0,02, contraste 0,25 → 0,12, saturation 0,10 → 0,18, teinte 255,248,250 ; Bloom intensité 1 → 0,6, seuil 2 → 1,6 (bases plus lisibles aussi)
 - [x] Blender (accord reçu) : `assets/hub/decor_hub.py` (lancé en arrière-plan, sans toucher le Blender ouvert) → `fbx/decor_hub.fbx`, `palette_hub.png`, `decor_hub.json`, `apercu/ensemble.png` : CerisierA / B (≈ 4 300 tri.), Torii courbé (4 248), LanternePierre (2 542), Chochin (840) ; ombrage peint dans une palette en dégradés, sans traits noirs
 - [x] Cerisier v2 (retour : « trop chewing-gum, pas assez arbre ») : tronc noueux fourchu en 4 branches et 8 rameaux visibles, touffes séparées et étagées en dôme (dessous aplati, bosselées, facettes peintes), rose moins bonbon ; ≈ 7 100 triangles
-- [ ] Import de `assets/hub/fbx/decor_hub.fbx` dans Studio (manuel)
-- [ ] Remplacer les pièces provisoires par les MeshParts (torii, lanternes de pierre, cerisiers, chochin), gabarits dans `ServerStorage.Gabarits.DecorHub`
+- [x] Import de `assets/hub/fbx/decor_hub.fbx` dans Studio (manuel, 31/10) : 5 MeshParts aux tailles de `decor_hub.json`, texture 136940091070439
+- [x] Script de remplacement `assets/hub/remplacer_decor_hub.luau` (lancé par MCP) : range les MeshParts dans `ServerStorage.Gabarits.DecorHub`, sauvegarde `ServerStorage.Sauvegarde_AvantMeshDecorHub` ; torii posé entre les piliers (piliers gardés invisibles en collision) ; lanternes de pierre (torii + centre) à l'échelle des provisoires, feu Neon recalé en cylindre dans la chambre aux 6 montants ; cerisiers A / B alternés à l'échelle du feuillage (×1,5 à 1,7, grands ×2,56), pétales gardés, cylindre de collision invisible recentré sur le tronc par rayons, grands cerisiers recentrés sur leur banc circulaire ; chochin en Neon rouge sans texture (la texture papier masquait la couleur), bagues recollées, PointLight déplacée
+- [x] Remplacement fait : 7 torii, 18 lanternes de pierre, 12 cerisiers, 8 chochin ; `Hub.Decor` 846 → 567 pièces ; captures vérifiées (ensemble, torii, stand, grands cerisiers, centre)
+- [ ] Tester en Play : passages des torii, collisions des troncs et lanternes
+- [x] Moins de rose (retour : « garde les cerisiers, pas les lanternes et tout en rose ») : sauvegarde `ServerStorage.Sauvegarde_AvantMoinsRose` ; palette `pierre` grise neutre et `toit` ardoise dans `decor_hub.py`, `palette_hub.png` régénérée et envoyée (102703033739592, 42 MeshParts + gabarits) ; sol et chemins en pierre beige, losanges vermillon, anneau en pierre foncée, bordure chaperon gris tuile / muret clair, dossiers des bancs en bois, gradins en pierre et liseré or, cœur, orbites, rayon et lumière en or ; cerisiers et pétales inchangés
+- [x] Nouvelle palette validée ; estrade et éclairage laissés tels quels
 - [x] `src/client/DecorAnime.luau` : tags `DecorTournant` (orbites, attribut `Vitesse`) et `DecorFlottant` (cœur, `Amplitude`, `Periode`), testé en Play
 
 ### Calibration R15 pour `/perso-catalogue` (Studio seulement, fichiers dans `assets/persos/_rig/`)
@@ -74,7 +181,7 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 - [ ] (abandonné pour l'instant) visage qui rit `visage_luffy_rire.png` : l'envoi 111985977929747 n'est pas servi par Roblox
 - [ ] Vérifier les sandales (vêtement en couches : invisibles en mode édition) en mode Play
 - [ ] 4. Éléments absents du catalogue (si besoin, Blender seulement avec accord)
-- [ ] 5. Animations `luffy_Idle` / `luffy_Action` / `luffy_Signature` (nouvelle fiche : rire + moulinet, rafale + poing élastique, bras de Haki)
+- [x] 5. Animations `luffy_Idle` / `luffy_Action` / `luffy_Signature` (nouvelle fiche : rire + moulinet, rafale + poing élastique, bras de Haki)
   - [x] Rig relevé dans Studio (`rig_luffy.json`, AnimationConstraint) ; `anims_luffy.py` (moteur de nami : IK, pieds plantés, `etirer` = translation de l'épaule le long du bras) ; `apercu_studio.py`, `vers_studio.py`
   - [x] Idle calculée (90 images, 20 clés) : main gauche au bord du chapeau, poing droit sur la hanche (coude sorti en arrière : vrai poing tourné vers l'intérieur impossible avec ce rig), rire, moulinet 2 tours, étirement en V
   - [x] Action calculée (150 images) : rafale 11 coups étirés de 1,5, charge genou levé, fente + bras étiré de 3 (poing à 5,7 studs du centre), LowerTorso 0,48 max ; marqueurs Rafale 20 / Charge_Poing 70 / Poing_Elastique 94 / Impact_Final 98
@@ -84,20 +191,34 @@ Suivi des tâches de développement. Les décisions de game design en attente so
   - [x] KeyframeSequence de blocage `luffy_Idle/Action/Signature` dans `RBX_ANIMSAVES.luffy`, à côté des `*_fini` (comparaison) ; `vers_studio.py` envoie des angles (3× plus court)
   - [x] Choix : version finie. Les 3 KeyframeSequence officielles `luffy_Idle/Action/Signature` sont construites depuis `luffy_<Nom>_fini.json` (lues par HttpService sur un serveur local, `HttpEnabled` remis à false) ; copies `*_fini` et blocage retirées de `RBX_ANIMSAVES.luffy`
   - [x] Action : l'épaule reste collée, seul l'avant-bras s'allonge (`etirer` = translation du coude, ressort `RightElbowPos` dans `finition.py`) ; Beams `BrasElastique_*` déplacés au coude (peau entre la manche et l'avant-bras) ; charge : le bras s'allonge vers l'arrière (signe corrigé), retour : dépassement -0,15
-  - [ ] **Prochaine session : bras élastique de `luffy_Action` en cube.** Remplacer le Beam `BrasElastique_*` (ruban plat face caméra) par un cube couleur peau de la largeur du bras (≈ 1 × 1 stud, comme l'avant-bras R15) qui s'étire entre le coude (bas de la manche) et l'avant-bras. Rien n'a été fait de ce côté ; contrainte : pas de script de jeu dans le modèle (taille d'une pièce non animable par KeyframeSequence) → piste à étudier : plusieurs segments de cube répartis le long de l'étirement, chacun soudé/translaté par la même translation de coude, ou mise à l'échelle lue côté client dans `Vitrine.luau` (modifie `src/`, à demander)
-  - [ ] Vérifier `luffy_Action` dans l'Animation Editor (pas encore fait par l'utilisateur)
-  - [ ] Publication (manuel, pas encore faite) → 3 IDs → attributs `AnimationIdle/Action/Signature`, vérification `GetKeyframeSequenceAsync`
-  - [ ] 7. Finition : AnimationController + Animator, ancrage, `ModelesPersonnages.luffy` ; supprimer `ServerStorage.Outil_Apercu_luffy`, `Outil_Seul_luffy`, `Outil_VFX_luffy`, `Outil_KS_luffy`
-  - [ ] Enregistrer la place Studio (Acc_Haki, VFX, Beams, KeyframeSequence n'existent que dans la place, pas dans git)
-  - [ ] KeyframeSequence dans `RBX_ANIMSAVES.luffy` → publication (manuel) → attributs `AnimationIdle/Action/Signature`
-- [ ] 6. Accessoires et VFX (dans `Workspace.luffy`)
+  - [x] Bras élastique en cube (31/10) : Beams `BrasElastique_*` supprimés, remplacés sur chaque bras par 4 Beams `BrasCube_<Côté>_Avant/Arriere/Exterieur/Interieur` (`FaceCamera = false`, faces à ±0,49 stud, largeur 0,98) tendus entre `<Côté>ElbowRigAttachment` de l'UpperArm et du LowerArm : boîte qui s'étire avec la translation du coude, sans script ; la largeur d'un Beam non tourné vers la caméra suit l'axe Y de ses attachments (Orientation 0,0,90 pour avant/arrière, 90,0,0 pour les côtés). Vérifié sur copie : étirement 2,5, coude plié à 90° avec et sans étirement (validé)
+  - [x] Couleurs de la boîte accordées à l'avant-bras (peau + Shirt `Shirt_Abdos`) en mesurant les pixels rendus, bras tendu devant : Avant 232,165,136 / Exterieur 202,153,131 / Interieur 126,106,112 / Arriere 120,99,104 (un Beam n'est pas ombré selon sa normale : l'ombre est peinte dans la couleur de chaque face)
+  - [x] Rafale plus longue : chaque coup étiré de 2,5 studs au lieu de 1,5 (`anims_luffy.py`), Action recalculée (vérifications inchangées), KeyframeSequence `luffy_Action` reconstruite depuis `_fini` (143 clés, 4 marqueurs) ; ancienne gardée dans `ServerStorage.Sauvegarde_luffy.luffy_Action_rafale15`
+  - [x] Poings encore plus loin : rafale étirée de 4 studs, coup final 4,5 (rebond 4,75) ; poing à l'impact à 7,2 studs du centre (5,7 avant) ; ressort `ElbowPos` de l'Action amorti à 0,6 au lieu de 0,35 (réglage local dans `finir("Action", ressorts=…)`, `finition.py` inchangé) : sinon au retour l'avant-bras rentrait dans la tête (image 63) et le torse (image 67) ; vérifications revenues au niveau du blocage ; KeyframeSequence reconstruite (141 clés, 4 marqueurs) ; `HumanoidRootPart.VFX_Rafale` avancé de z -1,8 à -3,3
+  - [x] Rafale bien devant lui : le buste penché de ~18° faisait taper vers le bas (bras jusqu'à 24° sous l'horizontale, -11° en moyenne) ; hauteurs d'épaule relevées (84-108 → 104-112, ~108 = horizontal) : coups entre -3,6° et +4,5°, poings à hauteur d'épaule (y 0,06-0,86, z ≈ -6,2 par rapport au HRP) ; Action recalculée sans alerte, KeyframeSequence reconstruite (141 clés) ; `VFX_Rafale` placé en (0 ; 0,45 ; -3,0)
+  - [x] Étirement de la rafale aligné sur le poing (« poignet cassé ») : l'angle du coude et sa translation avaient des ressorts séparés ; quand le coude passe de la garde (115°) au bras tendu en 4 images, la peau partait jusqu'à 68° de travers (poignet décalé de 1,9 stud). `aligner_etirement()` dans `anims_luffy.py` (appelée par `finir`) garde la longueur du ressort et la remet dans l'axe de l'avant-bras à chaque image → écart 0 ; coup final inchangé (coude déjà droit) ; Action recalculée sans alerte, KeyframeSequence reconstruite (142 clés) — **luffy_Action validée par l'utilisateur (31/10)**
+  - [x] `luffy_Action` vérifiée et validée par l'utilisateur
+  - [x] Publiées (31/10) : Idle 81344275960196, Action 94062333860417, Signature 130704863403781 — vérifiées conformes par `GetKeyframeSequenceAsync` (clés 80 / 142 / 78, durées 3 / 5 / 4 s, boucle, priorité, marqueurs identiques, écart 0 sur le coude à l'impact)
+  - [x] 7. Finition : `ReplicatedStorage.ModelesPersonnages.luffy` (comme zoro : Humanoid + Animator, sans nom ni barre de vie, script `Animate` retiré, seul le HRP ancré et invisible, collisions / toucher / requêtes coupés sur 30 pièces, attributs `AnimationIdle/Action/Signature`) ; `Outil_Apercu/Seul/VFX/KS_luffy` supprimés ; `Workspace.luffy` rangé dans `ServerStorage.Sauvegarde_luffy.luffy_travail` (rig de retouche, cible de `RBX_ANIMSAVES.luffy`)
+  - [x] Test en Play sur Emplacement1 (zoro retiré puis remis) : cycle Action → Signature → Idle avec les IDs publiés, 11 marqueurs reçus, Acc_Haki montré puis caché, étirement max du coude 5,1
+  - [ ] Enregistrer la place Studio (Ctrl+S, manuel : `ModelesPersonnages.luffy`, sauvegardes et KeyframeSequence n'existent que dans la place)
+- [x] 6. Accessoires et VFX (dans `Workspace.luffy`, aujourd'hui `ModelesPersonnages.luffy`)
   - [x] `Acc_Viande` : n'existait pas (rien à supprimer)
   - [x] `Acc_Haki` (coque avant-bras) + `Acc_Haki_Main` (coque main) : 2 accessoires car `Vitrine.luau` ne montre que le `Handle` ; Attachment unique sur la pièce porteuse (sinon le Humanoid les soude à la tête)
-  - [x] `BrasElastique_Right/Left` : Beam couleur peau du pivot d'épaule au haut du bras (invisible au repos, s'étire avec la translation)
+  - [x] `BrasElastique_Right/Left` : Beam couleur peau du pivot d'épaule au haut du bras (invisible au repos, s'étire avec la translation) — remplacé le 31/10 par la boîte `BrasCube_*`
   - [x] Textures `vfx/poing.png` 118675450303720, `vfx/trait.png` 82179997647549 (`vfx_luffy.py`)
   - [x] VFX Rafale, Charge_Poing (sphère `VFX_ZoneCharge` soudée à la main), Poing_Elastique, Impact_Final, Eclairs_Haki, Onde_Haki ; aperçus rafale, impact, Haki
   - [x] Vrais éclairs du Haki : planche `vfx/eclairs_haki.png` 4×4 (73977543565746, Flipbook Random) ; `Eclairs_Haki` = crépitement sur l'avant-bras (zone `VFX_ZoneHaki`), grands éclairs autour du buste (`VFX_ZoneHakiLarge`), aura rouge, étincelles ; `Onde_Haki` + salve d'éclairs au sol et flash rouge
-- [ ] 7. Finition (AnimationController, ancrage, `ModelesPersonnages.luffy`)
+- [x] 7. Finition (`ModelesPersonnages.luffy`, testé en Play)
+- [x] **VFX de l'Action refaits** (retour : « horribles » ; montrer un perso vif, rapide, puissant, sentir la vitesse de chaque coup et l'impact)
+  - [x] Textures anime (`vfx_luffy.py`) : `eclat` 112249090477155, `anneau` 93783833153831, `trait_vif` 97795166368994 (image carrée, ligne fine horizontale : une particule est toujours carrée et `VelocityParallel` aligne l'horizontale de l'image sur la vitesse), `lignes_impact` 135983583011818, `poussiere` 70434048288435
+  - [x] `Coup_Right` / `Coup_Left` (Burst au poing) : éclat, anneau perpendiculaire au coup, traits vers l'épaule nés sur 4 points autour du bras (nés dedans, la boîte étirée les cachait)
+  - [x] `Rafale` (Duree 1,4) : traînées courtes sur les deux poings ; anciens poings flottants et traits retirés
+  - [x] `Charge_Poing` (lignes aspirées, anneaux qui se resserrent), `Lancer_Poing` (3 anneaux au départ), `Poing_Elastique` (traits autour de l'avant-bras, traînée), `Impact_Final` (éclat, lignes d'impact, 2 ondes, étincelles, poussière en éventail, onde au sol) ; script `assets/persos/luffy/vfx_action.luau` (chargé dans Studio par HttpService + loadstring) ; ancien modèle dans `Sauvegarde_luffy.luffy_avant_vfx_action`
+  - [x] Aperçus en Play côté client sur une copie posée (déclenchement comme Vitrine, puis `TimeScale = 0` ; en mode édition le temps des particules avance par à-coups) et réglages
+  - [x] Marqueurs : `Coup_Right/Left` aux images 21, 25… 61 (bout de course, 1 image après la clé), `Lancer_Poing` 90, `Poing_Elastique` 91, `Impact_Final` 95 (avant : 94 / 98, sur le retour) ; recalcul, KeyframeSequence reconstruite (142 clés, 16 marqueurs)
+  - [x] Action republiée 74782094067526 (conforme : 142 clés, 16 marqueurs), attribut `AnimationAction` ; test en Play : 16 marqueurs reçus, captures rafale et impact ; impact final réduit d'un tiers (le poing frappe vers le joueur de l'allée et l'éclat cachait Luffy)
+  - [ ] Avis de l'utilisateur en jeu (traînées et traits du vol jamais vus figés) ; Ctrl+S
 - [ ] 8. Bilan ; garder `assets/persos/luffy/` pour `luffy_gear2`
 
 ### Modération (avertissement Roblox reçu, 2026-10-29)
@@ -106,6 +227,7 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 - [x] Détails du ventre : décision de ne remettre aucun détail anatomique (nombril, traits du bassin = cause probable de l'avertissement) ; à la place, décalque d'ombre neutre `ombre_torse_nami.png` (`peindre_ombre_torse.py` : ombre sous le haut, côtés) envoyé (118639795987019) et posé (`UpperTorso.OmbreTorse`)
 - [x] Réimport : 9 Vet_<Piece> remplacés (haut couvrant, texture 85250372065604)
 - [x] Bug corrigé : dans `ModelesPersonnages.nami`, HumanoidRootPart était en (0, 2, 0) et le corps en (-2, 3,44, 300) ; au clonage, les Motor6D recalaient le corps mais pas les pièces soudées (vêtements décalés en jeu). HRP replacé d'après Root (écart des 15 Motor6D au repos : 0), modèle ramené à l'origine ; clone vérifié (vêtements et accessoires : écart 0)
+- [x] Garde-fou charte Roblox (2026-11-03) : section dans `CLAUDE.md` (actions à risque → demander avant) + outils MCP d'envoi et de génération en `ask` dans `.claude/settings.json`
 - [ ] Supprimer les images déjà envoyées (Creator Dashboard, manuel) : ventre 108726701111437, 117000828854926, 113918571546651 ; textures d'atlas avec bikini 119937557598628, 99672583625574
 - [x] Rig de la nouvelle nami relevé dans Studio (`rig_nami.json`) ; `anims_nami.py` (IK, pieds plantés, bras dirigés par directions, vérifications) ; `apercu_studio.py` (copies figées posées dans `Workspace.Apercu_Anim`)
 - [x] 4. `nami_Idle` (90 images, 13 clés, 3 marqueurs) validée ✋ ; KeyframeSequence dans `RBX_ANIMSAVES.nami` (14 keyframes) ; ancienne Idle R6 renommée `nami_Idle_ancien` ; `vers_studio.py`
@@ -316,15 +438,25 @@ Refonte de l'ancien modèle R6 (section plus bas). Premier perso construit sur l
 - [x] Appliquer à `anims_luffy.py` (Idle, Action, Signature) : version « fini » à côté de la version actuelle
 - [x] Vérifications (pénétrations, LowerTorso ≤ 0,5, raccords) sur chaque image ; contacts exacts (main au chapeau, main sur le biceps)
 - [x] KeyframeSequence `luffy_*_fini` (80, 144, 78 clés) dans `RBX_ANIMSAVES.luffy` (les `luffy_*` du blocage sont construites par l'autre session /perso-catalogue)
-- [ ] Comparer blocage / fini dans l'éditeur d'animation et choisir (manuel)
+- [x] Comparer blocage / fini dans l'éditeur d'animation et choisir (manuel) : version finie retenue pour luffy
 - [ ] Relancer `anims_luffy.py Signature` quand la nouvelle signature() est stable (contacts à recaler si le minutage change) dans `ServerStorage.RBX_ANIMSAVES.luffy` pour comparer dans l'éditeur d'animation
 - [ ] Recette d'impact VFX en couches (flash, éclats, onde, poussière, braises) pour les effets de luffy
 - [x] Rendu validé par l'utilisateur (31/10)
 - [x] `finition.finir()` commun (cuisson + allègement) ; nami et zoro branchés (`finir()` dans leurs scripts, courbes d'impact : éclair de nami en `Entree`, saut en `Sortie`/`Entree`, dégainages et entailles de zoro en `Sortie`, clac en `Entree` ; secousses)
 - [x] Vérifié sur chaque image : rien de pire que le blocage (+0,03) sauf zoro Action image 75 (avant-bras dans le torse 0,05, une image, invisible) ; zoro Idle : bras exacts au retour (98-120)
 - [x] KeyframeSequence `nami_*_fini`, `zoro_*_fini` dans `RBX_ANIMSAVES.nami` / `.zoro`
-- [ ] **Reprise 01/11** : revoir les 6 `*_fini` dans l'éditeur d'animation (comparer aux versions publiées), retoucher si besoin
-- [ ] Publier les 6 `*_fini` (manuel) puis remplacer les attributs `AnimationIdle/Action/Signature` de `ModelesPersonnages.nami` et `.zoro` par les nouveaux IDs
+- [x] Copies `nami_apercu` / `zoro_apercu` posées dans `Workspace.Apercu_Anims` (place du Hub, côté stand Ateliers) pour l'éditeur d'animation
+- [x] Copies des KeyframeSequence dans `RBX_ANIMSAVES.nami_apercu` / `.zoro_apercu` (l'éditeur ne liste que les sauvegardes du modèle sélectionné ; `nami` / `zoro` ne pointent vers aucun modèle)
+- [x] Supprimer `Workspace.Apercu_Anims` et `RBX_ANIMSAVES.nami_apercu` / `.zoro_apercu` après la revue (les originaux restent dans `RBX_ANIMSAVES.nami` / `.zoro`)
+- [x] Revue de l'utilisateur (31/10) : nami → `nami_Action` publiée gardée (plus intense que la version finie) ; zoro → les jambes doivent bouger, comme un vrai combat contre un mannequin devant lui
+- [x] `finition.finir(retouche=...)` : passe propre au perso après la cuisson
+- [x] zoro Action v2 (`anims_zoro.py`, 120 images, 19 clés) : garde de profil, pas chassés sur chaque entaille (le pied du côté du coup passe devant), saut sabres croisés, atterrissage lourd en X (Tornade 83, secousse), bond arrière vers la garde ; bassin déplacé et tourné (`deplacer`, Waist compensé : bras inchangés), jambes recalculées à chaque image sur la piste `PAS` (`jambes_suivies`, pieds à ≤ 0,1 stud) ; lames jamais dans le corps ; fin identique (raccord Signature inchangé)
+- [x] `zoro_Action_fini` v2 (113 clés) dans `RBX_ANIMSAVES.zoro` et `.zoro_apercu` (l'ancienne renommée `zoro_Action_fini_v1`)
+- [x] Revue de zoro Action v2 (utilisateur) : validée (« parfait »)
+- [x] nami : `nami_Idle_fini` et `nami_Signature_fini` validées
+- [x] Publiées : nami Idle 122257281851022, Signature 92867395751806 (Action inchangée 75447177403978) ; zoro Idle 136440538552091, Action 137897326398396, Signature 71083760370331 ; vérifiées identiques aux versions locales (clés, marqueurs, durée, boucle, priorité, poses)
+- [x] Attributs `AnimationIdle/Action/Signature` de `ModelesPersonnages.nami` / `.zoro` remplacés ; test en Play : cycle Idle → Action → Signature complet sur les deux vitrines, marqueurs au bon moment
+- [ ] Enregistrer la place (Ctrl+S, manuel)
 - [x] Étape « Finition » ajoutée aux skills `/perso-catalogue` et `/perso-roblox` (section Animations)
 - [ ] Recette d'impact VFX en couches pour nami et zoro (après luffy)
 

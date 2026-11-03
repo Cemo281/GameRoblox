@@ -356,10 +356,29 @@ def ecrire(nom, cles, n_images, boucle, priorite, marqueurs):
 	print("ecrit", f"anims/luffy_{nom}.json", len(cles), "cles,", len(marqueurs), "marqueurs")
 
 
+def aligner_etirement(images):
+	"""Remet la translation du coude (etirement) dans l'axe de l'avant-bras de chaque image : l'angle du coude et la
+	translation ont des ressorts separes, et quand le coude se plie pendant l'etirement (rafale : garde -> bras tendu en
+	4 images) la peau partait dans une direction et l'avant-bras dans une autre (poignet casse). La longueur suivie par
+	le ressort est gardee (effet elastique), seule la direction est corrigee."""
+	for p in images:
+		for cote in ("Right", "Left"):
+			cle = cote + "ElbowPos"
+			v = np.array(p.get(cle, (0, 0, 0)), float)
+			n = float(np.linalg.norm(v))
+			if n < 1e-6:
+				continue
+			rx, ry, rz = p.get(cote + "Elbow", (0, 0, 0))[:3]
+			axe = angles(math.radians(rx), math.radians(ry), math.radians(rz))[:3, :3] @ np.array([0, -1.0, 0])
+			d = -n if v @ axe < -0.5 * n else n  # negatif seulement pour un vrai rappel (avant-bras qui rentre dans la manche)
+			p[cle] = tuple(float(c) for c in axe * d)
+	return images
+
+
 def finir(nom, cles, n_images, boucle, priorite, marqueurs, **reglages):
 	"""Version finie (finition.py) : cuisson image par image (ressorts, respiration, secousses), verifications sur
 	chaque image, allegement, ecrite dans anims/luffy_<Nom>_fini.json a cote du blocage."""
-	images = finition.cuire(cles, n_images, ARTICULATIONS, boucle=boucle, limites=LIMITES, **reglages)
+	images = aligner_etirement(finition.cuire(cles, n_images, ARTICULATIONS, boucle=boucle, limites=LIMITES, **reglages))
 	for art in ARTICULATIONS:
 		for i in (0, n_images):
 			assert np.allclose(transform(images[i], art), transform(cles[0 if i == 0 else -1][1], art), atol=1e-4), f"raccord fini {art} image {i}"
@@ -508,9 +527,9 @@ def action():
 		RightShoulder=(-20, 0, 15), RightElbow=(30, 0, 0), RightWrist=(0, 0, 0),
 		LeftShoulder=(-20, 0, -15), LeftElbow=(30, 0, 0), LeftWrist=(0, 0, 0)), saut_entre({}, garde_pieds))
 
-	# rafale : un coup toutes les 4 images, bras alternes, bras qui frappe tendu et etire de 1,5 stud
+	# rafale : un coup toutes les 4 images, bras alternes, bras qui frappe tendu et etire de 4 studs
 	base_rafale = avec(elan, Waist=(-12, 0, 0), Neck=(12, 0, 0))
-	hauteurs = [100, 88, 106, 94, 84, 102, 92, 108, 90, 98, 96]
+	hauteurs = [106, 111, 104, 110, 108, 105, 112, 107, 109, 106, 108]  # buste penche de ~18 deg : ~108 = bras horizontal (coups bien devant lui, +-4 deg)
 	cotes = [-6, 8, -2, 4, -8, 6, 0, -4, 8, -6, 2]
 
 	def coup(i):
@@ -526,7 +545,7 @@ def action():
 		p[garde + "Wrist"] = (0, 0, 0)
 		p["Waist"] = (-12, 10 * sf, 0)  # le buste suit le bras qui frappe (droit : vers sa gauche)
 		p["Neck"] = (12, -6 * sf, 0)
-		p = etirer(p, frappe, 1.5)
+		p = etirer(p, frappe, 4.0)
 		p[garde + "ElbowPos"] = (0, 0, 0)
 		return p
 
@@ -560,8 +579,8 @@ def action():
 		RightShoulder=(122, 0, -4), RightElbow=(0, 0, 0), RightWrist=(0, 0, 0),
 		LeftShoulder=(-45, 0, -22), LeftElbow=(55, 0, 0), LeftWrist=(0, 0, 0))
 	frappe = planter(frappe, fente_pieds)
-	frappe_3 = etirer(frappe, "Right", 3.0)
-	frappe_plus = etirer(frappe, "Right", 3.25)  # petit rebond elastique au bout du coup
+	frappe_3 = etirer(frappe, "Right", 4.5)
+	frappe_plus = etirer(frappe, "Right", 4.75)  # petit rebond elastique au bout du coup
 	rappel = etirer(frappe, "Right", -0.15)  # petit depassement au retour (l'avant-bras rentre a peine dans la manche)
 	frappe_0 = etirer(frappe, "Right", 0.0)
 	# 125 : il se redresse, toujours en fente ; 135 : le pied gauche revient (pas en l'air) ; 142 : pieds en place
@@ -601,12 +620,19 @@ def action():
 		p.setdefault("RightElbowPos", (0, 0, 0))
 		p.setdefault("LeftElbowPos", (0, 0, 0))
 		p.setdefault("RootPos", (0, 0, 0))
-	marqueurs = [
-		{"image": 20, "nom": "VFX", "valeur": "Rafale"},
-		{"image": 70, "nom": "VFX", "valeur": "Charge_Poing"},
-		{"image": 94, "nom": "VFX", "valeur": "Poing_Elastique"},
-		{"image": 98, "nom": "VFX", "valeur": "Impact_Final"},
-	]
+	# un effet par coup de la rafale, au bout de course du poing (version finie : 1 image apres la cle, ressort) ;
+	# coup final : depart a 90, bout de course a 95-96
+	marqueurs = sorted(
+		[
+			{"image": 20, "nom": "VFX", "valeur": "Rafale"},
+			{"image": 70, "nom": "VFX", "valeur": "Charge_Poing"},
+			{"image": 90, "nom": "VFX", "valeur": "Lancer_Poing"},
+			{"image": 91, "nom": "VFX", "valeur": "Poing_Elastique"},  # pas 2 marqueurs VFX sur la meme image (zoro : decale a la publication)
+			{"image": 95, "nom": "VFX", "valeur": "Impact_Final"},
+		]
+		+ [{"image": 21 + 4 * i, "nom": "VFX", "valeur": "Coup_Right" if i % 2 == 0 else "Coup_Left"} for i in range(11)],
+		key=lambda m: m["image"],
+	)
 	cfs = fk(frappe_3)
 	print("poing a l'impact", np.round(cfs["RightHand"][:3, 3], 2), "LowerTorso", np.round(cfs["LowerTorso"][:3, 3] - REPOS["LowerTorso"][:3, 3], 2))
 	verifier_anim("Action", cles, 150)
@@ -614,7 +640,9 @@ def action():
 	ecrire("Action", cles, 150, False, "Action", marqueurs)
 	secousses = [(20 + 8 * i, 5, 1.2) for i in range(6)] + [(94, 18, 4.5)]
 	# retour de la main gauche au chapeau (133-150) : bras gauche et tete exacts
-	finir("Action", cles, 150, False, "Action", marqueurs, secousses=secousses, contacts={a: [(130, 150)] for a in ("Neck", "LeftShoulder", "LeftElbow", "LeftWrist")})
+	finir("Action", cles, 150, False, "Action", marqueurs, secousses=secousses,
+		ressorts={"RightElbowPos": (3.0, 0.6, 1.4), "LeftElbowPos": (3.0, 0.6, 1.4)},  # etirement de 4 studs : moins de depassement au retour (sinon l avant-bras rentre dans la tete / le torse)
+		contacts={a: [(130, 150)] for a in ("Neck", "LeftShoulder", "LeftElbow", "LeftWrist")})
 	apercu("Action", cles, [0, 10, 24, 75, 94, 115, 133], lambda i: [])
 	return cles
 

@@ -54,3 +54,7 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | Pas d'îles flottantes : carte au sol, bases reliées au Hub par des chemins. |
 | 2026-10-29 | Animations de vitrine d'un personnage posé : Idle → Action → Signature en boucle, 2 s de pause entre chaque, visibles par tous les joueurs. |
 | 2026-10-31 | Direction artistique du Hub *(v1, à valider)* : sanctuaire de festival animé (torii, stands yatai, cerisiers, cœur lumineux flottant), aplats SmoothPlastic pastel. |
+| 2026-10-31 | La carte devient **une île volante** (Hub + 7 bases sur la même île, dans le style du Hub) ; murs visibles remplacés par des murs invisibles. Remplace la décision du 24/10 « carte au sol ». |
+| 2026-10-31 | Sous l'île : la **mer** (plutôt qu'une mer de nuages). |
+| 2026-10-31 | Direction artistique du Hub **validée** : sanctuaire de festival en pierre et bois (torii vermillon, lanternes de pierre grise à toit ardoise, sol en pierre beige, or au centre), cerisiers sculptés ; le rose est réservé aux cerisiers. Éclairage laissé tel quel. |
+| 2026-11-03 | Vitrine de Zoro : la **séquence du sabreur** (dégainage → aura → combat → rengainage, 9,2 s) remplace son cycle Idle → Action → Signature. Les marqueurs de coups et d'esquives sont gardés pour les futurs combats, sans hitbox pour l'instant. |

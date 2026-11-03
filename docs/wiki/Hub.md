@@ -45,18 +45,18 @@ Chaque stand = un PNJ (modèle 3D animé) + un comptoir + un ProximityPrompt qui
 ```
 Sens de rotation : tel que vu de dessus dans Studio, en partant du chemin 1 (base existante, côté -Z).
 
-## Direction artistique *(v1 en place dans la place Studio, à valider)*
+## Direction artistique *(validée le 2026-10-31)*
 Thème : **sanctuaire de festival animé** (matsuri). Objectif : un lieu lisible et chaleureux, qui se distingue des bases au premier coup d'œil.
 
 - **Rendu** : aplats `SmoothPlastic` (pas de textures réalistes type Slate / Cobblestone), couleurs pastel saturées en **tons moyens** (l'éclairage actuel, OutdoorAmbient rose et contraste élevé, brûle les teintes très claires).
-- **Palette** : sol pêche rosé, vermillon (torii, poteaux), noir prune (toits des torii), rose sakura (feuillage, bordure), or (liserés). Chaque stand garde **sa couleur** (Évolutions violet, Étoiles jaune, Ateliers bleu, Recyclage vert) sur le comptoir, l'enseigne, le toit rayé et les noren.
+- **Palette** : sol en pierre beige, vermillon (torii, losanges de la place), noir prune (toits des torii), bois (bancs, stands), pierre grise et toit ardoise (lanternes), bordure en tuiles grises sur muret clair, or (liserés, estrade, cœur). Le **rose est réservé aux cerisiers** (feuillage, pétales) : retour du 31/10, « trop rose ». Chaque stand garde **sa couleur** (Évolutions violet, Étoiles jaune, Ateliers bleu, Recyclage vert) sur le comptoir, l'enseigne, le toit rayé et les noren.
 - **Repères** : un **torii** à l'arrivée de chaque chemin (porte d'entrée du Hub, flanquée de 2 lanternes de pierre) ; au centre, **estrade à gradins** autour du piédestal et **cœur lumineux flottant** (≈ 35 studs de haut, orbites, rayon de lumière) visible depuis les bases.
 - **Stands** : façon **yatai** (toit rayé incliné, lambrequin festonné, 2 lanternes en papier, noren derrière le PNJ, caisses). Le centre du comptoir reste dégagé pour le futur ProximityPrompt.
 - **Ambiance** : cerisiers avec pétales en particules (2 grands cerisiers à banc circulaire dans les intervalles libres, des petits en bordure), bancs face à la place, panneau de classements encadré comme un panneau de sanctuaire.
 - **Règle** : rien ne doit gêner les chemins (bordure ouverte de ±9° à chaque arrivée) ni l'avant des comptoirs.
 - **Éclairage** : OutdoorAmbient mauve doux, contraste modéré, saturation légèrement relevée (réglages de la place, communs à toute la carte).
 - **Pièces sculptées** : cerisiers, torii, lanternes modélisés dans Blender (`assets/hub/decor_hub.py`), ombrage peint en dégradés dans une palette partagée, jamais de traits noirs.
-- **Technique** : décor dans `Workspace.Hub.Decor` (≈ 850 pièces, ~30 lumières, 13 émetteurs), séparé des pièces de jeu ; état d'avant dans `ServerStorage.Sauvegarde_AvantDecorHub`.
+- **Technique** : décor dans `Workspace.Hub.Decor` (≈ 570 pièces, ~30 lumières, 13 émetteurs), séparé des pièces de jeu ; torii, lanternes de pierre, cerisiers et chochin en MeshParts (gabarits dans `ServerStorage.Gabarits.DecorHub`, posés par `assets/hub/remplacer_decor_hub.luau`), collisions sur des pièces invisibles `Collision` (piliers, troncs, pieds de lanterne) ; états d'avant dans `ServerStorage.Sauvegarde_AvantDecorHub` et `ServerStorage.Sauvegarde_AvantMeshDecorHub`.
 
 ## À définir
 - Zone de combat : au Hub ou dans une zone dédiée (voir [Combats](Combats.md)) ?
