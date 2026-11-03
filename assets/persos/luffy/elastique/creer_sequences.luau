@@ -1,0 +1,144 @@
+--!nocheck
+-- Généré par adapter_sequences.py depuis roblox/ElastiqueAnimations.lua (handoff « combattant élastique »).
+-- Ne pas modifier à la main : modifier elastique.js, régénérer ElastiqueAnimations.lua (toLuau()), relancer le .py.
+-- Crée Workspace.Elastique_Apercu (clone de ModelesPersonnages.luffy, ancré) et ses KeyframeSequence dans
+-- ServerStorage.RBX_ANIMSAVES.Elastique_Apercu. Ensuite : Éditeur d'animation > Elastique_Apercu > Charger > Publier.
+-- Renvoie un bilan ; lancé par require() d'un ModuleScript temporaire (le script renvoie une chaîne).
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+
+local source = ReplicatedStorage.ModelesPersonnages.luffy
+-- le rig existant est réutilisé : l'Éditeur d'animation suit l'instance du rig, en recréer un lui fait créer un
+-- nouveau dossier vide dans RBX_ANIMSAVES et « perdre » les animations (supprimer le rig à la main pour le refaire)
+local rig = workspace:FindFirstChild("Elastique_Apercu")
+local nouveau = rig == nil
+if nouveau then
+rig = source:Clone()
+rig.Name = "Elastique_Apercu"
+for _, attribut in { "AnimationIdle", "AnimationAction", "AnimationSignature", "AnimationSequence" } do
+	rig:SetAttribute(attribut, nil)
+end
+rig.HumanoidRootPart.Anchored = true
+-- zone d'essais dans le ciel, à côté de Workspace.Sabreur_Apercu / Essais_Zoro (hors de l'île)
+local voisin = workspace:FindFirstChild("Sabreur_Apercu")
+rig:PivotTo(if voisin then voisin:GetPivot() + Vector3.new(15, 0, 0) else CFrame.new(40, 303, 400))
+rig.Parent = workspace
+end
+
+local saves = ServerStorage:FindFirstChild("RBX_ANIMSAVES")
+if not saves then saves = Instance.new("Folder") saves.Name = "RBX_ANIMSAVES" saves.Parent = ServerStorage end
+-- un seul dossier par rig, réutilisé (l'Éditeur d'animation ignore un 2e dossier du même nom) ; il pointe vers le rig recréé
+-- s'il y en a plusieurs, garder le dernier créé (celui que l'éditeur lit) et y regrouper le contenu des autres
+local holder
+for _, c in saves:GetChildren() do
+	if c.Name == rig.Name then
+		if holder then
+			for _, s in holder:GetChildren() do s.Parent = c end
+			holder:Destroy()
+		end
+		holder = c
+	end
+end
+if not holder then holder = Instance.new("ObjectValue") holder.Name = rig.Name holder.Parent = saves end
+holder.Value = rig
+local animSavesRig = rig:FindFirstChild("AnimSaves")
+if animSavesRig then animSavesRig:Destroy() end -- ancien emplacement : l'éditeur demanderait une migration
+
+local rad = math.rad
+local ZERO = { 0, 0, 0, 0, 0, 0 }
+local STYLE = { Cubic = Enum.PoseEasingStyle.CubicV2, Linear = Enum.PoseEasingStyle.Linear, Constant = Enum.PoseEasingStyle.Constant, Elastic = Enum.PoseEasingStyle.Elastic, Bounce = Enum.PoseEasingStyle.Bounce }
+local TREE = {"LowerTorso", {{"UpperTorso", {{"Head", {}}, {"RightUpperArm", {{"RightLowerArm", {{"RightHand", {}}}}}}, {"LeftUpperArm", {{"LeftLowerArm", {{"LeftHand", {}}}}}}}}, {"RightUpperLeg", {{"RightLowerLeg", {{"RightFoot", {}}}}}}, {"LeftUpperLeg", {{"LeftLowerLeg", {{"LeftFoot", {}}}}}}}}
+local ANIMS = {
+	{ name = "Elastique_Sequence_Complete", loop = false, priority = "Action", keys = {
+		{ t = 0, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -0.35, 0, 0, -15, 0}, UpperTorso = {0, 0, 0, -8, 12, 0}, Head = {0, 0, 0, -4, 4, 0}, RightUpperArm = {0, 0, 0, 70, 0, 22}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 80, 0, -18}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 28, 0, 10}, RightLowerLeg = {0, 0, 0, -45, 0, 0}, RightFoot = {0, 0, 0, 17, 0, 0}, LeftUpperLeg = {0, 0, 0, -8, 0, -10}, LeftLowerLeg = {0, 0, 0, -28, 0, 0} } },
+		{ t = 0.3, e = "Cubic", d = "Out", p = { LowerTorso = {0, -1.25, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -32, 0, 0}, Head = {0, 0, 0, -28, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.38, 0, 0, 0, 0}, RightHand = {0, -0.38, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 0.45, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.08, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -29, 0, 0}, Head = {0, 0, 0, -28, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.47, 0, 0, 0, 0}, RightHand = {0, -0.47, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 72, 0, 32}, RightLowerLeg = {0, 0, 0, -96, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 72, 0, -32}, LeftLowerLeg = {0, 0, 0, -96, 0, 0} } },
+		{ t = 0.6, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.25, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -32, 0, 0}, Head = {0, 0, 0, -28, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.38, 0, 0, 0, 0}, RightHand = {0, -0.38, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 0.75, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.08, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -29, 0, 0}, Head = {0, 0, 0, -28, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.47, 0, 0, 0, 0}, RightHand = {0, -0.47, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 72, 0, 32}, RightLowerLeg = {0, 0, 0, -96, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 72, 0, -32}, LeftLowerLeg = {0, 0, 0, -96, 0, 0} } },
+		{ t = 0.9, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.3, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -35, 0, 0}, Head = {0, 0, 0, -34, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.3, 0, 0, 0, 0}, RightHand = {0, -0.3, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 44, 0, -32}, LeftLowerArm = {0, 0, 0, 80, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 1.4, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.32, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -36, 1, 0}, Head = {0, 0, 0, -36, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.3, 0, 0, 0, 0}, RightHand = {0, -0.3, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 44, 0, -32}, LeftLowerArm = {0, 0, 0, 80, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 1.9, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.3, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -35, 0, 0}, Head = {0, 0, 0, -34, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.3, 0, 0, 0, 0}, RightHand = {0, -0.3, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 44, 0, -32}, LeftLowerArm = {0, 0, 0, 80, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 2.2, e = "Cubic", d = "In", p = { LowerTorso = {0, -1.32, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -36, 1, 0}, Head = {0, 0, 0, -36, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.3, 0, 0, 0, 0}, RightHand = {0, -0.3, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 44, 0, -32}, LeftLowerArm = {0, 0, 0, 80, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 2.32, e = "Cubic", d = "Out", p = { LowerTorso = {0, -1.22, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -28, 0, 0}, Head = {0, 0, 0, 32, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.38, 0, 0, 0, 0}, RightHand = {0, -0.38, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 2.7, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.25, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -30, 0, 0}, Head = {0, 0, 0, 28, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.38, 0, 0, 0, 0}, RightHand = {0, -0.38, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 3.15, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -1.22, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -28, 0, 0}, Head = {0, 0, 0, 32, 0, 0}, RightUpperArm = {0, 0, 0, 32, 0, 10}, RightLowerArm = {0, -0.38, 0, 0, 0, 0}, RightHand = {0, -0.38, 0, -20, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -30}, LeftLowerArm = {0, 0, 0, 75, 0, 0}, LeftHand = {0, 0, 0, -10, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 32}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 25, 0, -12}, LeftUpperLeg = {0, 0, 0, 80, 0, -32}, LeftLowerLeg = {0, 0, 0, -105, 0, 0} } },
+		{ t = 3.6, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.35, 0, 0, -15, 0}, UpperTorso = {0, 0, 0, -8, 12, 0}, Head = {0, 0, 0, -4, 4, 0}, RightUpperArm = {0, 0, 0, 70, 0, 22}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 80, 0, -18}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 28, 0, 10}, RightLowerLeg = {0, 0, 0, -45, 0, 0}, RightFoot = {0, 0, 0, 17, 0, 0}, LeftUpperLeg = {0, 0, 0, -8, 0, -10}, LeftLowerLeg = {0, 0, 0, -28, 0, 0} } },
+		{ t = 3.72, e = "Cubic", d = "In", p = { LowerTorso = {0, -0.75, 0.3, 0, 0, 0}, UpperTorso = {0, 0, 0, -2, 0, 0}, Head = {0, 0, 0, -10, 0, 0}, RightUpperArm = {0, 0, 0, 20, 0, 40}, RightLowerArm = {0, 0, 0, 120, 0, 0}, LeftUpperArm = {0, 0, 0, 20, 0, -40}, LeftLowerArm = {0, 0, 0, 120, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 3.8, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 0, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 75, 0, 25}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 75, 0, -25}, LeftLowerArm = {0, 0, 0, 110, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 3.86, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 88, 0, -10}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 3.93, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 96, 0, -6}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 82, 0, 0}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.07, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 92, 0, 4}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.14, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 85, 0, -16}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.21, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 88, 0, 10}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.28, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 96, 0, 6}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.35, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 82, 0, 0}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.42, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 92, 0, -4}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.49, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 85, 0, 16}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.56, e = "Linear", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, 14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 88, 0, -10}, RightLowerArm = {0, -3.2, 0, 0, 0, 0}, RightHand = {0, -3.2, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 86, 0, -12}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.63, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.65, 0, 0, 0, 0}, UpperTorso = {0, 0, 0, -14, -14, 0}, Head = {0, 0, 0, -4, 0, 0}, RightUpperArm = {0, 0, 0, 86, 0, 12}, LeftUpperArm = {0, 0, 0, 96, 0, -6}, LeftLowerArm = {0, -3.2, 0, 0, 0, 0}, LeftHand = {0, -3.2, 0, 0, 0, 0}, RightUpperLeg = {0, 0, 0, 40, 0, 22}, RightLowerLeg = {0, 0, 0, -60, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -22}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 4.72, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.45, 0.1, 10, -20, 0}, UpperTorso = {0, 0, 0, 8, 10, 0}, Head = {0, 0, 0, -14, 0, 0}, RightUpperArm = {0, 0, 0, 60, 0, 35}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 70, 0, -30}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 110, 0, 8}, RightLowerLeg = {0, 0, 0, -130, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, -5, 0, -10}, LeftLowerLeg = {0, 0, 0, -25, 0, 0} } },
+		{ t = 4.8, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.4, 0, 18, -20, 0}, UpperTorso = {0, 0, 0, 14, 10, 0}, Head = {0, 0, 0, -20, 0, 0}, RightUpperArm = {0, 0, 0, 60, 0, 35}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 70, 0, -30}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 95, 0, 4}, RightLowerLeg = {0, -2.5, 0, 0, 0, 0}, RightFoot = {0, -2.2, 0, -30, 0, 0}, LeftUpperLeg = {0, 0, 0, -15, 0, -10}, LeftLowerLeg = {0, 0, 0, -15, 0, 0} } },
+		{ t = 4.9, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -0.4, 0, 18, -20, 0}, UpperTorso = {0, 0, 0, 14, 10, 0}, Head = {0, 0, 0, -20, 0, 0}, RightUpperArm = {0, 0, 0, 60, 0, 35}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 70, 0, -30}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 95, 0, 4}, RightLowerLeg = {0, -2.9, 0, 0, 0, 0}, RightFoot = {0, -2.6, 0, -30, 0, 0}, LeftUpperLeg = {0, 0, 0, -15, 0, -10}, LeftLowerLeg = {0, 0, 0, -15, 0, 0} } },
+		{ t = 4.98, e = "Cubic", d = "InOut", p = { LowerTorso = {0, -0.4, 0, 18, -20, 0}, UpperTorso = {0, 0, 0, 14, 10, 0}, Head = {0, 0, 0, -20, 0, 0}, RightUpperArm = {0, 0, 0, 60, 0, 35}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 70, 0, -30}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 95, 0, 4}, RightLowerLeg = {0, -2.5, 0, 0, 0, 0}, RightFoot = {0, -2.2, 0, -30, 0, 0}, LeftUpperLeg = {0, 0, 0, -15, 0, -10}, LeftLowerLeg = {0, 0, 0, -15, 0, 0} } },
+		{ t = 5.12, e = "Cubic", d = "Out", p = { LowerTorso = {0, -1.2, 0, 0, 10, 0}, UpperTorso = {0, 0, 0, -30, -15, 0}, Head = {0, 0, 0, 25, 0, 0}, RightUpperArm = {0, 0, 0, -50, 0, 25}, RightLowerArm = {0, 0, 0, 40, 0, 0}, LeftUpperArm = {0, 0, 0, -40, 0, -25}, LeftLowerArm = {0, 0, 0, 40, 0, 0}, RightUpperLeg = {0, 0, 0, 85, 0, 14}, RightLowerLeg = {0, 0, 0, -115, 0, 0}, RightFoot = {0, 0, 0, 30, 0, 0}, LeftUpperLeg = {0, 0, 0, 85, 0, -14}, LeftLowerLeg = {0, 0, 0, -115, 0, 0} } },
+		{ t = 5.32, e = "Cubic", d = "Out", p = { LowerTorso = {0, 4.6, -0.4, 0, 30, 0}, UpperTorso = {0, 0, 0, -5, -30, 0}, Head = {0, 0, 0, -6, -20, 0}, RightUpperArm = {0, 0, 0, -50, 0, 25}, RightLowerArm = {0, -1.4, 0, 0, 0, 0}, RightHand = {0, -1.3, 0, 0, 0, 0}, LeftUpperArm = {0, 0, 0, 100, 0, -20}, LeftLowerArm = {0, 0, 0, 25, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 10}, RightLowerLeg = {0, 0, 0, -110, 0, 0}, RightFoot = {0, 0, 0, 10, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -10}, LeftLowerLeg = {0, 0, 0, -90, 0, 0} } },
+		{ t = 5.55, e = "Cubic", d = "InOut", p = { LowerTorso = {0, 5.8, -0.7, 10, 38, 0}, UpperTorso = {0, 0, 0, -2, -38, 0}, Head = {0, 0, 0, -6, -20, 0}, RightUpperArm = {0, 0, 0, 150, 0, 35}, RightLowerArm = {0, 0, 0, 100, 0, 0}, LeftUpperArm = {0, 0, 0, 75, 0, -15}, LeftLowerArm = {0, 0, 0, 15, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 10}, RightLowerLeg = {0, 0, 0, -110, 0, 0}, RightFoot = {0, 0, 0, 10, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -10}, LeftLowerLeg = {0, 0, 0, -90, 0, 0} } },
+		{ t = 5.95, e = "Cubic", d = "InOut", p = { LowerTorso = {0, 5.9, -0.75, 12, 40, 0}, UpperTorso = {0, 0, 0, -2, -38, 0}, Head = {0, 0, 0, -6, -20, 0}, RightUpperArm = {0, 0, 0, 150, 0, 35}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 75, 0, -15}, LeftLowerArm = {0, 0, 0, 15, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 10}, RightLowerLeg = {0, 0, 0, -110, 0, 0}, RightFoot = {0, 0, 0, 10, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -10}, LeftLowerLeg = {0, 0, 0, -90, 0, 0} } },
+		{ t = 6.25, e = "Cubic", d = "Out", p = { LowerTorso = {0, 6, -0.8, 14, 42, 0}, UpperTorso = {0, 0, 0, 0, -40, 0}, Head = {0, 0, 0, -6, -20, 0}, RightUpperArm = {0, 0, 0, 150, 0, 35}, RightLowerArm = {0, 0, 0, 110, 0, 0}, LeftUpperArm = {0, 0, 0, 75, 0, -15}, LeftLowerArm = {0, 0, 0, 15, 0, 0}, RightUpperLeg = {0, 0, 0, 80, 0, 10}, RightLowerLeg = {0, 0, 0, -110, 0, 0}, RightFoot = {0, 0, 0, 10, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -10}, LeftLowerLeg = {0, 0, 0, -90, 0, 0} } },
+		{ t = 6.35, e = "Cubic", d = "Out", p = { LowerTorso = {0, 5.3, -1.3, -20, -25, 0}, UpperTorso = {0, 0, 0, -12, 35, 0}, Head = {0, 0, 0, -12, -10, 0}, RightUpperArm = {0, 0, 0, 78, 0, -8}, RightLowerArm = {0, -5, 0, 0, 0, 0}, RightHand = {0, -5, 0, -10, 0, 0}, LeftUpperArm = {0, 0, 0, 20, 0, -45}, LeftLowerArm = {0, 0, 0, 60, 0, 0}, RightUpperLeg = {0, 0, 0, 20, 0, 10}, RightLowerLeg = {0, 0, 0, -40, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, -30, 0, -10}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 6.5, e = "Cubic", d = "InOut", p = { LowerTorso = {0, 5.2, -1.4, -22, -27, 0}, UpperTorso = {0, 0, 0, -12, 35, 0}, Head = {0, 0, 0, -12, -10, 0}, RightUpperArm = {0, 0, 0, 78, 0, -8}, RightLowerArm = {0, -5.6, 0, 0, 0, 0}, RightHand = {0, -5.6, 0, -10, 0, 0}, LeftUpperArm = {0, 0, 0, 20, 0, -45}, LeftLowerArm = {0, 0, 0, 60, 0, 0}, RightUpperLeg = {0, 0, 0, 20, 0, 10}, RightLowerLeg = {0, 0, 0, -40, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, -30, 0, -10}, LeftLowerLeg = {0, 0, 0, -60, 0, 0} } },
+		{ t = 6.62, e = "Cubic", d = "In", p = { LowerTorso = {0, 3, -1.5, -5, -15, 0}, UpperTorso = {0, 0, 0, -8, 10, 0}, Head = {0, 0, 0, -12, -10, 0}, RightUpperArm = {0, 0, 0, 70, 0, 25}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 60, 0, -30}, LeftLowerArm = {0, 0, 0, 100, 0, 0}, RightUpperLeg = {0, 0, 0, 60, 0, 12}, RightLowerLeg = {0, 0, 0, -90, 0, 0}, RightFoot = {0, 0, 0, 20, 0, 0}, LeftUpperLeg = {0, 0, 0, 50, 0, -12}, LeftLowerLeg = {0, 0, 0, -80, 0, 0} } },
+		{ t = 6.88, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.95, -1.5, 0, -15, 0}, UpperTorso = {0, 0, 0, -24, 10, 0}, Head = {0, 0, 0, 10, 0, 0}, RightUpperArm = {0, 0, 0, 40, 0, 50}, RightLowerArm = {0, 0, 0, 80, 0, 0}, LeftUpperArm = {0, 0, 0, 40, 0, -50}, LeftLowerArm = {0, 0, 0, 80, 0, 0}, RightUpperLeg = {0, 0, 0, 70, 0, 16}, RightLowerLeg = {0, 0, 0, -105, 0, 0}, RightFoot = {0, 0, 0, 28, 0, 0}, LeftUpperLeg = {0, 0, 0, 60, 0, -16}, LeftLowerLeg = {0, 0, 0, -100, 0, 0} } },
+		{ t = 7.1, e = "Cubic", d = "In", p = { LowerTorso = {0, 0.45, -0.75, 10, -15, 0}, UpperTorso = {0, 0, 0, -4, 10, 0}, Head = {0, 0, 0, -10, 4, 0}, RightUpperArm = {0, 0, 0, 55, 0, 30}, RightLowerArm = {0, 0, 0, 100, 0, 0}, LeftUpperArm = {0, 0, 0, 60, 0, -28}, LeftLowerArm = {0, 0, 0, 105, 0, 0}, RightUpperLeg = {0, 0, 0, 55, 0, 10}, RightLowerLeg = {0, 0, 0, -95, 0, 0}, RightFoot = {0, 0, 0, 10, 0, 0}, LeftUpperLeg = {0, 0, 0, 40, 0, -10}, LeftLowerLeg = {0, 0, 0, -85, 0, 0} } },
+		{ t = 7.23, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.55, 0, 0, -15, 0}, UpperTorso = {0, 0, 0, -13, 14, 0}, Head = {0, 0, 0, -8, 4, 0}, RightUpperArm = {0, 0, 0, 66, 0, 24}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 76, 0, -20}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 38, 0, 10}, RightLowerLeg = {0, 0, 0, -62, 0, 0}, RightFoot = {0, 0, 0, 22, 0, 0}, LeftUpperLeg = {0, 0, 0, 2, 0, -10}, LeftLowerLeg = {0, 0, 0, -42, 0, 0} } },
+		{ t = 7.4, e = "Cubic", d = "Out", p = { LowerTorso = {0, -0.35, 0, 0, -15, 0}, UpperTorso = {0, 0, 0, -8, 12, 0}, Head = {0, 0, 0, -4, 4, 0}, RightUpperArm = {0, 0, 0, 70, 0, 22}, RightLowerArm = {0, 0, 0, 105, 0, 0}, LeftUpperArm = {0, 0, 0, 80, 0, -18}, LeftLowerArm = {0, 0, 0, 115, 0, 0}, RightUpperLeg = {0, 0, 0, 28, 0, 10}, RightLowerLeg = {0, 0, 0, -45, 0, 0}, RightFoot = {0, 0, 0, 17, 0, 0}, LeftUpperLeg = {0, 0, 0, -8, 0, -10}, LeftLowerLeg = {0, 0, 0, -28, 0, 0} } },
+	}, markers = { { 0, "Montrer", "ChapeauTete" }, { 0, "Cacher", "ChapeauDos" }, { 0.3, "Cacher", "ChapeauTete" }, { 0.3, "Montrer", "ChapeauDos" }, { 0.3, "Gonfler", "Debut" }, { 0.45, "Pompe", "1" }, { 0.75, "Pompe", "2" }, { 0.9, "Aura", "Vapeur" }, { 1.4, "Pompe", "3" }, { 1.9, "Pompe", "4" }, { 2.32, "Explosion", "Vapeur" }, { 3.8, "VFX", "Rafale_Trainees" }, { 3.86, "Impact", "Rafale" }, { 3.93, "Impact", "Rafale" }, { 4, "Impact", "Rafale" }, { 4.07, "Impact", "Rafale" }, { 4.14, "Impact", "Rafale" }, { 4.21, "Impact", "Rafale" }, { 4.28, "Impact", "Rafale" }, { 4.35, "Impact", "Rafale" }, { 4.42, "Impact", "Rafale" }, { 4.49, "Impact", "Rafale" }, { 4.56, "Impact", "Rafale" }, { 4.63, "Impact", "Rafale" }, { 4.8, "Impact", "Pied" }, { 5.2, "Feu", "Debut" }, { 6.35, "Impact", "AirPoing" }, { 6.35, "Explosion", "AirPoing" }, { 6.6, "Feu", "Fin" }, { 6.88, "Esquive", "Atterrissage" } } },
+}
+
+local function addPose(kf, parentPose, node, k)
+	local name, children = node[1], node[2]
+	local v = k.p[name] or ZERO
+	local pose = Instance.new("Pose")
+	pose.Name = name
+	pose.CFrame = CFrame.new(v[1], v[2], v[3]) * CFrame.Angles(rad(v[4]), rad(v[5]), rad(v[6]))
+	pose.Weight = 1
+	pose.EasingStyle = STYLE[k.e]
+	pose.EasingDirection = Enum.PoseEasingDirection[k.d]
+	parentPose:AddSubPose(pose)
+	for _, child in ipairs(children) do addPose(kf, pose, child, k) end
+end
+
+local bilan = {}
+for _, a in ipairs(ANIMS) do
+	local seq = Instance.new("KeyframeSequence")
+	seq.Name = a.name
+	seq.Loop = a.loop
+	seq.Priority = Enum.AnimationPriority[a.priority]
+	for _, k in ipairs(a.keys) do
+		local kf = Instance.new("Keyframe")
+		kf.Time = k.t
+		local hrp = Instance.new("Pose")
+		hrp.Name = "HumanoidRootPart"
+		hrp.Weight = 0
+		kf:AddPose(hrp)
+		addPose(kf, hrp, TREE, k)
+		kf.Parent = seq
+	end
+	for _, m in ipairs(a.markers) do
+		local kf
+		for _, existing in ipairs(seq:GetKeyframes()) do
+			if math.abs(existing.Time - m[1]) < 1e-4 then kf = existing break end
+		end
+		if not kf then kf = Instance.new("Keyframe") kf.Time = m[1] kf.Parent = seq end
+		local mk = Instance.new("KeyframeMarker")
+		mk.Name = m[2]
+		mk.Value = m[3]
+		kf:AddMarker(mk)
+	end
+	local ancienne = holder:FindFirstChild(a.name)
+	if ancienne then ancienne:Destroy() end
+	seq.Parent = holder
+	table.insert(bilan, a.name .. " : " .. #a.keys .. " clés, " .. #a.markers .. " marqueurs")
+end
+return table.concat(bilan, "\n")

@@ -3,6 +3,40 @@
 Suivi des tâches de développement. Les décisions de game design en attente sont dans [Questions ouvertes](Questions-ouvertes.md).
 
 ## En cours
+### Séquence « combattant élastique » sur la vitrine de luffy (handoff `design_handoff_combattant_elastique`, sources dans `assets/persos/luffy/elastique/`)
+Même principe que zoro : `Elastique_Sequence_Complete` (Gear 2 → Combo, 7,4 s) en `AnimationSequence`, VFX sans hitbox.
+- [x] Copier les sources du handoff dans `assets/persos/luffy/elastique/` (vidéo de référence `references/*.mp4` hors git : œuvre protégée, 15 Mo)
+- [x] Générateur compact → `creer_sequences.luau` (séquence complète seule, 43 clés, 29 marqueurs, aucun doublon de marqueur ; rig `Workspace.Elastique_Apercu` ; dossier de l'éditeur réutilisé)
+- [x] Étirement vérifié avec les `AnimationConstraint` de luffy (écart jusqu'à 5 studs au coude) ; trous visibles aux jambes → tubes nécessaires
+- [x] Client `Elastique.luau` : tubes, gonflement ×1,12 / pompes ×1,24, peau rose, remise à zéro par cycle ; attend les pièces (streaming)
+- [x] `Vitrine` : attribut `AuMembre` (effet placé sur la main ou le pied le plus éloigné du torse), marqueurs `Feu` / `Pompe`
+- [x] `vfx_elastique.luau` : 13 effets (textures déjà en ligne ou intégrées), hit-stop 0,045 (rafale) / 0,09 (pied, poing aérien), secousses ; sauvegarde `ServerStorage.Sauvegarde_LuffyAvantElastique`
+- [x] Test en Play (clip temporaire) : 8 tubes, gonflement et pompes, peau rose 1,15 s, vapeur jusqu'à la fin (durée portée à 7,2 s à cause des hit-stops), feu 5,2-6,6 s, aucune erreur ; feu du poing renforcé (peu visible en plein jour)
+- [x] Chargement impossible : l'éditeur avait créé son propre dossier `Elastique_Apercu` (vide) → séquence déplacée dedans ; générateurs (luffy, zoro) : regroupent tout dans le dernier dossier créé
+- [x] Retours utilisateur (03/11) :
+  - [x] Bras et poing pas reliés pendant les coups : tubes calculés avec une image de retard (avant la simulation, or les `AnimationConstraint` placent les pièces pendant) → mise à jour en `PostSimulation`, vérifié en Play (longueur du tube = écart au rendu) ; matière du tube = celle du membre
+  - [x] Gear 2 : reste accroupi poing au sol, relève seulement la tête à l'explosion (2,32 s), tient la pose jusqu'à 3,15 s, se relève en garde à 3,6 s (`KNEEL_UP` / `KNEEL_UP2`, instructions de l'utilisateur ; README mis à jour)
+  - [x] Charge du poing aérien : poing près de la tête coude plié, sans étirement (réf. `references/pose_charge_poing.png`) ; l'allongement ne se fait qu'au lancer (2,65 → 2,75 s du Combo)
+  - [x] `regenerer_luau.js` (Node, = ELASTIC.toLuau()) ; séquences recréées dans Studio
+  - [x] Poing encore détaché du bras (04/11) : les tubes n'existaient qu'en Play (pas dans l'Éditeur d'animation) → remplacés par des `Beam` couleur peau dans le modèle (8, entre les attachments des articulations), non éclairés et assombris de 25 % pour ressembler au bras ; au coude, la peau déformable de l'avatar couvrait déjà l'écart, pas au poignet. Vérifié en mode édition et en Play (rose suivi)
+  - [x] Décision utilisateur : pas de `Elastique_Gear2` publiée à part, tout est dans `Elastique_Sequence_Complete`
+  - [x] Toujours impossible à charger (04/11) : en recréant le rig d'aperçu, mon script faisait créer à l'éditeur un nouveau dossier vide (3 dossiers `Elastique_Apercu`) → séquence mise dans celui de l'éditeur qui pointe vers le rig actuel, les 2 autres supprimés ; générateurs (luffy, zoro) : réutilisent le rig existant au lieu de le recréer
+- [x] Retours utilisateur (04/11) « bien plus épique » :
+  - [x] Plus de gonflement des membres (dépassaient du t-shirt) → bulles qui gonflent aux chevilles et remontent jusqu'au torse à chaque pompe (`Elastique.luau`, 2 par jambe)
+  - [x] Rafale en pistons : bras qui revient tendu dans l'axe (le coude plié à 115° faisait pivoter le segment étiré : « poignet cassé ») ; marqueur `VFX Rafale_Trainees` au début de la rafale
+  - [x] `Vitrine` : `Montee` (débit qui monte en puissance), `TraineeMembre` (bras / jambe fantôme lumineux à chaque coup) ; secousse de caméra corrigée (s'additionnait : la caméra dérivait après un gros impact, zoro compris)
+  - [x] `vfx_elastique.luau` v2 : vapeur épaisse et lente (Montee 1,2 s) + nappe au sol, pompes sèches (jets des jambes), explosion de vapeur énorme + nuage qui traîne, rafale (fantôme, éclat, traits de vitesse, traînées des poings), pied lourd, recharge (feu qui grossit, lignes qui convergent, anneaux qui implosent), poing aérien (traits le long du bras, boule de feu, double onde, fumée), hit-stop 0,12 au poing aérien
+  - [x] Vérifié en Play (clip temporaire), aucune erreur
+- [ ] **Prochaine session (demandé le 04/11)** :
+  - [ ] Bras étiré : garder la même épaisseur sur toute la longueur (aujourd'hui le Beam `Elastique_<articulation>` fait 0,8 × la plus petite dimension du membre, et la peau déformable du coude s'affine : à égaliser avec le bras)
+  - [ ] VFX avec beaucoup plus d'impact + effet **haki des rois** comme sur zoro (éclairs noirs et rouges autour du corps et des poings, ondes de choc) pour ressentir la puissance de luffy
+- [ ] Publication par l'utilisateur ✋ (Éditeur d'animation › `Elastique_Apercu` › Charger `Elastique_Sequence_Complete` › Publier) puis ID sur `ModelesPersonnages.luffy.AnimationSequence`
+- [ ] Chapeau : `CheveuxChapeau` = cheveux + chapeau d'une seule pièce → bascule tête/dos ignorée (à décider ✋)
+- [ ] Validation visuelle par l'utilisateur ✋, Ctrl+S
+- [x] Wiki, CLAUDE.md, selene
+- [ ] Suppression du dossier du handoff (`Downloads/design_handoff_combattant_elastique`) ✋
+- [ ] Note : pendant le test, le personnage du joueur est passé sur le collecteur (argent non collecté encaissé, sauvegarde Studio)
+
 ### Séquence du sabreur sur la vitrine de zoro (handoff `design_handoff_sabreur_roblox`, sources dans `assets/persos/zoro/sabreur/`)
 Décision (03/11) : la séquence complète (dégainage → aura → combat → rengainage, 9,2 s) devient la vitrine de zoro. Pas de hitbox ni de dégâts tant que les combats ne sont pas conçus. Animations publiées par l'utilisateur.
 - [x] Copier les sources du handoff dans `assets/persos/zoro/sabreur/` (anims.js = source de vérité, visualiseur, captures)

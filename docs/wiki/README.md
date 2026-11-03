@@ -58,3 +58,4 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-31 | Sous l'île : la **mer** (plutôt qu'une mer de nuages). |
 | 2026-10-31 | Direction artistique du Hub **validée** : sanctuaire de festival en pierre et bois (torii vermillon, lanternes de pierre grise à toit ardoise, sol en pierre beige, or au centre), cerisiers sculptés ; le rose est réservé aux cerisiers. Éclairage laissé tel quel. |
 | 2026-11-03 | Vitrine de Zoro : la **séquence du sabreur** (dégainage → aura → combat → rengainage, 9,2 s) remplace son cycle Idle → Action → Signature. Les marqueurs de coups et d'esquives sont gardés pour les futurs combats, sans hitbox pour l'instant. |
+| 2026-11-03 | Vitrine de Luffy : la **séquence « combattant élastique »** (Gear 2 → Combo, 7,4 s) remplace son cycle Idle → Action → Signature, avec membres élastiques et effets (vapeur, feu, impacts). |

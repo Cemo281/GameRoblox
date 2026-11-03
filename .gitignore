@@ -31,3 +31,6 @@ Thumbs.db
 
 # Python : fichiers compiles
 __pycache__/
+
+# Vidéos de référence (œuvre protégée, lourdes) : hors git
+assets/persos/*/elastique/references/*.mp4

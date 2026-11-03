@@ -9,13 +9,18 @@ local Debris = game:GetService("Debris")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local Elastique = require(script.Parent.Elastique)
+
 local Vitrine = {}
 
 local TAG_VITRINE = "PersonnageVitrine"
 -- Marqueurs de gameplay (séquence du sabreur) : « Impact Sol » déclenche l'effet VFX « Impact_Sol » s'il existe.
 -- Utile car l'Éditeur d'animation ne publie qu'un marqueur de chaque nom par image clé : un 2e « VFX » au même
 -- instant est perdu, alors que le marqueur de gameplay voisin est gardé.
-local MARQUEURS_EFFETS = { "Impact", "Esquive", "Aura", "Explosion", "Fin" }
+local MARQUEURS_EFFETS = { "Impact", "Esquive", "Aura", "Explosion", "Fin", "Feu", "Pompe" }
+-- Marqueurs du corps élastique (luffy), transmis au module Elastique
+local MARQUEURS_ELASTIQUE = { "Pompe", "Aura" }
+local EXTREMITES = { "RightHand", "LeftHand", "RightFoot", "LeftFoot" }
 -- Secousse de caméra : pleine jusqu'à SECOUSSE_PORTEE_PLEINE studs du personnage, nulle au-delà de + SECOUSSE_PORTEE
 local SECOUSSE_PORTEE_PLEINE = 15
 local SECOUSSE_PORTEE = 25
@@ -79,6 +84,18 @@ local function secouer(modele: Model, amplitude: number)
 	secousse = math.max(secousse, amplitude * attenuation)
 end
 
+-- Décalage appliqué à l'image précédente : retiré avant la mise à jour de la caméra du joueur, sinon la caméra repart
+-- de la position secouée et dérive (vu en Play : après un gros impact, la caméra restait tournée).
+local decalageApplique = CFrame.identity
+
+local function retirerSecousse()
+	local camera = workspace.CurrentCamera
+	if camera and decalageApplique ~= CFrame.identity then
+		camera.CFrame *= decalageApplique:Inverse()
+	end
+	decalageApplique = CFrame.identity
+end
+
 local function appliquerSecousse(dt: number)
 	if secousse < 0.01 then
 		secousse = 0
@@ -88,9 +105,71 @@ local function appliquerSecousse(dt: number)
 	if camera then
 		local a = secousse * SECOUSSE_ECHELLE
 		local decalage = Vector3.new((math.random() - 0.5) * a, (math.random() - 0.5) * a, 0)
-		camera.CFrame *= CFrame.new(decalage) * CFrame.Angles(0, 0, math.rad((math.random() - 0.5) * a * 6))
+		decalageApplique = CFrame.new(decalage) * CFrame.Angles(0, 0, math.rad((math.random() - 0.5) * a * 6))
+		camera.CFrame *= decalageApplique
 	end
 	secousse *= math.exp(-dt * SECOUSSE_AMORTI)
+end
+
+-- Membre le plus éloigné du torse (main ou pied qui frappe, membres étirés).
+local function membreLePlusLoin(modele: Model): BasePart?
+	local torse = modele:FindFirstChild("UpperTorso")
+	if not (torse and torse:IsA("BasePart")) then
+		return nil
+	end
+	local meilleur: BasePart? = nil
+	local distance = -1
+	for _, nom in EXTREMITES do
+		local part = modele:FindFirstChild(nom)
+		if part and part:IsA("BasePart") then
+			local d = (part.Position - torse.Position).Magnitude
+			if d > distance then
+				meilleur, distance = part, d
+			end
+		end
+	end
+	return meilleur
+end
+
+-- Traînée de coup : bande lumineuse de l'épaule (ou de la hanche) jusqu'au poing (ou au pied) qui frappe, qui
+-- s'efface très vite (vitesse des coups étirés). Attribut TraineeMembre (Color3) d'un effet.
+local RACINES = {
+	RightHand = "RightUpperArm",
+	LeftHand = "LeftUpperArm",
+	RightFoot = "RightUpperLeg",
+	LeftFoot = "LeftUpperLeg",
+}
+local INFO_TRAINEE = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local function traineeMembre(modele: Model, couleur: Color3)
+	local membre = membreLePlusLoin(modele)
+	local racine = membre and modele:FindFirstChild(RACINES[membre.Name] or "")
+	if not (membre and racine and racine:IsA("BasePart")) then
+		return
+	end
+	local a, b = racine.Position, membre.Position
+	local longueur = (b - a).Magnitude
+	if longueur < 1 then
+		return
+	end
+	local largeur = math.min(racine.Size.X, racine.Size.Z) * 0.9
+	local part = Instance.new("Part")
+	part.Name = "TraineeCoup"
+	part.Anchored = true
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+	part.CastShadow = false
+	part.Material = Enum.Material.Neon
+	part.Color = couleur
+	part.Transparency = 0.35
+	part.Size = Vector3.new(largeur, largeur, longueur)
+	part.CFrame = CFrame.lookAt((a + b) / 2, b)
+	part.Parent = workspace
+	TweenService:Create(part, INFO_TRAINEE, {
+		Transparency = 1,
+		Size = Vector3.new(largeur * 1.8, largeur * 1.8, longueur * 1.05),
+	}):Play()
+	Debris:AddItem(part, INFO_TRAINEE.Time + 0.05)
 end
 
 -- Image rémanente (esquives) : copie fantôme des pièces visibles, couleur `couleur`, qui s'efface.
@@ -123,9 +202,10 @@ end
 
 -- Marqueur « VFX <Nom> » (ou marqueur de gameplay → effet « <Marqueur>_<Valeur> ») sur le dossier VFX.<Nom> :
 --   Mode "Burst" : Emit(Quantite) de chaque émetteur, lumières allumées DureeFlash s (0,1 par défaut) ;
---   Mode "Duree" : tout allumé Duree secondes ;
+--   Mode "Duree" : tout allumé Duree secondes (attribut Montee : débit des émetteurs de 0 à sa valeur en Montee s) ;
 --   Mode "Eteindre" : éteint l'effet nommé par l'attribut Cible.
---   Attributs facultatifs : Secousse (amplitude de la secousse de caméra), Fantome (Color3 de l'image rémanente).
+--   Attributs facultatifs : Secousse (amplitude de la secousse de caméra), Fantome (Color3 de l'image rémanente),
+--   TraineeMembre (Color3 : traînée de l'épaule / hanche au membre qui frappe), AuMembre (effets placés sur ce membre).
 -- Marqueur « VFX <Nom>_Fin » : éteint l'effet <Nom>.
 local function declencher(modele: Model, nom: string)
 	local vfx = modele:FindFirstChild("VFX")
@@ -146,9 +226,25 @@ local function declencher(modele: Model, nom: string)
 	if typeof(amplitude) == "number" then
 		secouer(modele, amplitude)
 	end
+	local couleurTrainee = dossier:GetAttribute("TraineeMembre")
+	if typeof(couleurTrainee) == "Color3" then
+		traineeMembre(modele, couleurTrainee)
+	end
 	local couleurFantome = dossier:GetAttribute("Fantome")
 	if typeof(couleurFantome) == "Color3" then
 		fantome(modele, couleurFantome)
+	end
+	if dossier:GetAttribute("AuMembre") == true then
+		-- effets dans des Attachment : déplacés sur la main ou le pied qui frappe
+		local membre = membreLePlusLoin(modele)
+		if membre then
+			for _, effet in emetteurs(dossier) do
+				local attache = effet.Parent
+				if attache and attache:IsA("Attachment") then
+					attache.WorldPosition = membre.Position
+				end
+			end
+		end
 	end
 	local mode = dossier:GetAttribute("Mode")
 	if mode == "Eteindre" then
@@ -171,7 +267,20 @@ local function declencher(modele: Model, nom: string)
 		end
 	elseif mode == "Duree" then
 		local duree = dossier:GetAttribute("Duree")
+		local montee = dossier:GetAttribute("Montee")
 		for _, emetteur in emetteurs(dossier) do
+			if typeof(montee) == "number" and emetteur:IsA("ParticleEmitter") then
+				-- montée en puissance : débit de 0 à sa valeur d'origine en `montee` secondes
+				local debit = emetteur:GetAttribute("DebitBase")
+				if typeof(debit) ~= "number" then
+					debit = emetteur.Rate
+					emetteur:SetAttribute("DebitBase", debit)
+				end
+				emetteur.Rate = 0
+				TweenService:Create(emetteur, TweenInfo.new(montee, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+					Rate = debit,
+				}):Play()
+			end
 			allumer(emetteur, true)
 			task.delay(if typeof(duree) == "number" then duree else 1, function()
 				if emetteur.Parent then
@@ -195,6 +304,7 @@ local function suivre(instance: Instance)
 	if not (animator and animator:IsA("Animator")) then
 		return
 	end
+	task.spawn(Elastique.Suivre, modele)
 
 	-- premières animations du cycle : les accessoires y repartent de leur état par défaut
 	local debutsDeCycle: { unknown } = {}
@@ -212,6 +322,7 @@ local function suivre(instance: Instance)
 		animator.AnimationPlayed:Connect(function(piste: AnimationTrack)
 			if piste.Animation and table.find(debutsDeCycle, piste.Animation.AnimationId) then
 				reinitialiserAccessoires(modele)
+				Elastique.Reinitialiser(modele)
 			end
 			if pistesBranchees[piste] then
 				return
@@ -235,6 +346,14 @@ local function suivre(instance: Instance)
 					declencher(modele, nom)
 				end)
 			)
+			for _, marqueur in MARQUEURS_ELASTIQUE do
+				table.insert(
+					connexions,
+					piste:GetMarkerReachedSignal(marqueur):Connect(function(valeur: string)
+						Elastique.Marqueur(modele, marqueur, valeur)
+					end)
+				)
+			end
 			for _, marqueur in MARQUEURS_EFFETS do
 				table.insert(
 					connexions,
@@ -261,7 +380,9 @@ function Vitrine.Init()
 	end
 	CollectionService:GetInstanceAddedSignal(TAG_VITRINE):Connect(suivre)
 	-- après la mise à jour de la caméra du joueur, pour que la secousse ne soit pas écrasée
+	RunService:BindToRenderStep("SecousseVitrineRetrait", Enum.RenderPriority.Camera.Value - 1, retirerSecousse)
 	RunService:BindToRenderStep("SecousseVitrine", Enum.RenderPriority.Camera.Value + 1, appliquerSecousse)
+	Elastique.Init()
 end
 
 return Vitrine

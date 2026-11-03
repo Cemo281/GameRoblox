@@ -8,8 +8,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local source = ReplicatedStorage.ModelesPersonnages.zoro
+-- le rig existant est réutilisé : l'Éditeur d'animation suit l'instance du rig, en recréer un lui fait créer un
+-- nouveau dossier vide dans RBX_ANIMSAVES et « perdre » les animations (supprimer le rig à la main pour le refaire)
 local rig = workspace:FindFirstChild("Sabreur_Apercu")
-if rig then rig:Destroy() end
+local nouveau = rig == nil
+if nouveau then
 rig = source:Clone()
 rig.Name = "Sabreur_Apercu"
 for _, attribut in { "AnimationIdle", "AnimationAction", "AnimationSignature", "AnimationSequence" } do
@@ -20,14 +23,20 @@ rig.HumanoidRootPart.Anchored = true
 local voisin = workspace:FindFirstChild("Essais_Zoro") and workspace.Essais_Zoro:FindFirstChild("Zoro_v2")
 rig:PivotTo(if voisin then voisin:GetPivot() + Vector3.new(30, 0, 0) else CFrame.new(25, 303, 400))
 rig.Parent = workspace
+end
 
 local saves = ServerStorage:FindFirstChild("RBX_ANIMSAVES")
 if not saves then saves = Instance.new("Folder") saves.Name = "RBX_ANIMSAVES" saves.Parent = ServerStorage end
 -- un seul dossier par rig, réutilisé (l'Éditeur d'animation ignore un 2e dossier du même nom) ; il pointe vers le rig recréé
+-- s'il y en a plusieurs, garder le dernier créé (celui que l'éditeur lit) et y regrouper le contenu des autres
 local holder
 for _, c in saves:GetChildren() do
 	if c.Name == rig.Name then
-		if holder then c:Destroy() else holder = c end
+		if holder then
+			for _, s in holder:GetChildren() do s.Parent = c end
+			holder:Destroy()
+		end
+		holder = c
 	end
 end
 if not holder then holder = Instance.new("ObjectValue") holder.Name = rig.Name holder.Parent = saves end

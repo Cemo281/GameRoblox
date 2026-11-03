@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#12100f;color:#ece7e3;font-family:'IBM Plex Sans',system-ui,sans-serif;}a{color:#ff8a65;}a:hover{color:#ffb39b;}button{font-family:inherit;}</style>
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="./elastique.js"></script>
+<script src="./viewer-elastique.js"></script>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+  <header style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;padding:18px 24px 14px;border-bottom:1px solid #2a2523;">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+      <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em;">Combattant élastique</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#968c86;">Animations R15 · Roblox</div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#968c86;">Glisser = orbiter · molette = zoom</div>
+  </header>
+
+  <div style="flex:1;display:flex;flex-wrap:wrap;min-height:0;">
+    <nav style="flex:0 0 230px;display:flex;flex-direction:column;gap:2px;padding:14px 10px;border-right:1px solid #2a2523;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px 8px;">Animations</div>
+      <sc-for list="{{ items }}" as="item" hint-placeholder-count="4">
+        <button onClick="{{ item.select }}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:9px 10px;border-radius:6px;border:none;cursor:pointer;background:{{ item.bg }};color:{{ item.fg }};font-size:13.5px;" style-hover="background:#201c1a;">
+          <span>{{ item.label }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;">{{ item.durText }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <main style="flex:1 1 480px;display:flex;flex-direction:column;min-width:0;">
+      <div style="position:relative;flex:1;min-height:460px;">
+        <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;"></canvas>
+        <div style="position:absolute;left:20px;top:16px;display:flex;flex-direction:column;gap:4px;pointer-events:none;">
+          <div style="font-size:22px;font-weight:600;letter-spacing:-0.01em;">{{ current.label }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#968c86;">{{ current.id }}</div>
+        </div>
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:20px;top:16px;padding:6px 12px;border-radius:999px;background:#3a1a14;color:#ffbfa8;font-family:'IBM Plex Mono',monospace;font-size:12px;pointer-events:none;">◆ {{ toast }}</div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;padding:14px 20px 18px;border-top:1px solid #2a2523;">
+        <div ref="{{ trackRef }}" onPointerDown="{{ onScrubDown }}" style="position:relative;height:30px;cursor:pointer;touch-action:none;">
+          <div style="position:absolute;left:0;right:0;top:13px;height:4px;border-radius:2px;background:#2e2826;"></div>
+          <div style="position:absolute;left:0;top:13px;height:4px;border-radius:2px;background:#ff7a59;width:{{ progressPct }};"></div>
+          <sc-for list="{{ keyTicks }}" as="k" hint-placeholder-count="0">
+            <div style="position:absolute;top:9px;width:2px;height:12px;margin-left:-1px;background:#625853;left:{{ k.left }};"></div>
+          </sc-for>
+          <sc-for list="{{ markerTicks }}" as="m" hint-placeholder-count="0">
+            <div title="{{ m.title }}" style="position:absolute;top:0;width:8px;height:8px;margin-left:-4px;transform:rotate(45deg);background:{{ m.color }};left:{{ m.left }};"></div>
+          </sc-for>
+          <div style="position:absolute;top:7px;width:4px;height:16px;margin-left:-2px;border-radius:2px;background:#ece7e3;left:{{ progressPct }};"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button onClick="{{ togglePlay }}" style="width:40px;height:40px;border-radius:50%;border:none;background:#ece7e3;color:#12100f;font-size:14px;cursor:pointer;">{{ playIcon }}</button>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#cbc3be;">{{ timeText }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;gap:2px;padding:2px;border-radius:7px;background:#201c1a;">
+              <sc-for list="{{ speeds }}" as="s" hint-placeholder-count="4">
+                <button onClick="{{ s.select }}" style="padding:6px 10px;border:none;border-radius:5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;background:{{ s.bg }};color:{{ s.fg }};">{{ s.label }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ toggleLoop }}" style="padding:7px 12px;border-radius:7px;border:1px solid #352f2c;cursor:pointer;font-size:12.5px;background:{{ loopBg }};color:#ece7e3;">Boucle</button>
+            <button onClick="{{ toggleTrail }}" style="padding:7px 12px;border-radius:7px;border:1px solid #352f2c;cursor:pointer;font-size:12.5px;background:{{ trailBg }};color:#ece7e3;">Traînées</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside style="flex:1 0 280px;max-width:340px;display:flex;flex-direction:column;gap:22px;padding:18px 20px;border-left:1px solid #2a2523;">
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;text-transform:uppercase;letter-spacing:0.08em;">Exporter vers Roblox</div>
+        <button onClick="{{ copyLua }}" style="padding:11px 14px;border-radius:8px;border:none;cursor:pointer;background:#ff7a59;color:#2a0d06;font-size:14px;font-weight:600;text-align:left;">{{ copyLabel }}</button>
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ dlLua }}" style="flex:1;padding:9px 10px;border-radius:8px;border:1px solid #352f2c;background:transparent;color:#ece7e3;cursor:pointer;font-size:12.5px;">Animations .lua</button>
+          <button onClick="{{ dlRuntime }}" style="flex:1;padding:9px 10px;border-radius:8px;border:1px solid #352f2c;background:transparent;color:#ece7e3;cursor:pointer;font-size:12.5px;">Script élastique .lua</button>
+        </div>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;text-transform:uppercase;letter-spacing:0.08em;">Importer</div>
+        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.5;color:#cbc3be;text-wrap:pretty;">
+          <li>Dans Studio, sélectionne le Model R15 de ton personnage dans l'Explorer.</li>
+          <li>Affichage › Barre de commande : colle le script, Entrée.</li>
+          <li>Avatar › Éditeur d'animation › choisis le rig › ⋯ › Charger › <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;">Elastique_…</span></li>
+          <li>⋯ › Publier sur Roblox, puis récupère l'ID pour ton <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;">Animation</span>.</li>
+          <li>Place le script élastique dans StarterPlayerScripts : il remplit les membres étirés avec des tubes.</li>
+        </ol>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;text-transform:uppercase;letter-spacing:0.08em;">Accessory attendus</div>
+        <sc-for list="{{ accessories }}" as="a" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid #262120;">
+            <div style="display:flex;justify-content:space-between;gap:8px;">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#ece7e3;">{{ a.name }}</span>
+              <span style="font-size:12px;color:{{ a.stateColor }};">{{ a.state }}</span>
+            </div>
+            <div style="font-size:12px;color:#968c86;">{{ a.att }}</div>
+          </div>
+        </sc-for>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;line-height:1.5;color:#968c86;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#776d68;text-transform:uppercase;letter-spacing:0.08em;">Marqueurs</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#8fb4ff;flex:none;"></span>Montrer / Cacher — valeur = nom de l'Accessory</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#ff7a59;flex:none;"></span>Impact — branche ta hitbox ici</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="width:8px;height:8px;transform:rotate(45deg);background:#f0c46a;flex:none;"></span>Feu / Gonfler / Pompe / Aura / Explosion — VFX</div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;hitStop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lecture&quot;},&quot;rubberTubes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Rendu&quot;},&quot;steam&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Rendu&quot;}}">
+class Component extends DCLogic {
+  state = { sel: 0, t: 0, playing: true, speed: 1, loop: true, trail: true, toast: null, copied: false };
+  canvasRef = React.createRef();
+  trackRef = React.createRef();
+
+  componentDidMount() {
+    const boot = () => {
+      if (!window.THREE || !THREE.OrbitControls || !window.ELASTIC || !window.ElastiqueViewer || !this.canvasRef.current) return void (this.bootT = setTimeout(boot, 60));
+      this.viewer = ElastiqueViewer(this.canvasRef.current);
+      this.forceUpdate();
+      this.last = performance.now();
+      const tick = now => {
+        this.raf = requestAnimationFrame(tick);
+        this.step(Math.min(0.05, (now - this.last) / 1000));
+        this.last = now;
+      };
+      this.raf = requestAnimationFrame(tick);
+    };
+    boot();
+    this.onMove = e => { if (this.dragging) this.scrubTo(e.clientX); };
+    this.onUp = () => { this.dragging = false; };
+    window.addEventListener('pointermove', this.onMove);
+    window.addEventListener('pointerup', this.onUp);
+  }
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf); clearTimeout(this.bootT); clearTimeout(this.toastT);
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('pointerup', this.onUp);
+    this.viewer && this.viewer.dispose();
+  }
+
+  anim() { return ELASTIC.ANIMS[this.state.sel]; }
+
+  step(dt) {
+    const a = this.anim(), s = this.state;
+    let t = s.t, hold = this.hitStop > 0;
+    if (hold) this.hitStop -= dt;
+    if (s.playing && !this.dragging && !hold) {
+      const prev = t;
+      t += dt * s.speed;
+      if (t >= a.dur) {
+        this.fireMarkers(a, prev, a.dur + 1);
+        if (s.loop) { t = t % a.dur; this.fireMarkers(a, -1, t); }
+        else { t = a.dur; this.setState({ playing: false }); }
+      } else this.fireMarkers(a, prev, t);
+    }
+    if (t !== s.t) this.setState({ t });
+    const v = this.viewer;
+    v.setPose(ELASTIC.sample(a, t));
+    v.setVisible(ELASTIC.visibility(a, t));
+    v.setTrail(s.trail);
+    v.setTubes(this.props.rubberTubes ?? true);
+    v.setAura(ELASTIC.auraOn(a, t) ? 3 : 0);
+    v.setFire(ELASTIC.fireOn(a, t));
+    v.setSteam(this.props.steam ?? true);
+    v.setInflate(ELASTIC.inflateAmt(a, t));
+    v.render(s.playing && !this.dragging);
+  }
+
+  fireMarkers(a, from, to) {
+    a.markers.forEach(m => {
+      if (m[0] > from && m[0] <= to && !(m[0] === 0 && from >= 0)) {
+        const big = m[2] === 'Ultime' || m[2] === 'RafaleFinal' || m[2] === 'Sol' || m[2] === 'AirPoing' || m[2] === 'Pied';
+        if (m[1] === 'Impact') { this.viewer.ring(1); this.viewer.spark(big ? 2 : 1); this.viewer.shake(big ? 0.9 : 0.3); if (this.props.hitStop ?? true) this.hitStop = big ? 0.09 : 0.045; }
+        if (m[1] === 'Explosion') { this.viewer.shake(m[2] === 'Ultime' || m[2] === 'AirPoing' ? 1.4 : 0.7); this.viewer.ring(2.4); if (m[2] === 'Vapeur' && (this.props.steam ?? true)) this.viewer.burst(); }
+        if (m[1] === 'Pompe') { this.viewer.pulse(); this.viewer.ring(0.5); }
+        if (m[1] !== 'Montrer' && m[1] !== 'Cacher' || m[0] > 0) this.showToast(m[1] + ' · ' + m[2]);
+      }
+    });
+  }
+  showToast(txt) {
+    clearTimeout(this.toastT);
+    this.setState({ toast: txt });
+    this.toastT = setTimeout(() => this.setState({ toast: null }), 650);
+  }
+
+  select(i) {
+    this.viewer && this.viewer.clearTrails();
+    this.setState({ sel: i, t: 0, playing: true });
+  }
+
+  scrubTo(clientX) {
+    const el = this.trackRef.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    const f = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    this.setState({ t: f * this.anim().dur, playing: false });
+  }
+
+  download(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  renderVals() {
+    const S = window.ELASTIC, s = this.state;
+    if (!S) return { canvasRef: this.canvasRef, trackRef: this.trackRef, items: [], current: {}, keyTicks: [], markerTicks: [], speeds: [], accessories: [], progressPct: '0%' };
+    const a = S.ANIMS[s.sel];
+    const vis = S.visibility(a, s.t);
+    const pct = x => (x / a.dur * 100).toFixed(2) + '%';
+    const mColor = n => n === 'Impact' ? '#ff7a59' : (n === 'Montrer' || n === 'Cacher') ? '#8fb4ff' : '#f0c46a';
+    const seenM = {};
+    return {
+      canvasRef: this.canvasRef, trackRef: this.trackRef,
+      items: S.ANIMS.map((x, i) => ({
+        label: x.label, durText: x.dur.toFixed(2) + 's' + (x.loop ? ' ↻' : ''),
+        bg: i === s.sel ? '#2c1d18' : 'transparent', fg: i === s.sel ? '#ffb39b' : '#cbc3be',
+        select: () => this.select(i)
+      })),
+      current: a,
+      toast: s.toast,
+      progressPct: pct(s.t),
+      keyTicks: a.keys.map(k => ({ left: pct(k.t) })),
+      markerTicks: a.markers.filter(m => { const k = m[0].toFixed(3) + mColor(m[1]); if (seenM[k]) return false; return seenM[k] = true; })
+        .map(m => ({ left: pct(m[0]), color: mColor(m[1]), title: m[1] + ' ' + m[2] + ' @ ' + m[0] + 's' })),
+      timeText: s.t.toFixed(2) + ' / ' + a.dur.toFixed(2) + ' s',
+      playIcon: s.playing ? '❚❚' : '▶',
+      togglePlay: () => this.setState(st => {
+        const restart = !st.playing && st.t >= a.dur - 1e-3;
+        if (restart) this.viewer && this.viewer.clearTrails();
+        return { playing: !st.playing, t: restart ? 0 : st.t };
+      }),
+      onScrubDown: e => { this.dragging = true; this.scrubTo(e.clientX); },
+      speeds: [0.1, 0.25, 0.5, 1].map(v => ({ label: v + '×', bg: s.speed === v ? '#352c28' : 'transparent', fg: s.speed === v ? '#ece7e3' : '#968c86', select: () => this.setState({ speed: v }) })),
+      toggleLoop: () => this.setState({ loop: !s.loop }),
+      loopBg: s.loop ? '#2c1d18' : 'transparent',
+      toggleTrail: () => this.setState({ trail: !s.trail }),
+      trailBg: s.trail ? '#2c1d18' : 'transparent',
+      copyLabel: s.copied ? 'Script copié ✓' : 'Copier le script Luau',
+      copyLua: () => {
+        const txt = S.toLuau();
+        const done = () => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); };
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => { this.download('ElastiqueAnimations.lua', txt); done(); });
+        else { this.download('ElastiqueAnimations.lua', txt); done(); }
+      },
+      dlLua: () => this.download('ElastiqueAnimations.lua', S.toLuau()),
+      dlRuntime: () => this.download('ElastiqueMembres.client.lua', S.RUNTIME),
+      accessories: S.ACCESSORIES.map(x => ({ name: x.name, att: x.att, state: vis[x.name] ? 'visible' : 'caché', stateColor: vis[x.name] ? '#ffb39b' : '#776d68' }))
+    };
+  }
+}
+</script>
+</body>
+</html>
