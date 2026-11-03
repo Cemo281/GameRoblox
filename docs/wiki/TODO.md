@@ -34,7 +34,7 @@ Décision (03/11) : la séquence complète (dégainage → aura → combat → r
 - [ ] Joueur arrivé en cours de séquence : sabres en main cachés jusqu'au cycle suivant (≤ 11 s), à corriger si gênant
 - [ ] Validation visuelle de la séquence et des VFX par l'utilisateur ✋, puis Ctrl+S dans Studio
 - [x] Wiki (Personnages, journal), CLAUDE.md, selene
-- [ ] Supprimer le dossier du handoff (`Downloads/design_handoff_sabreur_roblox`) ✋ : tout est copié dans `assets/persos/zoro/sabreur/`
+- [x] Dossier du handoff (`Downloads/design_handoff_sabreur_roblox`) supprimé le 03/11 : tout est dans `assets/persos/zoro/sabreur/`
 - [ ] Inventaire Studio : un zoro de test ajouté pendant l'essai (uid 32), à recycler ou à garder
 
 ### Personnage `zoro` v2 (rig `assets/rig/Rig15ik.blend` + catalogue, comme luffy ; fichiers dans `assets/persos/zoro/`)
