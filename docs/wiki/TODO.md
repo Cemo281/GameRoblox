@@ -30,6 +30,16 @@ Suivi des tâches de développement. Les décisions de game design en attente so
 - [ ] Coller `CombatIdle.server.luau` dans un Script du modèle du personnage (manuel, hors Rojo)
 - [ ] Vérifier à l'œil dans l'Animation Editor le sens de l'easing Elastic/Out et les axes de la cape
 
+### Machine de tirage
+- [x] Décisions notées dans le wiki (animation à la machine, pass Tirage rapide / Tirage auto)
+- [x] Prompt Claude Design pour la maquette de la machine et de l'animation (`prompts-blender/Prompt-Claude-Design-Machine-tirage.md` dans les fichiers du projet)
+- [ ] Faire la maquette sur Claude Design et choisir le style de machine (manuel)
+- [ ] Construire la machine dans Studio (à la place du cube `RNG`)
+- [ ] Code : néons couleur de rareté, apparition du personnage + infos (BillboardGui), animation de révélation commune, trajet vers l'emplacement
+- [ ] Code : retirer la carte plein écran, garder un court flash pour Mythique / Secret
+- [ ] Attribut `AnimationRevelation` sur les modèles de personnages (animation unique si présente)
+- [ ] Pass Tirage rapide et Tirage auto (après fixation des prix)
+
 ## À faire
 ### Map (place Studio)
 - [ ] Enregistrer / publier la place Studio (Hub, chemins, murs recentrés : hors git)

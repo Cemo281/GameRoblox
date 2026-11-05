@@ -6,7 +6,11 @@ Décisions à prendre. Une fois tranchée, une question est retirée d'ici et la
 1. **Coût de déblocage** des emplacements 3 à 10.
 2. **Coût du niveau 1** de la machine et chances exactes par niveau.
 3. **Collecteur** : position exacte dans l'enclos.
-4. **Durée de l'animation de tirage.**
+4. **Durées exactes de l'animation de tirage** (proposition : 4 à 5 s, Tirage rapide ≈ 1,5 s), à régler en jeu.
+
+## Machine de tirage
+8. Style de la machine (autel torii, distributeur de cartes, gashapon…) : à choisir après la maquette Claude Design.
+9. Prix en Robux des pass Tirage rapide et Tirage auto.
 
 ## Étoiles
 5. Prix du reroll pour chaque rareté.

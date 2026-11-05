@@ -52,3 +52,5 @@ Une valeur marquée *(proposition)* n'est pas encore validée. Une valeur marqu�
 | 2026-10-24 | Plan du Hub validé : plateau circulaire, piédestal au centre, stands en couronne entre les ponts, classements au bord. |
 | 2026-10-24 | 7 bases (joueurs) par serveur. |
 | 2026-10-24 | Pas d'îles flottantes : carte au sol, bases reliées au Hub par des chemins. |
+| 2026-11-05 | Animation de tirage à la machine (plus de carte plein écran) : néons couleur de rareté, apparition du personnage avec ses infos, animation de révélation propre à chaque personnage (commune en attendant), joueur non bloqué. Durée 4 à 5 s (proposition). |
+| 2026-11-05 | Deux pass payants : Tirage rapide (animation raccourcie, jamais 0 s) et Tirage auto. |
