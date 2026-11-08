@@ -1,0 +1,37 @@
+{
+	"Id": "chopper",
+	"Version": 1,
+	"Date": "2026-11-08",
+	"RigType": "R15",
+	"Corps": {
+		"Bundle": 236495437663475,
+		"Torso": 126592639365761,
+		"LeftArm": 104848556732606,
+		"RightArm": 101906874550405,
+		"LeftLeg": 115231849799853,
+		"RightLeg": 96416776069479,
+		"Head": 132943922022855,
+		"Face": 0
+	},
+	"Couleurs": {
+		"HeadColor": "C8956A",
+		"TorsoColor": "C8956A",
+		"LeftArmColor": "C8956A",
+		"RightArmColor": "C8956A",
+		"LeftLegColor": "C8956A",
+		"RightLegColor": "C8956A"
+	},
+	"Echelles": {
+		"HeightScale": 1,
+		"WidthScale": 1,
+		"DepthScale": 1,
+		"HeadScale": 1,
+		"ProportionScale": 0,
+		"BodyTypeScale": 1
+	},
+	"Accessoires": [
+		{ "AssetId": 77371059799952, "AccessoryType": "Hat", "Order": 1, "Nom": "Chopper (blanksfall) : chapeau + bois + visage" },
+		{ "AssetId": 112130202593473, "AccessoryType": "Back", "Order": 2, "Nom": "Chopper Medical Bag (Project_Aurora)" }
+	],
+	"Studio": "Workspace.Essais_Chopper.chopper, pieds a y = 300 (Essais_Zoro.Fond), x = -20, z = 405, tourne de 180 degres"
+}

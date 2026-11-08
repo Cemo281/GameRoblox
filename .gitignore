@@ -33,4 +33,4 @@ Thumbs.db
 __pycache__/
 
 # Vidéos de référence (œuvre protégée, lourdes) : hors git
-assets/persos/*/elastique/references/*.mp4
+assets/persos/**/references/*.mp4

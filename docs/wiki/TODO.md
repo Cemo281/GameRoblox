@@ -3,6 +3,142 @@
 Suivi des tâches de développement. Les décisions de game design en attente sont dans [Questions ouvertes](Questions-ouvertes.md).
 
 ## En cours
+### Zone joueur « Sanctuaire » (spec « Zone joueur A », 08/11 ; sans la barrière anti-intrus : bases ouvertes à tous)
+- [x] `assets/zone/construire_zone.luau` (relançable, repère du `Centre`) : sol, marches, allée, 10 lanternes, clôture, torii, panneau, 10 socles, collecte, pupitre d'amélioration, 6 bannières ; ancienne base dans `ServerStorage.Sauvegarde_AvantZoneSanctuaire` ; `Centre` recalé sur `Hub.EmplacementsBases.Base1` (ancien CFrame dans son attribut `AncienCFrame`)
+- [x] Autel replacé au bout de l'allée (échelle 1,5 gardée, pivot z -36,55 au lieu de -33,2 de la spec à l'échelle 1) : `construire_autel.luau` suit le repère du `Centre` (attribut `AutelZ`)
+- [x] Serveur : socles (anneau de rareté, lumière, étiquette nom / rareté / gain, socle libre / verrouillé), panneau (nom + niveau), collecte (montant + « Marche pour collecter »)
+- [x] Client `ZoneCollecte` : colonne qui pulse, 3 pièces qui tournent en montant, gerbe de pièces à la collecte (attend les pièces streamées)
+- [x] Pupitre d'amélioration : visuel seulement, « Niv. N → N+1 » / « Bientôt » (coût du niveau 1 à définir dans le wiki)
+- [x] Test en Play : usopp sur le socle 1 tourné vers l'allée, socles 3-10 verrouillés, panneau, collecte, pupitre ; apparition devant les marches ; console sans nouvelle erreur ; selene OK ; wiki et CLAUDE.md
+- [ ] Gerbe et effet de collecte vus en vrai (pas testé : marcher sur la collecte aurait encaissé l'argent de la sauvegarde) ✋
+- [ ] Achat de l'amélioration au pupitre (ProximityPrompt) quand le coût sera décidé
+- [ ] Son de collecte (aucun son choisi : asset à valider) ✋
+- [ ] Validation visuelle par l'utilisateur ✋, puis Ctrl+S dans Studio ✋ (zone dans la place, hors Rojo)
+- [ ] Dupliquer la base sur `Base2..7` du Hub (relancer les deux scripts sur chaque copie)
+### Personnage `chopper` (08/11, skill /perso-catalogue, premier test)
+- [x] Choix de l'utilisateur : chibi petit, short violet + sac de médecin, catalogue d'abord puis pièces Studio
+- [x] Références enregistrées : `assets/references/chopper.png`, `chopper-roblox-blocs.png`, `chopper-roblox-debardeur.png`
+- [x] Recherche dans le catalogue → `assets/persos/chopper/catalogue.md` (bundles de corps, visages, chapeaux, sac)
+- [x] Choix des articles : corps 2Sick (bundle 236495437663475), tête dynamique 132943922022855, chapeau + visage blanksfall 77371059799952, sac Project_Aurora 112130202593473
+- [x] Assemblage dans Studio (`Workspace.Essais_Chopper.chopper`, sur `Essais_Zoro.Fond`), `assets/persos/chopper/tenue.json`, captures de face, 3/4 et dos
+- [x] Chapeau blanksfall gardé (choix de l'utilisateur, 08/11) : visage calme bouche fermée intégré au chapeau, la tête dynamique est cachée dessous
+- [ ] Revoir l'idée des animations de chopper (proposition du 08/11 : Idle sautillements, Action « Rumble Ball », Signature danse de joie, pas validée) ✋
+- [ ] Voir le design proposé pour chopper (corps 2Sick + chapeau blanksfall + sac) ✋
+- [ ] Animations de vitrine, VFX, `ModelesPersonnages.chopper`
+### Autel d'invocation (remplace le cube RNG, spec « Autel - spec Claude Code », 08/11)
+- [x] `assets/autel/construire_autel.luau` (relançable) : estrade, piliers, torii, autel, faisceau, carte géante, 2 lanternes ; niveaux N2-N10 (boules d'or, lanternes suspendues, néons des piliers, lanternes arrière, halo 36 segments, 6 cartes en orbite, aura ForceField 24 panneaux + étincelles + « MAX ») ; 188 objets
+- [x] Construit dans `BaseJoueur` à l'échelle de la spec (16 × 13,4 × 11 studs), arrière de l'estrade à 1 stud du fond de l'ancien cube ; `RNG` gardé invisible au volume de l'autel (tirage inchangé) ; ancien cube dans `ServerStorage.Sauvegarde_AvantAutel`
+- [x] Client `Autel.luau` : niveaux, réglages par niveau, couleur de rareté, rotation / flottement de la carte, halo, orbites (animé à moins de 250 studs)
+- [x] Serveur : `Level` = `NiveauMachine` (min 1) à l'attribution de la base, `Rarete` posé à la révélation du tirage ; texte du prompt « Autel d'invocation »
+- [x] Testé en Play : tirage (Rare → autel bleu), niveaux 1 et 10, orbites, « MAX » ; selene OK
+- [x] Taille ×1,5 (choix de l'utilisateur, 08/11) : constante `ECHELLE` du script, attribut `Echelle` lu par le client ; 24 × 20 × 16,5 studs, entre les cases 9 et 10
+- [x] Autel éteint avant le premier tirage (et quand la base se libère) : néons gris mats #6B7085, lumière, faisceau et étincelles coupés, carte immobile ; s'allume à la couleur de la rareté à la révélation
+- [x] Compte à rebours au-dessus du toit (« RECHARGE n s » / « PRÊT ! », base occupée seulement) : attribut `FinRecharge` (heure serveur) posé par `GachaService` ; panneau provisoire du résultat remonté au-dessus de « MAX »
+- [x] Testé en Play : éteint à l'arrivée, compte à rebours, allumé en Commun après tirage ; capture de l'état éteint
+- [x] Autel enregistré éteint dans la place (il paraissait encore doré en mode édition, où le client ne tourne pas) : le script construit l'état éteint, matière allumée dans l'attribut `MateriauAllume` des pièces taguées ; retesté en Play
+- [ ] Validation visuelle par l'utilisateur ✋ (le Commun gris néon reste assez proche du gris éteint : seuls la lueur, la lumière et la rotation les distinguent)
+- [ ] Ctrl+S dans Studio ✋ (l'autel est dans la place, hors Rojo ; le MCP ne peut pas enregistrer)
+### Tenue d'aventurier sur rig R15 bloc (handoff `design_handoff_tenue_r15`, 05/11)
+- [x] Lecture du README, du HTML (`build()`) et des références `assets/references/usopp*.png` ; écarts listés (référence suivie pour l'apparence)
+- [x] Cages officielles Roblox téléchargées (`tools/cages_roblox/`, dépôt `Roblox/avatar`)
+- [x] `tools/build_outfit_r15.py` : rig R15 bloc (os officiels, relevé `r15_bloc.json`), atlas 16 × 16 (`bretelle` rouille ajoutée), pièces nommées
+- [x] Salopette, chaussures, brassard en layered clothing : poids lissés (taille, hanches, genoux, chevilles, coude), cage interne = gabarit officiel recalé sur les blocs (1 358 sommets, UV `map1` inchangés), cage externe poussée jusqu'à contenir tout le vêtement (test par nombre d'enroulement)
+- [x] Chapeau + lunettes (Hat), cheveux (Hair), sac + bandoulière (**Back** : trop grand pour Front) en accessoires rigides ; positions des Attachments dans `export/offsets.json`
+- [x] Lance-pierre en Tool (`Handle`, `Tool.Grip = CFrame.new(0, -1.3879, 0)`)
+- [x] Contrôles : ≤ 4 000 triangles, maillages fermés, aucune face coplanaire entre éléments, ≤ 4 os par sommet ; chapeau dans la boîte Hat « Classic » (pas « Normal » : seulement pour le Marketplace)
+- [x] Export FBX dans `export/` (+ `chaussure_gauche.fbx` / `chaussure_droite.fbx`) et `export/IMPORT_STUDIO.md` ; FBX réimportés et vérifiés
+- [x] Rendus de contrôle (repos, pose extrême, marche) : bug de skinning corrigé (côtés de la ceinture pesés sur les bras)
+- [ ] Validation visuelle par l'utilisateur ✋ (brassard sur l'avant-bras ou le haut du bras : `BRASSARD_OS`)
+- [x] Import dans Studio (accord de l'utilisateur, 05/11) : 8 FBX à la bonne échelle, `WrapLayer` créés ; mannequin `Workspace.Tenue_Test` (R15 bloc par défaut) équipé ; accessoires et Tool prêts dans `ServerStorage.TenueAventurier`
+- [x] Bug : vêtements déformés en jeu (cage interne recalée sur les blocs ≠ cage réelle du corps) → cages du corps bloc téléchargées (`tools/cages_roblox/corps_bloc/`, 14 pièces, la tête demande une authentification) ; la cage interne reprend la position du sommet de même UV (u, 1 - v) ; directions de poussée de la cage externe prises sur la cage recalée (sommets confondus dans la cage réelle) ; vérifié en capture de face et de dos
+- [x] Test de la marche R15 par défaut (`Animator:StepAnimations` en mode édition) : pantalon et bottes suivent les jambes
+- [ ] Test en Play sur l'avatar du joueur (tenue + Tool en main) ✋
+- [x] Cage externe : pointes plafonnées (`POUSSEE_MAX` = 0,45 stud, au lieu de 0,68)
+- [x] Retouches (05/11) : calotte basse pincée et plongeante devant, cheveux en une masse bouclée (métaboules, 3 170 triangles), lacets fins et noirs
+- [x] Réimport (05/11) de salopette, chaussures, brassard, chapeau, cheveux ; remplacés sur `Tenue_Test` et dans `ServerStorage.TenueAventurier` (imports bruts rangés dans `TenueAventurier.Imports`) ; captures de face et de dos conformes au rendu Blender
+- [ ] Personnage d'animé : risque DMCA avant publication ✋
+### Personnage `usopp` (05/11, rig `Gabarits.MannequinR15` comme zoro + tenue d'aventurier)
+- [x] Modèle Toolbox 8379992491 (IgorFrancisco14, domaine public) inséré dans `ServerStorage.Toolbox_Usopp` : aucun script ; visage `rbxassetid://2924016063` (yeux, sourcils, sourire), nez en maillage `Nose` (5882936139) ; son Shirt 7437390598 dessine aussi bretelles, bandoulière, sac et brassard (doublons de la tenue 3D) → non utilisé
+- [x] Copie de travail `Workspace.Essais_Usopp.usopp` : MannequinR15 cloné, peau #D9A67A, visage et nez du modèle Toolbox (`Acc_Nez` sur FaceFrontAttachment), abdos = Shirt de zoro (catalogue 14603018481), 7 pièces de `TenueAventurier`, `Acc_LancePierre` sur RightGripAttachment (attribut `VisibleParDefaut`) ; aucun envoi à Roblox
+- [x] Abdos du modèle Toolbox « BeachBoy Model 1 » (2479880065, inséré avec l'accord de l'utilisateur, aucun script, supprimé ensuite) : Decal `Abdos` (rbxassetid://284037122) sur la face avant de `UpperTorso`, Shirt de zoro retiré (doubles traits) ; état d'avant dans `ServerStorage.Sauvegarde_UsoppAvantAbdos`
+- [x] Lance-pierre en deux accessoires : `Acc_LancePierre_Dos` (BodyBackAttachment, en diagonale, fourche au-dessus de l'épaule droite, `VisibleParDefaut` = true) et `Acc_LancePierre_Main` (prise juste sous la fourche, y = 1,2 sur le manche ; `VisibleParDefaut` = false, à montrer en combat par marqueurs `Montrer` / `Cacher`)
+- [x] Bouc : `Acc_Bouc` (2 WedgeParts noires, triangle pointe en bas sous la bouche, FaceFrontAttachment)
+- [x] Chapeau refait en bob à bord ondulé, en pièces (aucun envoi) : calotte basse arrondie (cylindres + sphère en SpecialMesh), ruban crème, bord = surface continue de 224 WedgeParts (triangles), inclinaison 24° ± 13° (5 vagues) ; ancien chapeau de `TenueAventurier` dans `ServerStorage.Sauvegarde_UsoppAvantAbdos`
+- [ ] Captures Studio (vue 3D noire au moment du montage) et validation ✋
+- [ ] Animations de vitrine (Idle / Action / Signature, combat : lance-pierre levé, fourche en haut, comme `assets/references/usopp-tenuarme.png`), puis `ReplicatedStorage.ModelesPersonnages.usopp` ✋
+### Séquence de combat de usopp (05/11, d'après `assets/persos/usopp/Animations de combat Usopp/` : scripts R6 de l'utilisateur, réécrits en R15)
+- [x] Relevé du rig dans Studio → `assets/persos/usopp/rig_usopp.json` (tête : taille visible 1,25)
+- [x] `anims_usopp.py` (moteur de luffy : IK, pieds plantés, `finition.py`) : une seule séquence de 540 images (18 s) Grenades (0-165) → Balle-liane (165-318) → Rafale en mouvement (318-540 : debout, plongeon roulé, à genou, salto arrière, tir chargé, range l'arme), 35 marqueurs ; sorties `anims/usopp_Sequence.json` (blocage) et `usopp_Sequence_fini.json` (497 clés, à publier). Génération complète ≈ 10 min
+- [x] Tenue à deux mains comme sur `usopp-tenuarme.png` (`viser` : on place l'arme, fourche près de la joue droite face à la cible, bras droit résolu en position + orientation, main gauche sur le manche) ; la direction des tirs est dans les marqueurs (`Bille "dx,dy,dz"`, `TirCharge`), pas dans la main ; prise de la main droite à y = 1,45 sur `Acc_LancePierre_Main`
+- [x] `outils_studio.py` : `temp <Nom>` écrit `src/shared/TempApercuUsopp.luau` (supprimé après usage), puis dans Studio `require(game.ServerStorage.OutilsUsopp:Clone()).apercu(HttpService:JSONDecode(require(ReplicatedStorage.Shared.TempApercuUsopp:Clone())), 6)` → copies figées dans `Workspace.Apercu_Anim` (en l'air à y ≈ 300, sol gris) ; `sequence <Nom>` = KeyframeSequence (pas encore lancé)
+- [x] Effets `vfx_usopp.luau` lancés sur `Workspace.Essais_Usopp.usopp` (7 effets dans `VFX`, Attachment `PointImpact` du HRP et `PoussierePieds` du LowerTorso, attribut `Tireur` = true, Forge dans `ReplicatedStorage.EffetsForge.usopp`, 120 instances) ; à relancer sur `ModelesPersonnages.usopp` quand il existera
+- [x] Aperçu des 22 images regardé : balle-liane correcte (prise dans le dos, saut, tir en l'air, réception, ordres) ; salto (430-446) lisible ; lancer de grenade (36-41) et mains aux oreilles (114) vérifiés (08/11)
+- [x] Roulade adoucie (08/11) : `roule` à -120° et bassin à 0,6 (avant -150° / 0,2, tête 0,47 stud sous le sol) → l'épaule droite effleure le sol, tête à 1,1 stud ; pose à genou remontée (`RootPos` y -0,9, tibia ne s'enfonce plus) ; régénération en 5 min
+- [x] KeyframeSequence `usopp_Sequence_fini` (496 clés, 35 marqueurs, 18 s) dans `ServerStorage.RBX_ANIMSAVES.usopp_test`, rig de test `Workspace.usopp_test` (copie de `Essais_Usopp.usopp`, zone des rigs d'animation à (10, 300, 411), à côté de `Sabreur_Apercu`) : chargeable dans l'Éditeur d'animation ; modules temporaires supprimés
+- [x] Test en Play (08/11) : clone tagué `PersonnageVitrine` sur l'Emplacement3, séquence par `RegisterKeyframeSequence`, piste de 18 s jouée, `Tireur` crée ses pièces, aucune erreur en console ; portées (cases 8 × 8 à ±26 studs de l'axe) : billes ≤ 30 studs (s'arrêtent dans l'allée, cases d'en face à 52), grenades ≤ 10, liane 6, roulade +2,4 studs dans l'intervalle de 6 entre deux cases → rien ne déborde
+- [x] Jambes visibles à travers le pantalon en pose pliée (réception 233, à genou 386 : cuisses et genoux du corps traversent la salopette layered) → `LeftUpperLeg` / `LeftLowerLeg` / `RightUpperLeg` / `RightLowerLeg` en Transparency 1 (attribut `CacheSousVetement`) sur `Essais_Usopp.usopp` et `usopp_test` ; pantalon propre en 233 et 386 (08/11). À reporter si le modèle est refait depuis `MannequinR15`
+- [x] Revue des effets à l'œil (08/11, reconstruits en mode édition sur `Essais_Usopp.usopp`, particules figées) : explosions plates (feu et fumée émis en sphère depuis un point au sol → moitié dans le sol, feu délavé sur le sol clair) → demi-sphère vers le haut, boule de feu `*Boule` qui s'élève, dégradé de feu saturé, colonne de fumée ; poussières (fouet, bille, atterrissages) trop petites et orangées → plus grosses, couleur sable ; cratères / fissures / blocs Forge corrects ; `vfx_usopp.luau` relancé
+- [ ] **Reprise ici** — vérifier en Play les projectiles en mouvement (liane, billes, tir chargé : pièces locales de `Tireur`, captures en Play noires → avis de l'utilisateur)
+- [x] `ReplicatedStorage.ModelesPersonnages.usopp` créé (copie de `Essais_Usopp.usopp`, 08/11, à la demande de l'utilisateur : usopp posé restait un cube), `vfx_usopp.luau` relancé dessus ; sans `AnimationSequence` publiée, le modèle posé reste figé
+- [x] Publication par l'utilisateur (08/11) : `rbxassetid://113513399062718` dans l'attribut `AnimationSequence` de `ModelesPersonnages.usopp` (et `Essais_Usopp.usopp`) ; test en Play : usopp posé sur l'Emplacement1 = modèle 3D, piste de 18 s jouée
+- [x] Tenue classique du lance-pierre (demande du 08/11 : « une main sur le manche et l'autre qui tire ») : `viser` réécrit (main droite bras tendu sur le manche, main gauche à la joue gauche : devant le visage la main entre dans la tête), salto tête en bas à part, tir chargé tiré à l'oreille ; élastique en Beams locaux dans `Tireur` (bouts de fourche → main gauche, caché 0,07 s après une bille de rafale, 1,5 s après la graine et le tir chargé), bille chargée dans la poche (main gauche)
+  - [x] Séquence régénérée (8 min 55), aperçu vérifié (debout, à genou, tir chargé : bras droit tendu, poing gauche à la joue), KeyframeSequence `usopp_Sequence_fini` remplacée sur `usopp_test` ; test en Play (séquence locale) : élastique tendu aux visées, claque entre les billes, caché après les tirs isolés
+  - [x] Republication par l'utilisateur (08/11) : `rbxassetid://122394379689788` dans `AnimationSequence` (`ModelesPersonnages.usopp`, `Essais_Usopp.usopp`) ; 113513399062718 = ancienne tenue à deux mains
+- [ ] Validation visuelle par l'utilisateur ✋ (projectiles en mouvement compris)
+- [ ] Ménage : `ServerStorage.OutilsUsopp`, `Workspace.Apercu_Anim`, `ServerStorage.Sauvegarde_UsoppAvantAbdos` (quand validé)
+### Refonte de l'interface (handoff `design_handoff_ui_roblox`, 05/11)
+- [x] 1. Tokens de style v2 (palette, polices FredokaOne / Montserrat, boutons 3 tons, bouton icône, fenêtre, onglets, barre, toasts) → `Ui.luau`, config `UiConfig.luau`
+- [x] 2. HUD v3 sans offres (argent + liasse, revenu, à collecter, barre de gauche, Boutique / Réglages « bientôt », raccourcis Hub / Évolutions / Étoiles, réduits à Hub / Ma base à la demande de l'utilisateur le 05/11) ; calé sur `GuiService.TopbarInset` (la barre Roblox recouvrait l'argent)
+- [x] 3. Téléportation : fenêtre, mini-carte du Hub (7 chemins, stands du wiki, ma base à son vrai emplacement), liste des stands, Ma base, barre rapide (interrupteur), effet manga ; `DeplacementService` + remote `Teleporter` (testée : lieux, cadence, ids invalides refusés)
+- [x] 4. Inventaire (filtres, tri, cartes v2, détail avec modèle 3D animé, Poser / Retirer, compteur, pastille « nouveaux ») et Index (collection par lot, barre, chances, meilleur score, lot 2 verrouillé)
+- [x] Téléportation pendant l'écran de transition (retour utilisateur 05/11 : on arrivait après l'effet) : demande envoyée dès que l'écran est couvert, fondu de sortie seulement après réception de la nouvelle position (mesuré : perso déplacé à 0,85 s, écran opaque, fondu à 1,5 s)
+- [x] Bouton carré « Mes stats » à droite de Ma base (05/11) ; icône `stats` dessinée au style du handoff (`assets/gui/icones/sources/stats.svg` → `stats.png`, à envoyer avec les autres ✋) ; le panneau des stats viendra avec l'idée 2b
+- [x] 5. Animation de tirage (rig R6 noir, paliers, ondes, jauge, cases manga, flash, révélation, ruban, étoiles, revenu, « Super ! », « Passer » ; Commun ≈ 6 s, Secret ≈ 11,6 s)
+- [x] Testé en Play (captures) : HUD, inventaire, index, téléportation (Évolutions, Classements, Centre, base), tirages Commun et Mythique ; console sans nouvelle erreur
+- [ ] Validation visuelle par l'utilisateur ✋
+- [x] Icônes converties en PNG 256 × 256 à fond transparent (`assets/gui/icones/`, 19 fichiers, rendu Edge headless des SVG du handoff) et montrées à l'utilisateur (planche)
+- [ ] Envoi des icônes à Roblox ✋ (accord de l'utilisateur) puis IDs dans `UiConfig.Icones` ; en attendant, symboles emoji
+- [x] Champ de recherche de l'inventaire (accord du 05/11) : filtre local par nom, 30 caractères max, jamais envoyé au serveur
+- [ ] Recycler (inventaire) : règles du recyclage à définir dans le wiki
+- [ ] Index : « obtenu » = présent dans l'inventaire ; garder les persos déjà obtenus demande un champ de sauvegarde ✋
+- [x] Décision (05/11) : temps entre deux tirages = durée de l'animation selon la rareté (`GachaConfig.DureeTirage`, appliqué par `GachaService`) ; bouton « Passer » gratuit retiré
+- [ ] Images à produire pour coller à la maquette (trame de points, lueurs radiales, rayons, lignes de vitesse) : remplacées par des cadres en code
+- [ ] 6. Offres et boutique : **à la fin du projet** (décision du 05/11), avec « passer les animations » et « tirage auto » payants ; achats Robux : accord obligatoire, prix à définir
+- [ ] 7. Nouvelles mécaniques 2a–2f ✋ (format de sauvegarde à changer, valeurs à définir dans le wiki)
+### Images d'interface de luffy (04/11, `rendu_studio.py` comme nami : portrait, plein pied, silhouette, grille Idle)
+- [x] Plateau photo en Play (`plateau_studio.luau` : table `CONFIGS` par perso ; luffy : pose 0, Idle 3 s, `Acc_Haki*` cachés)
+- [x] Captures (38, **une à la fois** : en parallèle, les caméras se mélangent), détourage, images dans `assets/gui/luffy/`, vérifiées (portrait, plein pied, silhouette, grille)
+- [x] Accord de l'utilisateur avant l'envoi (gilet ouvert, abdos dessinés visibles : « envoyer tel quel », 04/11)
+- [x] Envoi : portrait 101428508083176, pied 74465039531995, silhouette 131257289640939, grille 124882063717952 → `infos.json`, `ImagesPersonnages.luau` ; test en Play : 4 images chargées (Success), cartes luffy de l'inventaire avec cadre Mythique et portrait
+- [ ] Surveiller la modération des 4 images (si une est refusée : refaire le rendu sans `Shirt_Abdos`) ✋
+- [ ] `luffy_gear2` (Secret) : pas de modèle, garde le bloc coloré « L »
+### Images d'interface de usopp (08/11, `rendu_studio.py` comme luffy et zoro)
+- [x] Idle d'interface de 4 s (usopp n'avait que la séquence de combat) : `anims_usopp.py idle` → `anims/usopp_IdleGui_fini.json` (poings sur les hanches, respire, regarde à gauche puis à droite) ; KeyframeSequence dans `RBX_ANIMSAVES.usopp_test` et copie `Workspace.Essais_Usopp.usopp_IdleGui`, **non publiée** (jouée en local par `RegisterKeyframeSequence`)
+- [x] `plateau_studio.luau` : options `source` (modèle hors de `ModelesPersonnages`) et `idleLocale` ; attente de la longueur de la piste (Idle locale chargée une image plus tard) ; usopp : `Acc_LancePierre_Main` caché
+- [x] 38 captures, images dans `assets/gui/usopp/` vérifiées (portrait : haut de la fourche du lance-pierre coupé, chapeau entier)
+- [x] Envoyées telles quelles (torse nu, abdos dessinés : « envoyer tel quel », 08/11) : portrait 131621362760145, pied 133262628291191, silhouette 128942612022486, grille 105982684554992 → `infos.json`, `ImagesPersonnages.luau` ; test en Play : 4 images chargées (Success)
+- [ ] Surveiller la modération des 4 images ✋ (en cas de refus : rendu sans dessin d'abdos)
+- [ ] Si l'Idle d'interface plaît : la publier ✋ et la mettre en `AnimationIdle` de `ModelesPersonnages.usopp`
+### Images d'interface du nouveau zoro (04/11, remplacent celles de l'ancien zoro rendues dans Blender)
+- [x] `plateau_studio.luau` : option `poseFixe` (Transform des Motor6D d'un `<Id>_PoseGUI.json`, sans Animator) ; zoro : `zoro_PoseGUI.json` (main droite sur les poignées, choix de l'utilisateur ; tombe bien sur les nouveaux sabres), grille sur l'Idle 136440538552091 (4 s, commence et finit bras le long du corps)
+- [x] 38 captures, images dans `assets/gui/zoro/` vérifiées
+- [x] Envoyées telles quelles (torse nu, abdos, veines, cicatrice : risque signalé, « tel quel » choisi par l'utilisateur) : portrait 105241865396938, pied 117974979456961, silhouette 119444152343751, grille 136335869201198 → `infos.json`, `ImagesPersonnages.luau` ; test en Play : 4 images chargées, cartes de l'inventaire à jour
+- [ ] Surveiller la modération des 4 images ✋ (en cas de refus : rendu sans `Shirt` ni `Cicatrice`)
+### Effets VFX Forge sur la vitrine de nami (04/11, même principe que luffy)
+- [x] `EffetsForge` : attribut `Point` d'un groupe (attachment ou pièce nommée du modèle : point d'impact de l'éclair, bourse), ancre `Point`
+- [x] `vfx_forge_nami.luau` (relançable) : impact brûlé de l'éclair (fond noirci, rochers, fissures, débris, flash, anneau électrique), 3 petits impacts des rafales, pluie de pièces d'or de la Signature (effet `Pieces` qui manquait : le marqueur `VFX Pieces` ne déclenchait rien), pièces qui sautent de la bourse dans l'Idle
+- [x] Corrigé en test (vaut aussi pour luffy) : pièces d'or à 28 studs de haut / 114 de distance → (1) `AngularMagnitude` = impulsion × masse, énorme sur une petite pièce (1 900 rad/s, transformés en saut au sol) : valeurs réduites selon la taille ; (2) membres animés de la vitrine qui frappaient les débris → pièces des vitrines dans le groupe `ForgeDebris` sur le client (les débris les traversent, pas les joueurs) ; (3) `Airtime` : la parabole monte de ≈ 196 × t² / 8 ; maillages à délai visibles au centre avant leur départ → modèles Start/End transparents
+- [x] Test en Play (copie temporaire de nami sur l'emplacement 3, côté serveur) : éclair, rafales, pluie de pièces (17), pièces de la bourse (4) ; pièces d'or ≤ 12 studs (lancées au-dessus de la tête), débris de l'éclair ≤ 5 studs ; vue reconstruite en mode édition (impact, pluie de pièces) ; console sans nouvelle erreur, rien de temporaire laissé
+- [ ] Validation par l'utilisateur ✋ (en mouvement)
+- [ ] Une nami 1 étoile (uid 33) a été ajoutée à l'inventaire de cemobozo par `TestDonnerPersonnage` pendant le test (sauvegardé) : la garder ou la retirer à la main ✋
+### Effets VFX Forge sur la vitrine de luffy (04/11, EmitModule de VFX Forge 1.4.5, sans toucher aux marqueurs publiés)
+- [x] Serveur : `EmitModule.init()` (groupes de collision des débris), facultatif si le module manque
+- [x] Client `EffetsForge.luau` : `init` de `shared.vfx`, modèle Forge d'un effet cloné, placé (sol sous le perso / membre qui frappe) puis `emit` ; appelé par `Vitrine`
+- [x] `vfx_forge_luffy.luau` (relançable) : sol qui s'enfonce aux pieds pendant les pompes du Gear 2 (bord de cratère, fond qui s'assombrit, fissures, gravillons), gros cratère à l'explosion de vapeur, ondes d'air du pied et du poing aérien, sol fendu vers le poing, gravillons à l'atterrissage
+- [x] Corrigé en test : modèles d'abord rangés dans le Model de luffy → boîte englobante faussée, luffy posé 7 studs trop haut → déplacés dans `ReplicatedStorage.EffetsForge.luffy` (ObjectValue `Forge` dans l'effet) ; l'Attachment `Shockwave` doit être un **ancêtre** du dossier Rings/Lines/Debris ; rayons qui touchaient les rochers des pompes → tag local `ForgeIgnore` ; débris qui prenaient la couleur de l'herbe de l'île → couleur du sol (`TeinteSol`) ; débris projetés à 30 studs → `LinearMagnitude` = distance
+- [x] Test en Play (luffy posé) : pieds au sol, cratère 15 → 147 pièces pendant les pompes, 236 à l'explosion, tout disparaît à 9,6 s ; vérifié visuellement (scène reconstruite en mode édition : les captures en Play sont noires), console sans nouvelle erreur, rien de temporaire laissé
+- [ ] Validation par l'utilisateur ✋ (rendu en mouvement, taille du cratère, nombre de pièces)
+- [ ] Ctrl+S dans Studio ✋ (`EffetsForge`, `EmitModule` et les liens `Forge` sont dans la place)
 ### Séquence « combattant élastique » sur la vitrine de luffy (handoff `design_handoff_combattant_elastique`, sources dans `assets/persos/luffy/elastique/`)
 Même principe que zoro : `Elastique_Sequence_Complete` (Gear 2 → Combo, 7,4 s) en `AnimationSequence`, VFX sans hitbox.
 - [x] Copier les sources du handoff dans `assets/persos/luffy/elastique/` (vidéo de référence `references/*.mp4` hors git : œuvre protégée, 15 Mo)
@@ -27,10 +163,17 @@ Même principe que zoro : `Elastique_Sequence_Complete` (Gear 2 → Combo, 7,4 s
   - [x] `Vitrine` : `Montee` (débit qui monte en puissance), `TraineeMembre` (bras / jambe fantôme lumineux à chaque coup) ; secousse de caméra corrigée (s'additionnait : la caméra dérivait après un gros impact, zoro compris)
   - [x] `vfx_elastique.luau` v2 : vapeur épaisse et lente (Montee 1,2 s) + nappe au sol, pompes sèches (jets des jambes), explosion de vapeur énorme + nuage qui traîne, rafale (fantôme, éclat, traits de vitesse, traînées des poings), pied lourd, recharge (feu qui grossit, lignes qui convergent, anneaux qui implosent), poing aérien (traits le long du bras, boule de feu, double onde, fumée), hit-stop 0,12 au poing aérien
   - [x] Vérifié en Play (clip temporaire), aucune erreur
-- [ ] **Prochaine session (demandé le 04/11)** :
-  - [ ] Bras étiré : garder la même épaisseur sur toute la longueur (aujourd'hui le Beam `Elastique_<articulation>` fait 0,8 × la plus petite dimension du membre, et la peau déformable du coude s'affine : à égaliser avec le bras)
-  - [ ] VFX avec beaucoup plus d'impact + effet **haki des rois** comme sur zoro (éclairs noirs et rouges autour du corps et des poings, ondes de choc) pour ressentir la puissance de luffy
-- [ ] Publication par l'utilisateur ✋ (Éditeur d'animation › `Elastique_Apercu` › Charger `Elastique_Sequence_Complete` › Publier) puis ID sur `ModelesPersonnages.luffy.AnimationSequence`
+- [x] **Session du 04/11 (suite)** :
+  - [x] Bras étiré d'épaisseur constante : 4 Beam en boîte par articulation (`Elastique_<articulation>_<face>`, `FaceCamera = false`, 1,02 × la largeur du segment, recouvre la peau du coude qui s'affine) ; non éclairés, couleur compensée (mesurée sur capture : ×0,88 / 0,874 / 0,996) et ombre par face (1 / 0,9 / 0,95 / 0,86) ; `Elastique.luau` ne suit plus que la couleur. Vérifié en Play sur le poing aérien : bras d'un seul tenant, même teinte que le bras
+  - [x] Haki des rois (`vfx_elastique.luau`) : éclairs noirs et rouges (texture de nami teintée), ondes sombres ; nouvel effet `Haki_Aura` (marqueurs `VFX Haki_Aura` à l'explosion du Gear 2, `VFX Haki_Aura_Fin` à la fin du feu, ajoutés dans `elastique.js`, séquences régénérées : 32 marqueurs) qui crépite autour du torse et des poings ; éclairs sur chaque coup, flammes sombres et éclairs pendant la recharge, gerbes d'éclairs et ondes sur l'explosion de vapeur et le poing aérien
+  - [x] Plus d'impact : secousses 0,8 → 1,2 (explosion), 0,2 → 0,3 (rafale), 0,65 → 0,9 (pied), 1,4 → 2 (poing aérien) ; hit-stop pied 0,09 → 0,11, poing aérien 0,12 → 0,16 ; `Vitrine` : attribut `TeinteEcran` (écran assombri et rougi 0,5 s, joueurs proches) sur les deux explosions
+  - [x] Vérifié en Play (clip temporaire, particules figées) : explosion du Gear 2, aura sur le poing, poing aérien ; ondes du poing aérien réduites (36 → 18 studs, plus transparentes : elles couvraient l'écran)
+  - [ ] Validation par l'utilisateur ✋ (rendu en mouvement, intensité des éclairs, teinte d'écran)
+  - [x] Garde de combat du Gear 2 d'après un dessin fourni (`G2_GARDE` dans `elastique.js`) : de profil, bras gauche tendu main ouverte, bras droit en L poing levé derrière la tête, jambes très écartées ; orientée 3/4 vers l'allée (choix de l'utilisateur) ; Gear 2 3,6 → 4,1 s (garde tenue 0,5 s avec respiration), le Combo part de cette garde ; séquence complète 7,9 s, `Aura_Vapeur` 7,7 s. Poses réglées sur `Elastique_Apercu` en Play (Transform côté client), séquence régénérée dans Studio
+  - [x] Retours utilisateur (04/11) : orientation 3/4 refusée → garde remise de profil (bassin -40°) ; ondes au sol de la transformation décentrées → l'onde au sol du poing aérien était dans un effet `AuMembre`, qui déplaçait le point « sol » jusqu'au poing (retirée ; vérifié en Play : sol sous luffy tout le cycle) ; fin du Combo : saut arrière → garde Gear 2 tenue → retour à la normale à 4,6 s (marqueurs `Aura Normal` : peau normale, `VFX Aura_Vapeur_Fin` : vapeur coupée, effet `Aura_Normal` : dernière bouffée) → souffle (`G2_SOUFFLE`) → garde normale ; Combo 3,8 → 5,6 s, séquence 9,7 s ; vapeur allégée (débits /2, plus transparente, explosion et pompes réduites)
+  - [ ] Validation de la garde, de la fin et de la quantité de vapeur par l'utilisateur ✋
+- [x] Publiée par l'utilisateur (04/11) : rbxassetid://73031668950675 → `ModelesPersonnages.luffy.AnimationSequence` ; 9,7 s, 51 clés, 34 marqueurs intacts ; testée en Play (séquence jouée, peau rose puis normale à la fin). Dossier `RBX_ANIMSAVES.Elastique_Apercu` vide en double supprimé avant la publication
+- [ ] Ctrl+S dans Studio ✋
 - [ ] Chapeau : `CheveuxChapeau` = cheveux + chapeau d'une seule pièce → bascule tête/dos ignorée (à décider ✋)
 - [ ] Validation visuelle par l'utilisateur ✋, Ctrl+S
 - [x] Wiki, CLAUDE.md, selene
@@ -105,7 +248,7 @@ Décision (03/11) : la séquence complète (dégainage → aura → combat → r
   - [ ] Validation de la cicatrice par l'utilisateur ✋ puis Ctrl+S dans Studio
   - [ ] Vérifier en Play que la cicatrice suit les animations (Weld sur UpperTorso)
 - [x] Calibration du Shirt sur le corps « Blocky » (gabarit à bandes numérotées) : chaque face de bras 64 × 128 couvre tout le bras (haut 0-59 px, avant-bras 59-113, main 113-128), faces standard
-- [x] Bras et dos musclés style manga : `bras_zoro.py` → `shirt_zoro_v2.png` (deltoïdes, biceps, triceps, avant-bras, veines, trapèzes, omoplates, dorsaux, dentelés ; devant du torse transparent sous `TorseZoro`) ; 1er essai vu sur le clone `Calib_Bras` (rbxassetid://130523563613580, avec jointures des mains, retirées depuis)
+- [x] Bras et dos musclés style manga : `bras_zoro.py` → `shirt_zoro_v2.png` (deltoïdes, biceps, triceps, avant-bras, veines, trapèzes, omoplates, dorsaux, dentelés ; devant du torse transparent sous `TorseZoro`) ; 1er essai vu sur le clone `Calib_Bras` (rbxassetid://130523563613580, avec jointures des mains, retirées depuis ; image « not approved », clone supprimé le 08/11)
 - [ ] Studio fermé pendant les essais : vérifier que `TorseZoro` est toujours sur `ModelesPersonnages.zoro` / `Zoro_v2`, renvoyer `shirt_zoro_v2.png`, le poser en Shirt sur les deux, vérifier dos et profil, supprimer `Essais_Zoro.Calib_Bras`, Ctrl+S
 - [ ] Validation du mouvement par l'utilisateur ✋ (sabres en main = anciens modèles, à harmoniser avec les gardes dorées si besoin)
 - [ ] 4. Éléments faits main (à décider après l'assemblage : sabres séparés pour l'Action, etc.)
@@ -466,6 +609,7 @@ Refonte de l'ancien modèle R6 (section plus bas). Premier perso construit sur l
 - [ ] Vérifier à l'œil dans l'Animation Editor le sens de l'easing Elastic/Out et les axes de la cape
 
 ## À faire
+- [ ] Revoir le design de la zone joueur (`BaseJoueur` : enclos, allée, autel, emplacements, collecteur) ✋
 ### Finition des animations (fluidité, impact) — pilote : luffy
 - [x] Diagnostic : pourquoi les animations actuelles paraissent simples (clés communes à tout le corps, 2 easings, poses figées)
 - [x] Module partagé `assets/persos/_anim/finition.py` : cuisson à 30 i/s, easings d'impact, ressorts par articulation (décalage et dépassement), respiration, secousse d'impact, raccords exacts
