@@ -95,6 +95,12 @@
   const KNEEL_UP  = P(KNEEL,    {root:[0,-1.22,0, 0,0,0], waist:[-28,0,0], neck:[32,0,0]});
   const KNEEL_UP2 = P(KNEEL_UP, {root:[0,-1.25,0, 0,0,0], waist:[-30,0,0], neck:[28,0,0]});
   const G2_RISE = P(G2_BURST, {neck:[30,0,0], waist:[8,0,0]});
+  // Garde de combat du Gear 2 (demande du 04/11, dessin de référence) : de profil (bassin à -40°, buste à -70° : bras gauche
+  // tendu vers l'avant, orientation validée par l'utilisateur, le 3/4 a été refusé) main ouverte, bras droit en L derrière la tête poing levé, jambes très écartées.
+  const G2_GARDE = P(GUARD, {root:[0,-0.8,0, 0,-40,0], waist:[-12,-30,8], neck:[-2,55,-6], ls:[12,0,-92], le:[0,0,0], lw:[0,0,-80], rs:[90,0,112], re:[95,0,0], rw:[-10,0,0], lhip:[60,0,-28], lk:[-70,0,0], la:[10,0,0], rhip:[-40,0,22], rk:[-8,0,0], ra:[35,0,0]});
+  // Retour à la normale en fin de Combo : souffle qui retombe (épaules basses, tête baissée), puis garde normale
+  const G2_SOUFFLE = P(GUARD, {root:[0,-0.45,0, 0,-25,0], waist:[-20,5,0], neck:[-25,0,0], rs:[20,0,15], re:[40,0,0], rw:[0,0,0], ls:[20,0,-15], le:[40,0,0], lw:[0,0,0], rhip:[20,0,10], rk:[-30,0,0], ra:[10,0,0], lhip:[10,0,-10], lk:[-25,0,0], la:[12,0,0]});
+  const G2_GARDE2 = P(G2_GARDE, {root:[0,-0.88,0, 0,-40,0], waist:[-14,-31,8], rs:[90,0,116], ls:[12,0,-90]}); // respiration
 
   const KICK_WIND = P(GSET, {root:[0,-0.45,0.1, 10,-20,0], waist:[8,10,0], neck:[-14,0,0], rs:[60,0,35], re:[110,0,0], ls:[70,0,-30], le:[115,0,0], rhip:[110,0,8], rk:[-130,0,0], ra:[20,0,0], lhip:[-5,0,-10], lk:[-25,0,0], la:[15,0,0]});
   const KICK = P(KICK_WIND, {root:[0,-0.4,0, 18,-20,0], waist:[14,10,0], neck:[-20,0,0], rhip:[95,0,4], rk:S([0,0,0],2.5), ra:S([-30,0,0],2.2), lhip:[-15,0,-10], lk:[-15,0,0]});
@@ -112,18 +118,21 @@
   const ANIMS = [
     {id:'Elastique_Idle_Rebond', label:'Idle — Rebond', loop:true, priority:'Idle', dur:1.4,
       keys:[K(0,GUARD,'Cubic','Out'), K(0.35,HOP_R,'Cubic','In'), K(0.7,GUARD,'Cubic','Out'), K(1.05,HOP_L,'Cubic','In'), K(1.4,GUARD)], markers:HAT_HEAD.slice()},
-    {id:'Elastique_Gear2', label:'Transformation — Gear 2', priority:'Action', dur:3.6,
+    {id:'Elastique_Gear2', label:'Transformation — Gear 2', priority:'Action', dur:4.1,
       keys:[K(0,GUARD,'Cubic','InOut'), K(0.3,KNEEL,'Cubic','Out'), K(0.45,KNEEL_B,'Cubic','InOut'), K(0.6,KNEEL,'Cubic','InOut'), K(0.75,KNEEL_B,'Cubic','InOut'),
         K(0.9,KNEEL_H,'Cubic','InOut'), K(1.4,KNEEL_H2,'Cubic','InOut'), K(1.9,KNEEL_H,'Cubic','InOut'), K(2.2,KNEEL_H2,'Cubic','In'),
-        K(2.32,KNEEL_UP,'Cubic','Out'), K(2.7,KNEEL_UP2,'Cubic','InOut'), K(3.15,KNEEL_UP,'Cubic','InOut'), K(3.6,GUARD)],
-      markers:HAT_HEAD.concat([[0.3,'Cacher','ChapeauTete'],[0.3,'Montrer','ChapeauDos'],[0.3,'Gonfler','Debut'],[0.45,'Pompe','1'],[0.75,'Pompe','2'],[0.9,'Aura','Vapeur'],[1.4,'Pompe','3'],[1.9,'Pompe','4'],[2.32,'Explosion','Vapeur']])},
-    {id:'Elastique_Combo', label:'Combo — Rafale, pied, poing aérien', priority:'Action', dur:3.8,
-      keys:[K(0,GUARD,'Cubic','Out'), K(0.12,G_ANT,'Cubic','In'), K(0.2,GSET,'Cubic','Out')]
+        K(2.32,KNEEL_UP,'Cubic','Out'), K(2.7,KNEEL_UP2,'Cubic','InOut'), K(3.15,KNEEL_UP,'Cubic','InOut'), K(3.6,G2_GARDE,'Cubic','InOut'), K(3.85,G2_GARDE2,'Cubic','InOut'), K(4.1,G2_GARDE)],
+      markers:HAT_HEAD.concat([[0.3,'Cacher','ChapeauTete'],[0.3,'Montrer','ChapeauDos'],[0.3,'Gonfler','Debut'],[0.45,'Pompe','1'],[0.75,'Pompe','2'],[0.9,'Aura','Vapeur'],[1.4,'Pompe','3'],[1.9,'Pompe','4'],[2.32,'Explosion','Vapeur'],[2.32,'VFX','Haki_Aura']])},
+    {id:'Elastique_Combo', label:'Combo — Rafale, pied, poing aérien', priority:'Action', dur:5.6,
+      keys:[K(0,G2_GARDE,'Cubic','Out'), K(0.12,G_ANT,'Cubic','In'), K(0.2,GSET,'Cubic','Out')]
         .concat(Array.from({length:nHits}, (_, i) => K(hitT(i), gat(i), i === nHits - 1 ? 'Cubic' : 'Linear')),
           [K(1.12,KICK_WIND,'Cubic','Out'), K(1.2,KICK,'Cubic','Out'), K(1.3,KICK_OVER,'Cubic','InOut'), K(1.38,KICK,'Cubic','InOut'),
            K(1.52,JCROUCH,'Cubic','Out'), K(1.72,AIR_RISE,'Cubic','Out'), K(1.95,AIR_CHARGE,'Cubic','InOut'), K(2.35,AIR_CHARGE2,'Cubic','InOut'), K(2.65,AIR_CHARGE3,'Cubic','Out'),
-           K(2.75,AIR_PUNCH,'Cubic','Out'), K(2.9,AIR_OVER,'Cubic','InOut'), K(3.02,AIR_RETR,'Cubic','In'), K(3.28,LANDING,'Cubic','Out')], recover(3.5,-1.5)),
-      markers:[[0.2,'VFX','Rafale_Trainees']].concat(Array.from({length:nHits}, (_, i) => [hitT(i), 'Impact', 'Rafale'])).concat([[1.2,'Impact','Pied'],[1.6,'Feu','Debut'],[2.75,'Impact','AirPoing'],[2.75,'Explosion','AirPoing'],[3.0,'Feu','Fin'],[3.28,'Esquive','Atterrissage']])},
+           K(2.75,AIR_PUNCH,'Cubic','Out'), K(2.9,AIR_OVER,'Cubic','InOut'), K(3.02,AIR_RETR,'Cubic','In'), K(3.28,LANDING,'Cubic','Out'),
+           // fin : saut arrière, garde du Gear 2 tenue, puis retour à la normale (vapeur coupée, peau normale) à 4,6 s
+           K(3.5,hopBack(-0.75),'Cubic','In'), K(3.63,SETTLE,'Cubic','Out'), K(3.85,G2_GARDE,'Cubic','InOut'), K(4.2,G2_GARDE2,'Cubic','InOut'), K(4.6,G2_GARDE,'Cubic','InOut'),
+           K(5.0,G2_SOUFFLE,'Cubic','InOut'), K(5.6,GUARD)]),
+      markers:[[0.2,'VFX','Rafale_Trainees']].concat(Array.from({length:nHits}, (_, i) => [hitT(i), 'Impact', 'Rafale'])).concat([[1.2,'Impact','Pied'],[1.6,'Feu','Debut'],[2.75,'Impact','AirPoing'],[2.75,'Explosion','AirPoing'],[3.0,'Feu','Fin'],[3.0,'VFX','Haki_Aura_Fin'],[3.28,'Esquive','Atterrissage'],[4.6,'Aura','Normal'],[4.6,'VFX','Aura_Vapeur_Fin']])},
     {id:'Elastique_Poing', label:'Poing élastique — Charge', priority:'Action', dur:1.5,
       keys:[K(0,GUARD,'Cubic','Out'), K(0.1,ANT_P,'Cubic','In'), K(0.2,RUN(-0.4,-0.15,'r'),'Linear'), K(0.36,RUN(-1.3,0.1,'l'),'Linear'), K(0.52,COCK,'Cubic','InOut'),
         K(0.64,LEAP,'Cubic','In'), K(0.71,DASH_HIT,'Cubic','Out'), K(0.82,DASH_OVER,'Cubic','InOut'), K(0.9,DASH_HIT,'Cubic','InOut'), K(1.06,RETR_P,'Cubic','Out')].concat(recover(1.2,-3.4)),

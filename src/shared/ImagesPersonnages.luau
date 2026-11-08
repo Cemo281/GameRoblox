@@ -26,10 +26,22 @@ local parPerso: { [string]: ImagesPerso } = {
 		Idle = { Image = "rbxassetid://122462618381607", Colonnes = 4, Lignes = 4, TailleCase = 256, Fps = 16 / 3 },
 	},
 	zoro = {
-		Portrait = "rbxassetid://140034364207144",
-		Pied = "rbxassetid://80949230946055",
-		Silhouette = "rbxassetid://112226033450017",
-		Idle = { Image = "rbxassetid://83426259296376", Colonnes = 4, Lignes = 4, TailleCase = 256, Fps = 16 / 4 },
+		Portrait = "rbxassetid://105241865396938",
+		Pied = "rbxassetid://117974979456961",
+		Silhouette = "rbxassetid://119444152343751",
+		Idle = { Image = "rbxassetid://136335869201198", Colonnes = 4, Lignes = 4, TailleCase = 256, Fps = 16 / 4 },
+	},
+	luffy = {
+		Portrait = "rbxassetid://101428508083176",
+		Pied = "rbxassetid://74465039531995",
+		Silhouette = "rbxassetid://131257289640939",
+		Idle = { Image = "rbxassetid://124882063717952", Colonnes = 4, Lignes = 4, TailleCase = 256, Fps = 16 / 3 },
+	},
+	usopp = {
+		Portrait = "rbxassetid://131621362760145",
+		Pied = "rbxassetid://133262628291191",
+		Silhouette = "rbxassetid://128942612022486",
+		Idle = { Image = "rbxassetid://105982684554992", Colonnes = 4, Lignes = 4, TailleCase = 256, Fps = 16 / 4 },
 	},
 }
 

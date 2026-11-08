@@ -3,7 +3,7 @@
 ## Vue d'ensemble
 Un personnage au corps en caoutchouc pour un jeu Roblox, avec un kit d'animations R15 :
 - **Idle — Rebond** (boucle 1,4 s)
-- **Transformation — Gear 2** (3,6 s) : pose accroupie tête baissée et poing au sol, pompes, explosion de vapeur, garde voûtée.
+- **Transformation — Gear 2** (4,1 s) : pose accroupie tête baissée et poing au sol, pompes, explosion de vapeur, garde de combat de profil (`G2_GARDE`, tenue 0,5 s).
 - **Combo** (3,8 s) : rafale de 12 coups, coup de pied étiré, saut, longue charge en l'air poing en feu, poing aérien étiré, atterrissage.
 - **Séquence complète** : Gear 2 suivi du Combo (pour preview / cinématique).
 
@@ -58,14 +58,14 @@ Les animations déplacent le `LowerTorso` mais **pas** le `HumanoidRootPart`. Da
 - 1,52 s : accroupi, puis saut
 - 1,95 → 2,65 s : **suspension en l'air** pendant la charge, poing en feu près de la tête, coude plié, sans étirement (l'allongement ne se fait qu'au lancer, 2,65 → 2,75 s)
 - 2,75 s : poing aérien étiré de 5,6 studs, impact + explosion
-- 3,28 s : atterrissage ; 3,5 → 3,8 s : saut arrière et retour en garde
+- 3,28 s : atterrissage ; 3,5 → 3,85 s : saut arrière et retour dans la garde du Gear 2, tenue jusqu'à 4,6 s ; 4,6 s : retour à la normale (marqueurs `Aura Normal` et `VFX Aura_Vapeur_Fin`), souffle (`G2_SOUFFLE`, 5,0 s) puis garde normale à 5,6 s
 
 ## Moments clés (Gear 2)
 - 0,30 s : pose mythique (accroupi, tête baissée, poing droit au sol, avant-bras gauche sur le genou), gonflement
 - 0,45 / 0,75 / 1,40 / 1,90 s : pompes ; vapeur à partir de 0,90 s
 - 2,32 s : il reste accroupi, le poing au sol, et relève seulement la tête pendant que la vapeur explose
 - 2,32 → 3,15 s : il tient la pose, tête levée
-- 3,15 → 3,6 s : il se relève en garde
+- 3,15 → 3,6 s : il se relève dans la garde de combat du Gear 2 (`G2_GARDE`, 04/11) : de profil, bras gauche tendu vers l'avant, main ouverte ; bras droit en L derrière la tête, poing levé ; jambes très écartées, genou avant plié. Tenue jusqu'à 4,1 s avec une respiration (`G2_GARDE2`), puis le Combo part de cette garde
 
 ## Tâches suggérées pour Claude Code
 1. Importer les animations : lancer `roblox/ElastiqueAnimations.lua` dans la barre de commande avec le rig sélectionné, publier, puis récupérer les IDs. (Option : convertir `elastique.js` en ModuleScript Luau pour générer les KeyframeSequence via Rojo.)

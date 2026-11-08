@@ -1,0 +1,76 @@
+{
+	"id": "luffy",
+	"source": "Studio : ReplicatedStorage.ModelesPersonnages.luffy (rendu_studio.py)",
+	"animation": "rbxassetid://81344275960196",
+	"images": {
+		"portrait.png": {
+			"taille": [
+				512,
+				512
+			],
+			"pose": 0,
+			"temps": 0
+		},
+		"pied.png": {
+			"taille": [
+				1024,
+				1024
+			],
+			"pose": 0,
+			"temps": 0
+		},
+		"silhouette.png": {
+			"taille": [
+				512,
+				512
+			],
+			"cadrage": "portrait"
+		},
+		"idle_sheet.png": {
+			"taille": [
+				1024,
+				1024
+			],
+			"grille": [
+				4,
+				4
+			],
+			"taille_case": [
+				256,
+				256
+			],
+			"ordre": "ligne par ligne, de gauche a droite puis de haut en bas (case k : ligne k // 4, colonne k % 4)",
+			"images_animation": [
+				0,
+				5.625,
+				11.25,
+				16.875,
+				22.5,
+				28.125,
+				33.75,
+				39.375,
+				45,
+				50.625,
+				56.25,
+				61.875,
+				67.5,
+				73.125,
+				78.75,
+				84.375
+			]
+		}
+	},
+	"boucle": {
+		"duree": 3,
+		"images": 90,
+		"fps_source": 30,
+		"raccord_fin_debut": 0.0
+	},
+	"fps_conseille": 5.3333,
+	"ids_roblox": {
+		"portrait.png": 101428508083176,
+		"pied.png": 74465039531995,
+		"silhouette.png": 131257289640939,
+		"idle_sheet.png": 124882063717952
+	}
+}

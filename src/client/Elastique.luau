@@ -1,12 +1,12 @@
 --!strict
 -- Elastique : corps en caoutchouc des personnages tagués par l'attribut `Elastique` (luffy, séquence Gear 2 → Combo).
--- Les membres étirés sont reliés par des Beam rangés dans le modèle (« Elastique_<articulation> », créés par
+-- Les membres étirés sont reliés par 4 Beam en boîte rangés dans le modèle (« Elastique_<articulation>_<face> », créés par
 -- assets/persos/luffy/elastique/vfx_elastique.luau) : Roblox les dessine entre les deux points d'articulation à chaque
 -- rendu, en jeu comme dans l'Éditeur d'animation, sans retard (les anciens tubes recalculés par script décrochaient).
 -- Appelé par Vitrine pour chaque personnage posé qui a cet attribut :
---   - Beam : couleur et largeur suivent le membre (peau rose du Gear 2) ;
+--   - Beam : leur couleur suit celle du membre (peau rose du Gear 2), avec l'ombre de leur face (attribut `Ombre`) ;
 --   - marqueur Pompe : bulles qui gonflent aux chevilles et remontent dans le corps (plus de gonflement des membres :
---     les bras dépassaient du t-shirt) ; Aura Vapeur : peau rose du Gear 2 ;
+--     les bras dépassaient du t-shirt) ; Aura Vapeur : peau rose du Gear 2, Aura Normal : retour à la peau normale ;
 --   - Reinitialiser au début de chaque cycle de vitrine (couleurs d'origine, bulles retirées).
 
 local RunService = game:GetService("RunService")
@@ -41,11 +41,11 @@ local BULLE_MONTEE = 0.38 -- s : puis remonte jusqu'au torse
 local BULLES_PAR_JAMBE = 2
 local BULLE_DECALAGE = 0.07 -- s entre deux bulles d'une même jambe
 local PEAU_GEAR2 = Color3.fromRGB(242, 133, 138) -- #f2858a
-local LARGEUR = 0.8 -- largeur du Beam / plus petite dimension du membre
-local ASSOMBRIR = 0.25 -- Beam non éclairé : assombri pour ressembler au membre ombré (même valeur que vfx_elastique.luau)
-local DISTANCE_MAJ = 160 -- studs : au-delà, couleur et largeur des Beam ne sont plus suivies
+-- Beam non éclairé → même rendu que la pièce éclairée (mesuré ; même valeur que vfx_elastique.luau)
+local COMPENSATION = Color3.new(0.88, 0.874, 0.996)
+local DISTANCE_MAJ = 160 -- studs : au-delà, la couleur des Beam n'est plus suivie
 
-type Lien = { beam: Beam, membre: BasePart, couleur: Color3? }
+type Lien = { beam: Beam, membre: BasePart, ombre: number, couleur: Color3? }
 type Bulle = { part: Part, chemin: { BasePart }, debut: number, taille: number }
 type Etat = {
 	liens: { Lien },
@@ -107,7 +107,7 @@ local function animerBulles(etat: Etat, maintenant: number)
 	end
 end
 
--- Couleur et largeur des Beam = celles du membre (changent pendant le Gear 2).
+-- Couleur des Beam = celle du membre (change pendant le Gear 2), ombrée selon la face.
 local function mettreAJour()
 	local camera = workspace.CurrentCamera
 	local oeil = camera and camera.CFrame.Position
@@ -120,15 +120,17 @@ local function mettreAJour()
 		animerBulles(etat, time())
 		if oeil and (modele:GetPivot().Position - oeil).Magnitude < DISTANCE_MAJ then
 			for _, lien in etat.liens do
-				local membre = lien.membre
-				local largeur = math.min(membre.Size.X, membre.Size.Z) * LARGEUR
-				if math.abs(lien.beam.Width0 - largeur) > 0.005 then
-					lien.beam.Width0 = largeur
-					lien.beam.Width1 = largeur
-				end
-				if lien.couleur ~= membre.Color then
-					lien.couleur = membre.Color
-					lien.beam.Color = ColorSequence.new(membre.Color:Lerp(Color3.new(0, 0, 0), ASSOMBRIR))
+				local c = lien.membre.Color
+				if lien.couleur ~= c then
+					lien.couleur = c
+					local k = lien.ombre
+					lien.beam.Color = ColorSequence.new(
+						Color3.new(
+							math.min(1, c.R * COMPENSATION.R * k),
+							math.min(1, c.G * COMPENSATION.G * k),
+							math.min(1, c.B * COMPENSATION.B * k)
+						)
+					)
 				end
 			end
 		end
@@ -212,6 +214,8 @@ function Elastique.Marqueur(modele: Model, nom: string, valeur: string)
 		lancerBulles(modele)
 	elseif nom == "Aura" and valeur == "Vapeur" then
 		teinter(modele, true)
+	elseif nom == "Aura" and valeur == "Normal" then
+		teinter(modele, false) -- fin du Gear 2 : la peau redevient normale
 	end
 end
 
@@ -232,7 +236,12 @@ function Elastique.Suivre(modele: Model)
 	for _, beam in modele:GetDescendants() do
 		local membre = beam.Parent
 		if beam:IsA("Beam") and string.sub(beam.Name, 1, 10) == "Elastique_" and membre and membre:IsA("BasePart") then
-			table.insert(etat.liens, { beam = beam, membre = membre })
+			local ombre = beam:GetAttribute("Ombre")
+			table.insert(etat.liens, {
+				beam = beam,
+				membre = membre,
+				ombre = if typeof(ombre) == "number" then ombre else 1,
+			})
 		end
 	end
 	-- peau : pièces du corps de la couleur de la tête (les vêtements sont des pièces à part)

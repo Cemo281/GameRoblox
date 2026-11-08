@@ -1,7 +1,7 @@
 {
 	"id": "zoro",
-	"source": "assets/persos/zoro/zoro_apercu.blend",
-	"animation": "zoro_Idle",
+	"source": "Studio : ReplicatedStorage.ModelesPersonnages.zoro (rendu_studio.py)",
+	"animation": "rbxassetid://136440538552091",
 	"images": {
 		"portrait.png": {
 			"taille": [
@@ -9,7 +9,7 @@
 				512
 			],
 			"pose": "zoro_PoseGUI.json",
-			"temps": null
+			"temps": 0
 		},
 		"pied.png": {
 			"taille": [
@@ -17,7 +17,7 @@
 				1024
 			],
 			"pose": "zoro_PoseGUI.json",
-			"temps": null
+			"temps": 0
 		},
 		"silhouette.png": {
 			"taille": [
@@ -41,36 +41,36 @@
 			],
 			"ordre": "ligne par ligne, de gauche a droite puis de haut en bas (case k : ligne k // 4, colonne k % 4)",
 			"images_animation": [
-				0.0,
+				0,
 				7.5,
-				15.0,
+				15,
 				22.5,
-				30.0,
+				30,
 				37.5,
-				45.0,
+				45,
 				52.5,
-				60.0,
+				60,
 				67.5,
-				75.0,
+				75,
 				82.5,
-				90.0,
+				90,
 				97.5,
-				105.0,
+				105,
 				112.5
 			]
 		}
 	},
 	"boucle": {
-		"duree": 4.0,
-		"images": 120,
+		"duree": 4,
+		"images": 150,
 		"fps_source": 30,
-		"raccord_fin_debut": 0.0
+		"raccord_fin_debut": 0.719934
 	},
 	"fps_conseille": 4.0,
 	"ids_roblox": {
-		"portrait.png": 140034364207144,
-		"pied.png": 80949230946055,
-		"silhouette.png": 112226033450017,
-		"idle_sheet.png": 83426259296376
+		"portrait.png": 105241865396938,
+		"pied.png": 117974979456961,
+		"silhouette.png": 119444152343751,
+		"idle_sheet.png": 136335869201198
 	}
 }

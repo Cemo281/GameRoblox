@@ -4,7 +4,9 @@
 -- passer par un ModuleScript temporaire, le script renvoie un bilan).
 -- Dossiers <modèle>.VFX nommés d'après les marqueurs de l'animation, déclenchés par src/client/Vitrine.luau
 -- (« <Marqueur>_<Valeur> », ou marqueur « VFX <Nom> ») ; bulles des pompes et peau rose : src/client/Elastique.luau.
--- Membres élastiques : Beam « Elastique_<articulation> » entre les points d'articulation (visibles partout).
+-- Attention : dans un effet AuMembre, Vitrine déplace l'attachment de chaque émetteur sur le membre qui frappe : n'y mettre que
+-- des émetteurs de « membre » (un émetteur du sol y décalait ensuite toutes les ondes au sol, vu le 04/11).
+-- Membres élastiques : 4 Beam « Elastique_<articulation>_<face> » en boîte entre les points d'articulation (visibles partout).
 -- Tempos :
 --   Pompe_1..4 (Burst, sec)           bouffée de vapeur, jets qui montent des jambes, onde au sol, petite secousse
 --   Aura_Vapeur (Duree, lent)         vapeur épaisse qui monte doucement (Montee 1,2 s) + nappe au sol, jusqu'à la fin
@@ -17,6 +19,10 @@
 --   Impact_AirPoing (Duree 0,25)      traits de vitesse le long du bras étiré, hit-stop 0,12
 --   Explosion_AirPoing (Burst, détonation) éclat géant, boule de feu, ondes blanche et orange, lignes, fumée, secousse forte
 --   Esquive_Atterrissage (Burst)      poussière et onde à l'atterrissage
+-- Haki des rois (04/11, « ressentir la puissance de luffy ») : éclairs noirs et rouges, ondes sombres, écran assombri
+-- (TeinteEcran) sur Explosion_Vapeur et Explosion_AirPoing ; Haki_Aura (Duree, marqueurs VFX Haki_Aura / _Fin) :
+-- crépitement autour du corps et des poings de l'explosion du Gear 2 à la fin du poing aérien ; éclairs sur chaque
+-- coup, flammes sombres et éclairs pendant la recharge ; secousses et hit-stops renforcés.
 -- Textures : intégrées (rbxasset://) ou déjà en ligne (luffy, zoro). Aucun envoi.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -40,6 +46,13 @@ local TEX_ETOILE_IMPACT = "rbxassetid://112249090477155" -- luffy
 local TEX_ANNEAU_IMPACT = "rbxassetid://93783833153831" -- luffy
 local TEX_TRAITS = "rbxassetid://97795166368994" -- luffy (traits de vitesse)
 local TEX_LIGNES_IMPACT = "rbxassetid://135983583011818" -- luffy
+local TEX_ECLAIRS = "rbxassetid://88432637509015" -- nami (claire, se teinte : noir ou rouge)
+
+-- Haki des rois : éclairs noirs et rouges, ondes sombres, écran qui s'assombrit (attribut TeinteEcran de Vitrine)
+local NOIR_HAKI = Color3.fromRGB(18, 4, 8)
+local ROUGE_HAKI = Color3.fromRGB(255, 30, 45)
+local POURPRE_HAKI = Color3.fromRGB(120, 10, 30)
+local TEINTE_HAKI = Color3.fromRGB(255, 150, 160)
 
 -- articulations étirées par les animations (pièce enfant → AnimationConstraint)
 local ARTICULATIONS = {
@@ -68,6 +81,8 @@ local DOSSIERS = {
 	"Impact_AirPoing",
 	"Explosion_AirPoing",
 	"Esquive_Atterrissage",
+	"Haki_Aura",
+	"Aura_Normal",
 }
 
 local function seq(a: number, b: number): NumberSequence
@@ -135,6 +150,78 @@ local function emetteur(parent: Instance, nom: string, r: Reglages): ParticleEmi
 	return e
 end
 
+-- Éclairs du haki des rois : une paire d'émetteurs, noirs (opaques, non lumineux) et rouges (lumineux).
+-- r : Taille (studs), Quantite (Burst) ou Debit (Duree), Vitesse, Duree, Accroche.
+local function eclairsHaki(parent: Instance, nom: string, r: Reglages): { Instance }
+	local taille = r.Taille or 3
+	local commun = function(couleur: Color3, lumineux: boolean, facteur: number): Reglages
+		return {
+			Texture = TEX_ECLAIRS,
+			Couleur = couleur,
+			LightEmission = if lumineux then 0.7 else 0,
+			LightInfluence = 0,
+			Eclat = if lumineux then 4 else 1,
+			-- un éclair claque : plein tout de suite, disparaît vite
+			Taille = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, taille * facteur * 0.7),
+				NumberSequenceKeypoint.new(0.3, taille * facteur),
+				NumberSequenceKeypoint.new(1, taille * facteur * 1.1),
+			}),
+			Transparence = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0),
+				NumberSequenceKeypoint.new(0.6, 0.1),
+				NumberSequenceKeypoint.new(1, 1),
+			}),
+			Duree = r.Duree or NumberRange.new(0.08, 0.16),
+			Vitesse = r.Vitesse or NumberRange.new(0),
+			Frein = r.Frein or 0,
+			Angle = NumberRange.new(0, 360),
+			Accroche = if r.Accroche == nil then true else r.Accroche,
+			Debit = r.Debit,
+			Quantite = r.Quantite,
+			ZOffset = if lumineux then 0.3 else 0.2,
+		}
+	end
+	return {
+		emetteur(parent, `{nom}Noirs`, commun(NOIR_HAKI, false, 1)),
+		emetteur(parent, `{nom}Rouges`, commun(ROUGE_HAKI, true, 0.85)),
+	}
+end
+
+-- Onde de choc sombre du haki (anneau à plat ou face caméra), noire puis pourpre
+local function ondeHaki(
+	parent: Instance,
+	nom: string,
+	taille: number,
+	duree: number,
+	aPlat: boolean
+): ParticleEmitter
+	return emetteur(parent, nom, {
+		Texture = TEX_ANNEAU,
+		Couleur = ColorSequence.new(NOIR_HAKI, POURPRE_HAKI),
+		LightEmission = 0,
+		LightInfluence = 0,
+		Eclat = 1,
+		Orientation = if aPlat
+			then Enum.ParticleOrientation.VelocityPerpendicular
+			else Enum.ParticleOrientation.FacingCamera,
+		Taille = jaillir(1, taille * 0.75, taille),
+		-- vu en Play : opaques, elles couvraient tout l'écran
+		Transparence = fondu(0.35),
+		Duree = NumberRange.new(duree),
+		Vitesse = NumberRange.new(0.01),
+		Ecart = Vector2.zero,
+		Quantite = 1,
+	})
+end
+
+local function ajouter(liste: { Instance }, autres: { Instance }): { Instance }
+	for _, x in autres do
+		table.insert(liste, x)
+	end
+	return liste
+end
+
 local function attache(part: BasePart, nom: string, position: Vector3): Attachment
 	local a = Instance.new("Attachment")
 	a.Name = nom
@@ -193,17 +280,40 @@ local function nettoyer(modele: Model, vfx: Folder)
 	for _, d in modele:GetDescendants() do
 		if
 			string.sub(d.Name, 1, 14) == "VFX_Elastique_"
-			or (d:IsA("Beam") and string.sub(d.Name, 1, 10) == "Elastique_")
+			or ((d:IsA("Beam") or d:IsA("Attachment")) and string.sub(d.Name, 1, 10) == "Elastique_")
 		then
 			d:Destroy()
 		end
 	end
 end
 
+-- Bras « boîte » : 4 faces autour de l'axe du membre (décalage dans le repère de l'attachment d'articulation, direction
+-- de la largeur, facteur d'ombre de la face). Même valeurs que src/client/Elastique.luau (COMPENSATION).
+local MARGE = 1.02 -- un peu plus large que le membre : recouvre la peau déformable du coude qui s'affine en s'étirant
+local COMPENSATION = Color3.new(0.88, 0.874, 0.996) -- Beam non éclairé → même rendu que la pièce éclairée (mesuré)
+local FACES = {
+	{ nom = "PX", normale = Vector3.xAxis, largeur = Vector3.zAxis, ombre = 1 },
+	{ nom = "NX", normale = -Vector3.xAxis, largeur = Vector3.zAxis, ombre = 0.9 },
+	{ nom = "PZ", normale = Vector3.zAxis, largeur = Vector3.xAxis, ombre = 0.95 },
+	{ nom = "NZ", normale = -Vector3.zAxis, largeur = Vector3.xAxis, ombre = 0.86 },
+}
+
+local function couleurFace(peau: Color3, ombre: number): ColorSequence
+	return ColorSequence.new(
+		Color3.new(
+			math.min(1, peau.R * COMPENSATION.R * ombre),
+			math.min(1, peau.G * COMPENSATION.G * ombre),
+			math.min(1, peau.B * COMPENSATION.B * ombre)
+		)
+	)
+end
+
 local function membresElastiques(modele: Model): number
-	-- Membres élastiques : un Beam couleur peau entre les deux points de chaque articulation étirée. Roblox le dessine à
-	-- chaque rendu (jeu, mode édition, Éditeur d'animation), sans script ni retard ; longueur nulle quand le membre
-	-- n'est pas étiré, donc invisible.
+	-- Membres élastiques : 4 Beam (FaceCamera = false) forment une boîte de la taille du membre entre les deux points
+	-- de chaque articulation étirée : même épaisseur sur toute la longueur, quel que soit l'angle de vue. Roblox les
+	-- dessine à chaque rendu (jeu, mode édition, Éditeur d'animation), sans script ni retard ; longueur nulle quand le
+	-- membre n'est pas étiré, donc invisibles. La largeur d'un Beam non tourné vers la caméra suit l'axe Y de ses
+	-- attachments : X le long du membre, Y dans le plan de la face.
 	local nb = 0
 	for membre, nomJoint in ARTICULATIONS do
 		local part = modele:FindFirstChild(membre)
@@ -216,21 +326,38 @@ local function membresElastiques(modele: Model): number
 			and joint.Attachment0
 			and joint.Attachment1
 		then
-			local beam = Instance.new("Beam")
-			beam.Name = `Elastique_{nomJoint}`
-			beam.Attachment0 = joint.Attachment0
-			beam.Attachment1 = joint.Attachment1
-			-- non éclairé et assombri : éclairé (ou à la couleur exacte), il paraissait plus clair que le bras
-			beam.Color = ColorSequence.new(part.Color:Lerp(Color3.new(0, 0, 0), 0.25))
-			beam.Transparency = NumberSequence.new(0)
-			beam.LightEmission = 0
-			beam.LightInfluence = 0
-			beam.FaceCamera = true
-			beam.Segments = 1
-			beam.Width0 = math.min(part.Size.X, part.Size.Z) * 0.8
-			beam.Width1 = beam.Width0
-			beam.Parent = part
-			nb += 1
+			local a0, a1 = joint.Attachment0, joint.Attachment1
+			local segment = a0.Parent :: BasePart -- largeur du segment qui s'étire (avant-bras pour le poignet)
+			local demi = Vector3.new(segment.Size.X, 0, segment.Size.Z) * (MARGE / 2)
+			for _, face in FACES do
+				local function point(base: Attachment): Attachment
+					local cf = base.CFrame
+					local a = Instance.new("Attachment")
+					a.Name = `Elastique_{nomJoint}_{face.nom}`
+					a.CFrame = CFrame.fromMatrix(
+						cf.Position + cf:VectorToWorldSpace(face.normale * demi),
+						cf:VectorToWorldSpace(Vector3.yAxis),
+						cf:VectorToWorldSpace(face.largeur)
+					)
+					a.Parent = base.Parent
+					return a
+				end
+				local beam = Instance.new("Beam")
+				beam.Name = `Elastique_{nomJoint}_{face.nom}`
+				beam.Attachment0 = point(a0)
+				beam.Attachment1 = point(a1)
+				beam.Color = couleurFace(part.Color, face.ombre)
+				beam:SetAttribute("Ombre", face.ombre) -- src/client/Elastique.luau : suit la peau rose du Gear 2
+				beam.Transparency = NumberSequence.new(0)
+				beam.LightEmission = 0
+				beam.LightInfluence = 0
+				beam.FaceCamera = false
+				beam.Segments = 1
+				beam.Width0 = 2 * (if face.largeur == Vector3.xAxis then demi.X else demi.Z)
+				beam.Width1 = beam.Width0
+				beam.Parent = part
+				nb += 1
+			end
 		end
 	end
 	return nb
@@ -264,14 +391,14 @@ local function construire(modele: Model): string
 					Couleur = VAPEUR,
 					LightEmission = 0.1,
 					LightInfluence = 0.3,
-					Taille = seq(0.8, 2.8),
-					Transparence = fondu(0.08),
+					Taille = seq(0.6, 2.2),
+					Transparence = fondu(0.3),
 					Duree = NumberRange.new(0.35, 0.6),
 					Vitesse = NumberRange.new(10, 16),
 					Ecart = Vector2.new(25, 25),
 					Frein = 5,
 					Rotation = NumberRange.new(-120, 120),
-					Quantite = 5,
+					Quantite = 3,
 				})
 			)
 		end
@@ -292,14 +419,14 @@ local function construire(modele: Model): string
 			Couleur = VAPEUR,
 			LightEmission = 0,
 			LightInfluence = 0.3,
-			Taille = seq(1.6, 3.8),
-			Transparence = fondu(0.12),
+			Taille = seq(1.2, 3),
+			Transparence = fondu(0.35),
 			Duree = NumberRange.new(0.5, 0.9),
 			Vitesse = NumberRange.new(9, 14),
 			Ecart = Vector2.new(90, 90),
 			Frein = 5,
 			Rotation = NumberRange.new(-60, 60),
-			Quantite = 10,
+			Quantite = 5,
 		}),
 	}
 	for _, jet in jets do
@@ -313,13 +440,13 @@ local function construire(modele: Model): string
 	local vapeur: { Instance } = {}
 	for nom, debit in
 		{
-			UpperTorso = 34,
-			LowerTorso = 18,
-			RightUpperArm = 14,
-			LeftUpperArm = 14,
-			RightUpperLeg = 14,
-			LeftUpperLeg = 14,
-			Head = 10,
+			UpperTorso = 18,
+			LowerTorso = 9,
+			RightUpperArm = 8,
+			LeftUpperArm = 8,
+			RightUpperLeg = 8,
+			LeftUpperLeg = 8,
+			Head = 5,
 		}
 	do
 		local part = modele:FindFirstChild(nom)
@@ -332,11 +459,12 @@ local function construire(modele: Model): string
 					LightEmission = 0.15,
 					LightInfluence = 0,
 					Eclat = 1.6,
-					Taille = seq(1.2, 3.4),
-					Transparence = nuage(0.12),
-					Duree = NumberRange.new(1, 1.6),
-					Vitesse = NumberRange.new(0.8, 2),
-					Acceleration = Vector3.new(0, 3.5, 0),
+					-- 04/11 : allégée (cachait luffy) : volutes fines qui quittent vite le corps
+					Taille = seq(0.8, 2.4),
+					Transparence = nuage(0.3),
+					Duree = NumberRange.new(0.9, 1.4),
+					Vitesse = NumberRange.new(1, 2.5),
+					Acceleration = Vector3.new(0, 5, 0),
 					Rotation = NumberRange.new(-50, 50),
 					Debit = debit,
 				})
@@ -351,48 +479,53 @@ local function construire(modele: Model): string
 			Couleur = VAPEUR,
 			LightEmission = 0,
 			LightInfluence = 0.3,
-			Taille = seq(2.5, 6),
-			Transparence = nuage(0.3),
+			Taille = seq(2, 4.5),
+			Transparence = nuage(0.55),
 			Duree = NumberRange.new(1.5, 2.2),
 			Vitesse = NumberRange.new(2, 4),
 			Ecart = Vector2.new(88, 88),
 			Frein = 1,
 			Acceleration = Vector3.new(0, 0.6, 0),
 			Rotation = NumberRange.new(-30, 30),
-			Debit = 8,
+			Debit = 3,
 		})
 	)
-	-- 7,2 s réelles : les hit-stops rallongent la séquence
-	dossier(vfx, "Aura_Vapeur", { Mode = "Duree", Duree = 7.2, Montee = 1.2 }, vapeur)
+	-- éteinte par le marqueur « VFX Aura_Vapeur_Fin » (retour à la normale en fin de séquence) ; Duree = sécurité
+	dossier(vfx, "Aura_Vapeur", { Mode = "Duree", Duree = 12, Montee = 1.2 }, vapeur)
 
 	-- Explosion de vapeur (tempo énorme) : jet radial rapide + nuage lent qui traîne
-	dossier(vfx, "Explosion_Vapeur", { Mode = "Burst", Secousse = 0.8, DureeFlash = 0.15 }, {
+	dossier(vfx, "Explosion_Vapeur", {
+		Mode = "Burst",
+		Secousse = 1.2,
+		DureeFlash = 0.18,
+		TeinteEcran = TEINTE_HAKI,
+	}, ajouter({
 		emetteur(torse, "VapeurRadiale", {
 			Texture = TEX_FUMEE,
 			Couleur = VAPEUR,
 			LightEmission = 0.1,
 			LightInfluence = 0.3,
-			Taille = seq(2, 6),
-			Transparence = fondu(0.05),
-			Duree = NumberRange.new(0.6, 1.1),
-			Vitesse = NumberRange.new(30, 48),
+			Taille = seq(1.5, 4.5),
+			Transparence = fondu(0.25),
+			Duree = NumberRange.new(0.5, 0.9),
+			Vitesse = NumberRange.new(32, 50),
 			Frein = 4.5,
 			Rotation = NumberRange.new(-120, 120),
-			Quantite = 90,
+			Quantite = 55,
 		}),
 		emetteur(torse, "NuageLent", {
 			Texture = TEX_FUMEE,
 			Couleur = ColorSequence.new(VAPEUR, VAPEUR_ROSE),
 			LightEmission = 0,
 			LightInfluence = 0.3,
-			Taille = seq(3.5, 8),
-			Transparence = nuage(0.1),
-			Duree = NumberRange.new(1.8, 2.6),
-			Vitesse = NumberRange.new(3, 6),
+			Taille = seq(3, 6),
+			Transparence = nuage(0.4),
+			Duree = NumberRange.new(1.4, 2),
+			Vitesse = NumberRange.new(5, 8),
 			Frein = 1.5,
 			Acceleration = Vector3.new(0, 1.5, 0),
 			Rotation = NumberRange.new(-25, 25),
-			Quantite = 18,
+			Quantite = 8,
 		}),
 		emetteur(sol, "OndeVapeur", {
 			Texture = TEX_ANNEAU,
@@ -435,7 +568,44 @@ local function construire(modele: Model): string
 			Quantite = 1,
 		}),
 		lumiere(haut, "VFX_Elastique_FlashVapeur", BLANC, 2, 14),
-	})
+		lumiere(haut, "VFX_Elastique_FlashHaki", ROUGE_HAKI, 3, 18),
+		-- haki des rois : gerbe d'éclairs autour du corps et projetée, ondes sombres au sol et face caméra
+		ondeHaki(sol, "OndeHakiSol", 24, 0.6, true),
+		ondeHaki(torse, "OndeHaki", 13, 0.35, false),
+	}, ajouter(
+		eclairsHaki(torse, "EclairsCorps", { Taille = 7, Quantite = 9 }),
+		eclairsHaki(torse, "EclairsProjetes", {
+			Taille = 4.5,
+			Quantite = 8,
+			Accroche = false,
+			Vitesse = NumberRange.new(18, 30),
+			Frein = 7,
+			Duree = NumberRange.new(0.15, 0.25),
+		})
+	)))
+
+	-- Haki des rois (de l'explosion du Gear 2 à la fin du poing aérien) : éclairs qui crépitent autour du corps et
+	-- des poings, braises sombres qui montent ; marqueurs « VFX Haki_Aura » et « VFX Haki_Aura_Fin »
+	local mainD = attache(main, "VFX_Elastique_HakiMainD", Vector3.zero)
+	local gauche = modele:FindFirstChild("LeftHand") :: BasePart
+	local mainG = attache(gauche, "VFX_Elastique_HakiMainG", Vector3.zero)
+	local haki: { Instance } = {
+		emetteur(torse, "BraisesHaki", {
+			Couleur = ColorSequence.new(ROUGE_HAKI, NOIR_HAKI),
+			LightEmission = 0.3,
+			Taille = seq(0.35, 0),
+			Duree = NumberRange.new(0.6, 1),
+			Vitesse = NumberRange.new(2, 5),
+			Acceleration = Vector3.new(0, 6, 0),
+			Rotation = NumberRange.new(-200, 200),
+			Debit = 18,
+		}),
+		lumiere(torse, "LueurHaki", ROUGE_HAKI, 0.8, 7),
+	}
+	ajouter(haki, eclairsHaki(torse, "EclairsAura", { Taille = 4.5, Debit = 6 }))
+	ajouter(haki, eclairsHaki(mainD, "EclairsMainD", { Taille = 2.4, Debit = 5 }))
+	ajouter(haki, eclairsHaki(mainG, "EclairsMainG", { Taille = 2.4, Debit = 5 }))
+	dossier(vfx, "Haki_Aura", { Mode = "Duree", Duree = 6, Montee = 0.4 }, haki)
 
 	-- Combo ----------------------------------------------------------------------------------------------------------
 	-- Rafale : traînées des deux poings pendant toute la rafale (anciennes traînées de luffy)
@@ -447,10 +617,10 @@ local function construire(modele: Model): string
 		Mode = "Burst",
 		AuMembre = true,
 		TraineeMembre = FANTOME,
-		Secousse = 0.2,
+		Secousse = 0.3,
 		HitStop = 0.045,
 		DureeFlash = 0.04,
-	}, {
+	}, ajouter({
 		emetteur(membre, "Eclat", {
 			Texture = TEX_ETOILE_IMPACT,
 			Taille = jaillir(0.6, 2.8, 2),
@@ -483,15 +653,15 @@ local function construire(modele: Model): string
 			Quantite = 4,
 		}),
 		lumiere(membre, "VFX_Elastique_FlashCoup", JAUNE, 1.5, 7),
-	})
+	}, eclairsHaki(membre, "EclairsCoup", { Taille = 2.4, Quantite = 1, Accroche = false })))
 	dossier(vfx, "Impact_Pied", {
 		Mode = "Burst",
 		AuMembre = true,
 		TraineeMembre = FANTOME,
-		Secousse = 0.65,
-		HitStop = 0.09,
+		Secousse = 0.9,
+		HitStop = 0.11,
 		DureeFlash = 0.08,
-	}, {
+	}, ajouter({
 		emetteur(membre, "EclatPied", {
 			Texture = TEX_ETOILE_IMPACT,
 			Taille = jaillir(1, 5, 3.5),
@@ -542,7 +712,8 @@ local function construire(modele: Model): string
 			Quantite = 8,
 		}),
 		lumiere(membre, "VFX_Elastique_FlashPied", JAUNE, 2, 10),
-	})
+		ondeHaki(membre, "OndeHakiPied", 8, 0.25, false),
+	}, eclairsHaki(membre, "EclairsPied", { Taille = 4, Quantite = 4, Accroche = false })))
 
 	-- Recharge du poing aérien (tempo montée en puissance) ----------------------------------------------------------
 	local recharge: { Instance } = {
@@ -588,7 +759,23 @@ local function construire(modele: Model): string
 			Debit = 7,
 		}),
 		lumiere(main, "VFX_Elastique_LumiereFeu", ORANGE, 1.5, 10),
+		-- haki qui enveloppe le poing : flammes sombres sous le feu
+		emetteur(main, "VFX_Elastique_AuraNoire", {
+			Texture = TEX_FEU,
+			Couleur = ColorSequence.new(NOIR_HAKI, POURPRE_HAKI),
+			LightEmission = 0,
+			LightInfluence = 0,
+			Eclat = 1,
+			Taille = seq(3, 0.8),
+			Transparence = fondu(0.15),
+			Duree = NumberRange.new(0.25, 0.45),
+			Vitesse = NumberRange.new(1, 2),
+			Acceleration = Vector3.new(0, 6, 0),
+			ZOffset = -0.5, -- derrière le feu
+			Debit = 40,
+		}),
 	}
+	ajouter(recharge, eclairsHaki(mainD, "EclairsCharge", { Taille = 3.4, Debit = 14 }))
 	-- lignes qui convergent vers le poing (ancien effet de luffy : sphère soudée à la main, émission vers l'intérieur)
 	for _, ancien in anciens(vfx, "Charge_Poing", "ParticleEmitter") do
 		if ancien.Name == "Charge_Lignes" then
@@ -602,16 +789,17 @@ local function construire(modele: Model): string
 	dossier(
 		vfx,
 		"Impact_AirPoing",
-		{ Mode = "Duree", Duree = 0.25, HitStop = 0.12 },
+		{ Mode = "Duree", Duree = 0.25, HitStop = 0.16 },
 		anciens(vfx, "Poing_Elastique", "ParticleEmitter")
 	)
 	dossier(vfx, "Explosion_AirPoing", {
 		Mode = "Burst",
 		AuMembre = true,
 		TraineeMembre = Color3.fromRGB(255, 190, 120),
-		Secousse = 1.4,
-		DureeFlash = 0.18,
-	}, {
+		Secousse = 2,
+		DureeFlash = 0.22,
+		TeinteEcran = TEINTE_HAKI,
+	}, ajouter({
 		emetteur(membre, "EclatPoing", {
 			Texture = TEX_ETOILE_IMPACT,
 			Taille = jaillir(2, 10, 7),
@@ -678,6 +866,49 @@ local function construire(modele: Model): string
 			Quantite = 18,
 		}),
 		lumiere(membre, "VFX_Elastique_FlashPoing", ORANGE, 3, 16),
+		lumiere(membre, "VFX_Elastique_FlashHakiPoing", ROUGE_HAKI, 4, 22),
+		ondeHaki(membre, "OndeHakiPoing", 18, 0.45, false),
+		ondeHaki(membre, "OndeHakiPoing2", 11, 0.3, false),
+	}, ajouter(
+		eclairsHaki(membre, "EclairsPoing", { Taille = 9, Quantite = 10 }),
+		eclairsHaki(membre, "EclairsPoingProjetes", {
+			Taille = 5,
+			Quantite = 12,
+			Accroche = false,
+			Vitesse = NumberRange.new(25, 40),
+			Frein = 7,
+			Duree = NumberRange.new(0.15, 0.3),
+		})
+	)))
+
+	-- Retour à la normale (fin de séquence, marqueur Aura Normal) : dernière bouffée de vapeur qui s'échappe du corps
+	-- (la peau redevient normale : src/client/Elastique.luau)
+	dossier(vfx, "Aura_Normal", { Mode = "Burst" }, {
+		emetteur(torse, "VapeurSortie", {
+			Texture = TEX_FUMEE,
+			Couleur = ColorSequence.new(VAPEUR_ROSE, VAPEUR),
+			LightEmission = 0.1,
+			LightInfluence = 0.3,
+			Taille = seq(1, 3.2),
+			Transparence = nuage(0.35),
+			Duree = NumberRange.new(0.9, 1.4),
+			Vitesse = NumberRange.new(3, 6),
+			Ecart = Vector2.new(70, 70),
+			Frein = 2,
+			Acceleration = Vector3.new(0, 4, 0),
+			Rotation = NumberRange.new(-40, 40),
+			Quantite = 12,
+		}),
+		emetteur(sol, "OndeRetour", {
+			Texture = TEX_ANNEAU,
+			Orientation = Enum.ParticleOrientation.VelocityPerpendicular,
+			Taille = seq(1, 6),
+			Transparence = fondu(0.6),
+			Duree = NumberRange.new(0.5),
+			Vitesse = NumberRange.new(0.01),
+			Ecart = Vector2.zero,
+			Quantite = 1,
+		}),
 	})
 
 	-- Atterrissage ------------------------------------------------------------------------------------------------------
