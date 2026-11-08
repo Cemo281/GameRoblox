@@ -1,0 +1,76 @@
+{
+	"id": "usopp",
+	"source": "Studio : ReplicatedStorage.ModelesPersonnages.usopp (rendu_studio.py)",
+	"animation": "usopp_IdleGui (locale, non publiee)",
+	"images": {
+		"portrait.png": {
+			"taille": [
+				512,
+				512
+			],
+			"pose": 0,
+			"temps": 0
+		},
+		"pied.png": {
+			"taille": [
+				1024,
+				1024
+			],
+			"pose": 0,
+			"temps": 0
+		},
+		"silhouette.png": {
+			"taille": [
+				512,
+				512
+			],
+			"cadrage": "portrait"
+		},
+		"idle_sheet.png": {
+			"taille": [
+				1024,
+				1024
+			],
+			"grille": [
+				4,
+				4
+			],
+			"taille_case": [
+				256,
+				256
+			],
+			"ordre": "ligne par ligne, de gauche a droite puis de haut en bas (case k : ligne k // 4, colonne k % 4)",
+			"images_animation": [
+				0,
+				7.5,
+				15,
+				22.5,
+				30,
+				37.5,
+				45,
+				52.5,
+				60,
+				67.5,
+				75,
+				82.5,
+				90,
+				97.5,
+				105,
+				112.5
+			]
+		}
+	},
+	"boucle": {
+		"duree": 4,
+		"images": null,
+		"fps_source": 30,
+		"raccord_fin_debut": null
+	},
+	"fps_conseille": 4.0,
+	"ids_roblox": {
+		"portrait.png": 131621362760145,
+		"pied.png": 133262628291191,
+		"silhouette.png": 128942612022486,
+		"idle_sheet.png": 105982684554992
+	}
+}

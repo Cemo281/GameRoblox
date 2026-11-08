@@ -9,7 +9,9 @@ local Debris = game:GetService("Debris")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local EffetsForge = require(script.Parent.EffetsForge)
 local Elastique = require(script.Parent.Elastique)
+local Tireur = require(script.Parent.Tireur)
 
 local Vitrine = {}
 
@@ -27,6 +29,9 @@ local SECOUSSE_PORTEE = 25
 local SECOUSSE_ECHELLE = 0.6 -- studs de décalage pour une amplitude 1
 local SECOUSSE_AMORTI = 9
 local INFO_FANTOME = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+-- Teinte d'écran (attribut TeinteEcran, haki des rois de luffy) : coup sec puis retour, mêmes portées que la secousse
+local TEINTE_ATTAQUE = TweenInfo.new(0.05, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local TEINTE_RETOUR = TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 
 -- Remet chaque accessoire dans son état par défaut (attribut VisibleParDefaut), ex. pour un joueur arrivé en cours d'Action.
 local function reinitialiserAccessoires(modele: Model)
@@ -82,6 +87,54 @@ local function secouer(modele: Model, amplitude: number)
 	local distance = (camera.Focus.Position - modele:GetPivot().Position).Magnitude
 	local attenuation = 1 - math.clamp((distance - SECOUSSE_PORTEE_PLEINE) / SECOUSSE_PORTEE, 0, 1)
 	secousse = math.max(secousse, amplitude * attenuation)
+end
+
+-- Teinte d'écran : l'image s'assombrit, se contraste et vire à la couleur donnée un instant (gros impacts).
+-- ColorCorrectionEffect rangé dans la caméra : propre au joueur, rien n'est répliqué.
+local correction: ColorCorrectionEffect? = nil
+local teinteEnCours: Tween? = nil
+local function teinterEcran(modele: Model, couleur: Color3)
+	local camera = workspace.CurrentCamera
+	if not camera then
+		return
+	end
+	local distance = (camera.Focus.Position - modele:GetPivot().Position).Magnitude
+	local force = 1 - math.clamp((distance - SECOUSSE_PORTEE_PLEINE) / SECOUSSE_PORTEE, 0, 1)
+	if force <= 0 then
+		return
+	end
+	local effet: ColorCorrectionEffect
+	if correction and correction.Parent == camera then
+		effet = correction
+	else
+		effet = Instance.new("ColorCorrectionEffect")
+		effet.Name = "TeinteVitrine"
+		effet.Parent = camera
+		correction = effet
+	end
+	if teinteEnCours then
+		teinteEnCours:Cancel()
+	end
+	local attaque = TweenService:Create(effet, TEINTE_ATTAQUE, {
+		TintColor = Color3.new(1, 1, 1):Lerp(couleur, force),
+		Brightness = -0.12 * force,
+		Contrast = 0.45 * force,
+		Saturation = -0.25 * force,
+	})
+	local retour = TweenService:Create(effet, TEINTE_RETOUR, {
+		TintColor = Color3.new(1, 1, 1),
+		Brightness = 0,
+		Contrast = 0,
+		Saturation = 0,
+	})
+	teinteEnCours = attaque
+	attaque.Completed:Connect(function(etat)
+		if etat == Enum.PlaybackState.Completed and teinteEnCours == attaque then
+			teinteEnCours = retour
+			retour:Play()
+		end
+	end)
+	attaque:Play()
 end
 
 -- Décalage appliqué à l'image précédente : retiré avant la mise à jour de la caméra du joueur, sinon la caméra repart
@@ -205,7 +258,8 @@ end
 --   Mode "Duree" : tout allumé Duree secondes (attribut Montee : débit des émetteurs de 0 à sa valeur en Montee s) ;
 --   Mode "Eteindre" : éteint l'effet nommé par l'attribut Cible.
 --   Attributs facultatifs : Secousse (amplitude de la secousse de caméra), Fantome (Color3 de l'image rémanente),
---   TraineeMembre (Color3 : traînée de l'épaule / hanche au membre qui frappe), AuMembre (effets placés sur ce membre).
+--   TraineeMembre (Color3 : traînée de l'épaule / hanche au membre qui frappe), AuMembre (effets placés sur ce membre),
+--   TeinteEcran (Color3 : l'écran s'assombrit et vire à cette couleur 0,5 s, joueurs proches).
 -- Marqueur « VFX <Nom>_Fin » : éteint l'effet <Nom>.
 local function declencher(modele: Model, nom: string)
 	local vfx = modele:FindFirstChild("VFX")
@@ -226,6 +280,10 @@ local function declencher(modele: Model, nom: string)
 	if typeof(amplitude) == "number" then
 		secouer(modele, amplitude)
 	end
+	local teinte = dossier:GetAttribute("TeinteEcran")
+	if typeof(teinte) == "Color3" then
+		teinterEcran(modele, teinte)
+	end
 	local couleurTrainee = dossier:GetAttribute("TraineeMembre")
 	if typeof(couleurTrainee) == "Color3" then
 		traineeMembre(modele, couleurTrainee)
@@ -245,6 +303,10 @@ local function declencher(modele: Model, nom: string)
 				end
 			end
 		end
+	end
+	-- effets VFX Forge (dossier « Forge » de l'effet : rochers, fissures, débris, ondes en maillage)
+	if dossier:FindFirstChild("Forge") then
+		EffetsForge.Jouer(modele, dossier, membreLePlusLoin(modele))
 	end
 	local mode = dossier:GetAttribute("Mode")
 	if mode == "Eteindre" then
@@ -323,6 +385,7 @@ local function suivre(instance: Instance)
 			if piste.Animation and table.find(debutsDeCycle, piste.Animation.AnimationId) then
 				reinitialiserAccessoires(modele)
 				Elastique.Reinitialiser(modele)
+				Tireur.Reinitialiser(modele)
 			end
 			if pistesBranchees[piste] then
 				return
@@ -351,6 +414,15 @@ local function suivre(instance: Instance)
 					connexions,
 					piste:GetMarkerReachedSignal(marqueur):Connect(function(valeur: string)
 						Elastique.Marqueur(modele, marqueur, valeur)
+					end)
+				)
+			end
+			-- projectiles de usopp (attribut Tireur)
+			for _, marqueur in Tireur.MARQUEURS do
+				table.insert(
+					connexions,
+					piste:GetMarkerReachedSignal(marqueur):Connect(function(valeur: string)
+						Tireur.Marqueur(modele, marqueur, valeur, declencher)
 					end)
 				)
 			end
@@ -383,6 +455,8 @@ function Vitrine.Init()
 	RunService:BindToRenderStep("SecousseVitrineRetrait", Enum.RenderPriority.Camera.Value - 1, retirerSecousse)
 	RunService:BindToRenderStep("SecousseVitrine", Enum.RenderPriority.Camera.Value + 1, appliquerSecousse)
 	Elastique.Init()
+	Tireur.Init()
+	EffetsForge.Init()
 end
 
 return Vitrine
