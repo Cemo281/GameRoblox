@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+html{background:#0B0918}body{margin:0;background:#0B0918;color:#FFFFFF;font-family:Montserrat,sans-serif}
+a{color:#FFD66B}a:hover{color:#FFE9A8}
+@keyframes sheen{0%{transform:translateX(-160px) rotate(20deg)}55%,100%{transform:translateX(240px) rotate(20deg)}}
+@keyframes idle16{0%{background-position:0% 0%}6.25%{background-position:33.33% 0%}12.5%{background-position:66.67% 0%}18.75%{background-position:100% 0%}25%{background-position:0% 33.33%}31.25%{background-position:33.33% 33.33%}37.5%{background-position:66.67% 33.33%}43.75%{background-position:100% 33.33%}50%{background-position:0% 66.67%}56.25%{background-position:33.33% 66.67%}62.5%{background-position:66.67% 66.67%}68.75%{background-position:100% 66.67%}75%{background-position:0% 100%}81.25%{background-position:33.33% 100%}87.5%{background-position:66.67% 100%}93.75%,100%{background-position:100% 100%}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes wobble{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(-2deg) scale(1.06)}}
+</style>
+</helmet>
+<div style="max-width:1240px;margin:0 auto;padding:48px 40px 80px;display:flex;flex-direction:column;gap:28px">
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <img src="icons2/etoile.svg" style="width:44px;height:44px">
+    <h1 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:44px;text-shadow:0 3px 0 #0D0A1C">Planche de style v2</h1>
+    <span style="font:800 11px Montserrat;color:#0D0A1C;background:linear-gradient(180deg,#FFF0A8,#FFC93C);border:1.5px solid #0D0A1C;border-radius:6px;padding:4px 8px;letter-spacing:1px">GACHA MODERNE + MANGA</span>
+    
+    <a href="HUD v3 offres.dc.html" style="font:600 13px Montserrat">HUD v3 →</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <div style="padding:14px 16px;border-radius:12px;background:linear-gradient(180deg,#2A2350,#17132E);border:1px solid #4A3F86;font-size:13px;line-height:1.5;color:#C9C3E6"><b style="color:#fff;font:400 16px 'Fredoka One'">Base gacha moderne</b><br>Panneaux sombres façon verre teinté (dégradé, pas de flou), liseré clair à l'intérieur, filet doré sous les titres, rubans en biais. Contour sombre affiné : 2 px au lieu de 3.</div>
+    <div style="padding:14px 16px;border-radius:12px;background:linear-gradient(180deg,#2A2350,#17132E);border:1px solid #4A3F86;font-size:13px;line-height:1.5;color:#C9C3E6"><b style="color:#fff;font:400 16px 'Fredoka One'">Rendu au lieu de dessin</b><br>Tes renders 3D dans les cartes (glisse-en d'autres dessus), icônes en volume avec reflets, boutons brillants à 3 tons + bande de reflet.</div>
+    <div style="padding:14px 16px;border-radius:12px;background:linear-gradient(180deg,#2A2350,#17132E);border:1px solid #4A3F86;font-size:13px;line-height:1.5;color:#C9C3E6"><b style="color:#fff;font:400 16px 'Fredoka One'">Manga sur les moments forts</b><br>Lignes de vitesse, trames, cadres d'impact et titres-chocs réservés au tirage, à la téléportation et au rebirth, pour qu'ils restent spéciaux.</div>
+  </div>
+</header>
+
+<section style="position:relative;border-radius:16px;background:linear-gradient(180deg,#221C42,#16122A);border:1px solid #4A3F86;padding:26px;display:flex;flex-direction:column;gap:18px">
+  <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Palette</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px">
+    <sc-for list="{{ palette }}" as="c" hint-placeholder-count="12">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="position:relative;height:56px;border-radius:10px;border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C;background:{{ c.fond }};overflow:hidden"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,{{ c.gloss }})"></div></div>
+        <div style="font:700 13px Montserrat">{{ c.nom }}</div>
+        <div style="font:500 11px ui-monospace,Menlo,monospace;color:#A9A2CC;line-height:1.4">{{ c.hex }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <h3 style="margin:6px 0 0;font-family:'Fredoka One';font-weight:400;font-size:20px">Raretés <span style="font:500 13px Montserrat;color:#A9A2CC">— gemmes à 3 tons, couleur centrale imposée</span></h3>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px">
+    <sc-for list="{{ raretes }}" as="r" hint-placeholder-count="5">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="position:relative;height:56px;border-radius:10px;border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C;background:linear-gradient(160deg,{{ r.light }} 0%,{{ r.hex }} 50%,{{ r.dark }} 100%);overflow:hidden">
+          <div style="position:absolute;inset:3px;border-radius:7px;border:1px solid rgba(255,255,255,.55)"></div>
+          <div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.22)"></div>
+          <sc-if value="{{ r.secret }}" hint-placeholder-val="{{ false }}">{{ sheen }}</sc-if>
+        </div>
+        <div style="font:700 13px Montserrat">{{ r.nom }} · {{ r.pct }}</div>
+        <div style="font:500 11px ui-monospace,Menlo,monospace;color:#A9A2CC">{{ r.light }} · {{ r.hex }} · {{ r.dark }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="border-radius:16px;background:linear-gradient(180deg,#221C42,#16122A);border:1px solid #4A3F86;padding:26px;display:flex;flex-direction:column;gap:18px">
+  <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Boutons</h2>
+  <div style="display:grid;grid-template-columns:140px repeat(4,minmax(0,1fr));gap:16px 20px;align-items:center">
+    <div></div>
+    <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">NORMAL</div>
+    <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">SURVOL (+5 %, plus clair)</div>
+    <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">APPUI (−3 px)</div>
+    <div style="font:700 11px Montserrat;color:#FFD66B;letter-spacing:1px">À ESSAYER</div>
+    <sc-for list="{{ boutons }}" as="b" hint-placeholder-count="5">
+      <div style="font:700 14px Montserrat">{{ b.nom }}<div style="font:500 11px ui-monospace,Menlo,monospace;color:#A9A2CC;margin-top:4px">{{ b.c2 }}</div></div>
+      <sc-for list="{{ b.etats }}" as="e" hint-placeholder-count="3">
+        <div style="height:58px;display:flex;align-items:flex-start">
+          <div style="position:relative;height:50px;min-width:150px;padding:0 24px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,{{ b.c1 }} 0%,{{ b.c2 }} 50%,{{ b.c3 }} 100%);box-shadow:0 {{ e.ombre }}px 0 {{ b.ombre }};transform:{{ e.transform }};filter:brightness({{ e.bright }});font-family:'Fredoka One';font-size:19px;color:{{ b.texte }};text-shadow:{{ b.ts }};overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,{{ b.gloss }})"></div>
+            <div style="position:absolute;inset:2px;border-radius:9px;border:1px solid rgba(255,255,255,{{ b.liseré }})"></div>
+            <span style="position:relative">{{ b.label }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <div style="height:58px;display:flex;align-items:flex-start">
+        <div style="position:relative;height:50px;min-width:150px;padding:0 24px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,{{ b.c1 }} 0%,{{ b.c2 }} 50%,{{ b.c3 }} 100%);box-shadow:0 3px 0 {{ b.ombre }};font-family:'Fredoka One';font-size:19px;color:{{ b.texte }};text-shadow:{{ b.ts }};cursor:{{ b.curseur }};overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1),filter .12s;user-select:none" style-hover="transform:{{ b.hover }};filter:brightness({{ b.bright }})" style-active="transform:{{ b.active }};box-shadow:0 0 0 {{ b.ombre }}">
+          <div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,{{ b.gloss }})"></div>
+          <div style="position:absolute;inset:2px;border-radius:9px;border:1px solid rgba(255,255,255,{{ b.liseré }})"></div>
+          <span style="position:relative">{{ b.label }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;padding-top:12px;border-top:1px solid #2E2758">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">BOUTON ICÔNE 60 × 60</div>
+      <div style="display:flex;gap:16px">
+        <sc-for list="{{ icoBtns }}" as="i" hint-placeholder-count="6">
+          <div style="cursor:pointer;position:relative;width:60px;height:60px;box-sizing:border-box;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ i.c1 }} 0%,{{ i.c2 }} 50%,{{ i.c3 }} 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+            <div style="position:absolute;inset:0;border-radius:12px;overflow:hidden">
+              
+              <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+              <div style="position:absolute;left:0;right:0;top:0;height:44%;background:rgba(255,255,255,.2)"></div>
+            </div>
+            <div style="position:absolute;inset:2px;border-radius:11px;border:1.5px solid rgba(255,255,255,.65)"></div>
+            <div style="position:relative;width:42px;height:42px;background:url({{ i.src }}) center/contain no-repeat"></div>
+            <sc-if value="{{ i.badge }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;box-sizing:border-box;padding:0 5px;border-radius:11px;background:linear-gradient(180deg,#FF7A92,#F0244A);border:2px solid #0D0A1C;font:400 13px 'Fredoka One';display:flex;align-items:center;justify-content:center">{{ i.badge }}</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">ONGLETS</div>
+      <div style="display:flex;gap:4px;background:#0D0A1C;padding:4px;border-radius:12px;border:1px solid #2E2758">
+        <sc-for list="{{ onglets }}" as="o" hint-placeholder-count="3">
+          <div onClick="{{ o.choisir }}" style="position:relative;height:40px;padding:0 20px;display:flex;align-items:center;border-radius:9px;background:{{ o.bg }};font-family:'Fredoka One';font-size:17px;color:{{ o.couleur }};cursor:pointer;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,{{ o.gloss }})"></div>
+            <span style="position:relative">{{ o.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 11px Montserrat;color:#A9A2CC;letter-spacing:1px">PROGRESSION 300 × 24</div>
+      <div style="position:relative;width:300px;height:24px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:#120E26;overflow:hidden">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:64%;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45)"></div>
+        <div style="position:absolute;left:0;top:0;width:64%;height:45%;background:rgba(255,255,255,.3)"></div>
+        <div style="position:absolute;left:calc(64% - 6px);top:0;bottom:0;width:6px;background:#FFFFFF;opacity:.8"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">7 / 11</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="border-radius:16px;background:linear-gradient(180deg,#221C42,#16122A);border:1px solid #4A3F86;padding:26px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Cartes de personnage</h2>
+    <span style="font:500 13px Montserrat;color:#A9A2CC">140 × 184 · glisse un render sur une carte pour le remplacer (double-clic pour recadrer)</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start">
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#E4E3E6 0%,#A3A2A5 50%,#5C5B60 100%);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+      <div style="position:absolute;left:10px;top:4px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.75),rgba(255,255,255,0))"></div>
+      <image-slot id="v2-carte-commun" src="img/perso_a_pied.png" fit="contain" shape="rect" placeholder="Render" style="position:absolute;left:0;top:2px;width:136px;height:150px"></image-slot>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%);pointer-events:none"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#4A494F;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px;pointer-events:none">COMMUN</div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
+        <div style="font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Capitaine</div>
+        <div style="display:flex;gap:1px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"></div>
+        <div style="display:flex;align-items:center;gap:3px;font:700 11px Montserrat;color:#7DF08A"><img src="icons/billets.png" style="width:12px;height:12px">12 $/s</div>
+      </div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(255,255,255,.55);pointer-events:none"></div>
+    </div>
+
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#6CC0FF 0%,#0078FF 50%,#003A80 100%);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+      <div style="position:absolute;left:10px;top:4px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(190,230,255,.8),rgba(255,255,255,0))"></div>
+      <image-slot id="v2-carte-rare" src="img/perso_b_pied.png" fit="contain" shape="rect" placeholder="Render" style="position:absolute;left:0;top:2px;width:136px;height:150px"></image-slot>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%);pointer-events:none"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#003A80;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px;pointer-events:none">RARE</div>
+      <div style="position:absolute;right:5px;top:6px;height:18px;padding:0 6px;display:flex;align-items:center;border-radius:9px;background:linear-gradient(180deg,#B6FFB0,#3FCB52);border:1.5px solid #0D0A1C;font:800 8.5px Montserrat;color:#0B2A10;pointer-events:none">POSÉ</div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
+        <div style="font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Sabreur</div>
+        <div style="display:flex;gap:1px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"></div>
+        <div style="display:flex;align-items:center;gap:3px;font:700 11px Montserrat;color:#7DF08A"><img src="icons/billets.png" style="width:12px;height:12px">42 $/s</div>
+      </div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(255,255,255,.55);pointer-events:none"></div>
+    </div>
+
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FFE98A 0%,#FFBE00 50%,#8A5A00 100%);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+      <div style="position:absolute;left:-30px;top:-36px;width:200px;height:200px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.28) 0deg 6deg,rgba(255,255,255,0) 6deg 22.5deg);border-radius:50%"></div>
+      <div style="position:absolute;left:10px;top:4px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,250,220,.85),rgba(255,255,255,0))"></div>
+      <image-slot id="v2-carte-legendaire" src="img/perso_a_pied.png" fit="contain" shape="rect" placeholder="Render" style="position:absolute;left:0;top:2px;width:136px;height:150px"></image-slot>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%);pointer-events:none"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#8A5A00;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px;pointer-events:none">LÉGENDAIRE</div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
+        <div style="font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Capitaine</div>
+        <div style="display:flex;gap:1px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"></div>
+        <div style="display:flex;align-items:center;gap:3px;font:700 11px Montserrat;color:#7DF08A"><img src="icons/billets.png" style="width:12px;height:12px">96 $/s</div>
+      </div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(255,240,180,.8);pointer-events:none"></div>
+      <div style="position:absolute;left:4px;bottom:4px;width:9px;height:9px;background:#FFF0A8;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+      <div style="position:absolute;right:4px;bottom:4px;width:9px;height:9px;background:#FFF0A8;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+    </div>
+
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#EBA0FF 0%,#C800FF 50%,#5A0080 100%);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+      <div style="position:absolute;left:-30px;top:-36px;width:200px;height:200px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.3) 0deg 5deg,rgba(255,255,255,0) 5deg 15deg);border-radius:50%;animation:spin 16s linear infinite"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.22) 1.2px,rgba(255,255,255,0) 1.6px) 0 0/7px 7px"></div>
+      <div style="position:absolute;left:10px;top:4px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(250,220,255,.85),rgba(255,255,255,0))"></div>
+      <image-slot id="v2-carte-mythique" src="img/perso_b_pied.png" fit="contain" shape="rect" placeholder="Render" style="position:absolute;left:0;top:2px;width:136px;height:150px"></image-slot>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%);pointer-events:none"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#5A0080;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px;pointer-events:none">MYTHIQUE</div>
+      <div style="position:absolute;right:5px;top:6px;height:18px;padding:0 6px;display:flex;align-items:center;border-radius:9px;background:linear-gradient(180deg,#B6FFB0,#3FCB52);border:1.5px solid #0D0A1C;font:800 8.5px Montserrat;color:#0B2A10;pointer-events:none">POSÉ</div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
+        <div style="font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Sabreur</div>
+        <div style="display:flex;gap:1px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile_vide.svg" style="width:13px;height:13px"></div>
+        <div style="display:flex;align-items:center;gap:3px;font:700 11px Montserrat;color:#7DF08A"><img src="icons/billets.png" style="width:12px;height:12px">162 $/s</div>
+      </div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(250,220,255,.85);pointer-events:none"></div>
+      <div style="position:absolute;left:4px;bottom:4px;width:9px;height:9px;background:#F5C8FF;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+      <div style="position:absolute;right:4px;bottom:4px;width:9px;height:9px;background:#F5C8FF;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+    </div>
+
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FF9A9A 0%,#FF2828 50%,#6E0606 100%);box-shadow:0 3px 0 #0D0A1C,0 0 0 3px #FF8A8A;overflow:hidden;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+      <div style="position:absolute;left:-30px;top:-36px;width:200px;height:200px;background:repeating-conic-gradient(from 0deg,rgba(255,240,200,.38) 0deg 4deg,rgba(255,255,255,0) 4deg 12deg);border-radius:50%;animation:spin 8s linear infinite"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(0,0,0,.22) 1.2px,rgba(0,0,0,0) 1.6px) 0 0/6px 6px"></div>
+      <div style="position:absolute;left:10px;top:4px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,235,220,.9),rgba(255,255,255,0))"></div>
+      <image-slot id="v2-carte-secret" src="img/perso_a_pied.png" fit="contain" shape="rect" placeholder="Render" style="position:absolute;left:0;top:2px;width:136px;height:150px"></image-slot>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%);pointer-events:none"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#6E0606;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px;pointer-events:none">SECRET</div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
+        <div style="font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Capitaine Éveillé</div>
+        <div style="display:flex;gap:1px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"><img src="icons2/etoile.svg" style="width:13px;height:13px"></div>
+        <div style="display:flex;align-items:center;gap:3px;font:700 11px Montserrat;color:#7DF08A"><img src="icons/billets.png" style="width:12px;height:12px">2K $/s</div>
+      </div>
+      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden">{{ sheen }}</div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(255,220,220,.9);pointer-events:none"></div>
+      <div style="position:absolute;left:4px;bottom:4px;width:9px;height:9px;background:#FFD0D0;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+      <div style="position:absolute;right:4px;bottom:4px;width:9px;height:9px;background:#FFD0D0;border:1.5px solid #0D0A1C;transform:rotate(45deg);pointer-events:none"></div>
+    </div>
+
+    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#3A3462,#1A1534);box-shadow:0 3px 0 #0D0A1C;overflow:hidden">
+      <div style="position:absolute;left:4px;top:10px;width:132px;height:132px;background:url(img/perso_b_silhouette.png) center/contain no-repeat;opacity:.95"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.92) 45%)"></div>
+      <div style="position:absolute;left:0;top:7px;height:18px;padding:0 12px 0 7px;display:flex;align-items:center;background:#5A0080;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font:800 9px Montserrat;letter-spacing:.8px">MYTHIQUE</div>
+      <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="font:400 16px 'Fredoka One';color:#7A7596">???</div>
+        <div style="font:700 10px Montserrat;color:#A9A2CC">Chance 1,63 %</div>
+      </div>
+      <div style="position:absolute;inset:3px;border-radius:9px;border:1px solid rgba(201,182,255,.25)"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:center;padding-top:12px;border-top:1px solid #2E2758">
+    <div style="position:relative;width:220px;height:220px;flex:none;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#EBA0FF,#C800FF 55%,#5A0080);overflow:hidden">
+      <div style="position:absolute;left:30px;top:30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,240,255,.85),rgba(255,255,255,0))"></div>
+      <div style="position:absolute;left:50%;bottom:14px;width:120px;height:20px;margin-left:-60px;border-radius:50%;background:rgba(13,10,28,.35)"></div>
+      <div style="position:absolute;left:10px;top:6px;width:200px;height:200px;background:url(img/perso_a_idle.png) 0 0/400% 400% no-repeat;animation:idle16 1.6s steps(1,end) infinite"></div>
+      <div style="position:absolute;inset:3px;border-radius:11px;border:1px solid rgba(255,255,255,.5)"></div>
+    </div>
+    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.55;color:#C9C3E6">
+      <div style="font:400 20px 'Fredoka One';color:#fff">Personnage animé</div>
+      <div>Ta planche <b style="color:#fff">idle_sheet</b> (4 × 4 images de 256 px) jouée à 10 images/s. Dans Roblox : ImageLabel 1024 × 1024 avec <b style="color:#fff">ImageRectSize 256 × 256</b> et ImageRectOffset changé toutes les 0,1 s. C'est léger et marche partout (inventaire, index, cartes). Le ViewportFrame 3D reste pour le panneau de détail et le tirage.</div>
+    </div>
+  </div>
+</section>
+
+<section style="border-radius:16px;background:linear-gradient(180deg,#221C42,#16122A);border:1px solid #4A3F86;padding:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Fenêtre type</h2>
+    <div style="position:relative;max-width:520px;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C">
+      <div style="position:absolute;inset:3px;border-radius:13px;border:1px solid #5A4E9E;pointer-events:none"></div>
+      <div style="position:relative;height:58px;display:flex;align-items:center;gap:12px;padding:0 14px">
+        <div style="position:relative;width:76px;height:40px;flex:none">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,#B48CFF,#6A48E0);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)"></div>
+          <img src="icons2/inventaire.svg" style="position:absolute;left:18px;top:-6px;width:44px;height:44px">
+        </div>
+        <div style="font:400 24px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Titre de fenêtre</div>
+        <div style="position:absolute;right:12px;top:10px;width:38px;height:38px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234);box-shadow:0 3px 0 #7A1020;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(6deg)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.22)"></div><img src="icons2/fermer.svg" style="position:relative;width:20px;height:20px"></div>
+      </div>
+      <div style="height:2px;margin:0 14px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
+        <div style="border-radius:12px;background:#1C1738;border:1px solid #3E3478;padding:14px;font-size:13px;line-height:1.5;color:#C9C3E6">Zone de contenu : #1C1738, liseré #3E3478 1 px, coins 12. Le ruban derrière l'icône prend la couleur de la fonction (ici Inventaire).</div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <div style="position:relative;height:46px;padding:0 22px;display:flex;align-items:center;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#7E78A8,#4A4570 50%,#36315C);box-shadow:0 3px 0 #1E1A38;font:400 18px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C;cursor:pointer;overflow:hidden;transition:transform .12s" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.12)"></div><span style="position:relative">Annuler</span></div>
+          <div style="position:relative;height:46px;padding:0 22px;display:flex;align-items:center;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4);box-shadow:0 3px 0 #2E1C8A;font:400 18px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C;cursor:pointer;overflow:hidden;transition:transform .12s" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.2)"></div><span style="position:relative">Valider</span></div>
+        </div>
+      </div>
+    </div>
+    <h2 style="margin:10px 0 0;font-family:'Fredoka One';font-weight:400;font-size:26px">Badges</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <sc-for list="{{ raretes }}" as="r" hint-placeholder-count="5">
+        <div style="position:relative;height:24px;padding:0 14px 0 10px;display:flex;align-items:center;background:linear-gradient(180deg,{{ r.light }},{{ r.hex }} 55%,{{ r.dark }});clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);font:800 11px Montserrat;letter-spacing:.6px;color:{{ r.badgeTexte }}">{{ r.maj }}</div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <div style="height:22px;padding:0 9px;display:flex;align-items:center;border-radius:11px;background:linear-gradient(180deg,#B6FFB0,#3FCB52);border:1.5px solid #0D0A1C;font:800 10px Montserrat;color:#0B2A10">POSÉ</div>
+      <div style="height:26px;padding:0 12px;display:flex;align-items:center;background:#FFFFFF;color:#0D0A1C;border:2px solid #0D0A1C;font:400 15px 'Fredoka One';transform:rotate(-5deg);box-shadow:3px 3px 0 #F0244A">NOUVEAU !</div>
+      <div style="height:26px;padding:0 10px;display:flex;align-items:center;gap:5px;border-radius:13px;background:#0D0A1C;border:1px solid #FF6AAE;font:700 11px Montserrat;color:#FF9CC8"><img src="icons2/cadenas.svg" style="width:16px;height:16px">Rebirth 1</div>
+      <div style="height:20px;padding:0 8px;display:flex;align-items:center;border-radius:4px;background:repeating-linear-gradient(135deg,#FFD66B 0 6px,#F2A516 6px 12px);border:1.5px solid #0D0A1C;font:800 9px Montserrat;letter-spacing:1px;color:#3A2500">EXEMPLE</div>
+      <div style="width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:linear-gradient(180deg,#FF7A92,#F0244A);border:2px solid #0D0A1C;font:400 13px 'Fredoka One';display:flex;align-items:center;justify-content:center">!</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Notifications</h2>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="4">
+        <div style="position:relative;width:380px;max-width:100%;height:50px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;gap:12px;overflow:hidden">
+          <div style="position:relative;width:56px;height:100%;flex:none;background:linear-gradient(180deg,{{ t.c1 }},{{ t.c2 }} 55%,{{ t.c3 }});clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);display:flex;align-items:center;justify-content:center"><div style="width:30px;height:30px;margin-right:6px;background:url({{ t.src }}) center/contain no-repeat"></div></div>
+          <div style="font:400 17px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">{{ t.msg }}</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:3px;background:{{ t.c2 }}"></div>
+        </div>
+      </sc-for>
+    </div>
+    <h2 style="margin:10px 0 0;font-family:'Fredoka One';font-weight:400;font-size:26px">Icônes rendues <span style="font:500 13px Montserrat;color:#A9A2CC">volume, reflet, ombre portée</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px">
+      <sc-for list="{{ icones }}" as="i" hint-placeholder-count="18">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:10px;background:#1C1738;border:1px solid #2E2758">
+          <div style="width:36px;height:36px;background:url({{ i.src }}) center/contain no-repeat"></div>
+          <div style="font:600 10px Montserrat;color:#A9A2CC;text-align:center">{{ i.n }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="border-radius:16px;background:linear-gradient(180deg,#221C42,#16122A);border:1px solid #4A3F86;padding:26px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Effets manga</h2>
+    <span style="font:500 13px Montserrat;color:#A9A2CC">réservés aux moments forts : tirage, téléportation, rebirth</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="position:relative;height:160px;border-radius:12px;border:2px solid #0D0A1C;overflow:hidden;background:#FFFFFF">
+        <div style="position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;background:radial-gradient(closest-side,#FFFFFF 22%,rgba(255,255,255,0) 60%),repeating-conic-gradient(from 0deg,#0D0A1C 0deg 1.4deg,rgba(13,10,28,0) 1.4deg 5deg,#0D0A1C 5deg 5.8deg,rgba(13,10,28,0) 5.8deg 11deg);animation:spin 30s linear infinite"></div>
+      </div>
+      <div style="font:700 13px Montserrat">Lignes de vitesse <span style="font-weight:500;color:#A9A2CC">— téléportation</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="position:relative;height:160px;border-radius:12px;border:2px solid #0D0A1C;overflow:hidden;background:linear-gradient(135deg,#C800FF,#5A0080)">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.55) 2px,rgba(255,255,255,0) 2.6px) 0 0/10px 10px"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(90,0,128,1) 0%,rgba(90,0,128,0) 70%)"></div>
+      </div>
+      <div style="font:700 13px Montserrat">Trame <span style="font-weight:500;color:#A9A2CC">— fond des cartes Mythique+, rebirth</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="position:relative;height:160px;border-radius:12px;border:2px solid #0D0A1C;overflow:hidden;background:#0D0A1C;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;width:210px;height:210px;background:#FFFFFF;clip-path:polygon(50% 0,58% 32%,88% 12%,68% 40%,100% 50%,68% 60%,88% 88%,58% 68%,50% 100%,42% 68%,12% 88%,32% 60%,0 50%,32% 40%,12% 12%,42% 32%)"></div>
+        <div style="position:absolute;width:150px;height:150px;background:#FF2828;clip-path:polygon(50% 0,58% 32%,88% 12%,68% 40%,100% 50%,68% 60%,88% 88%,58% 68%,50% 100%,42% 68%,12% 88%,32% 60%,0 50%,32% 40%,12% 12%,42% 32%)"></div>
+      </div>
+      <div style="font:700 13px Montserrat">Éclat d'impact <span style="font-weight:500;color:#A9A2CC">— retournement de carte</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="position:relative;height:160px;border-radius:12px;border:2px solid #0D0A1C;overflow:hidden;background:#FFE066;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(13,10,28,.25) 1.6px,rgba(13,10,28,0) 2.2px) 0 0/8px 8px"></div>
+        <div style="position:relative;font:400 40px 'Fredoka One';color:#FFFFFF;text-shadow:0 3px 0 #0D0A1C,3px 0 0 #0D0A1C,-3px 0 0 #0D0A1C,0 -3px 0 #0D0A1C,3px 3px 0 #0D0A1C,-3px 3px 0 #0D0A1C,6px 7px 0 #F0244A;animation:wobble 1.2s ease-in-out infinite">MYTHIQUE !!</div>
+      </div>
+      <div style="font:700 13px Montserrat">Titre-choc <span style="font-weight:500;color:#A9A2CC">— TextLabel + UIStroke 3 px, rotation −6°</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#F4F1FA;color:#1A1530;border:2px solid #0D0A1C;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Fiche technique — planche v2</h2>
+    <span style="font:600 12px Montserrat;color:#5A547A">valeurs à 1100 × 650 (UIScale)</span>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ specs }}" as="s" hint-placeholder-count="12">
+        <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid #DAD4EA;font-size:13px">
+          <div style="font-weight:700">{{ s.k }}</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;color:#3A3456">{{ s.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:700 13px Montserrat">Images PNG à produire (fond transparent, sans texte)</div>
+      <sc-for list="{{ pngs }}" as="p" hint-placeholder-count="12">
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #DAD4EA;font:500 12px ui-monospace,Menlo,monospace"><span>{{ p.f }}</span><span style="color:#6A6488;white-space:nowrap">{{ p.t }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { onglet: 0 };
+  renderVals() {
+    const TS = '0 1.5px 0 #0D0A1C, 1.5px 0 0 #0D0A1C, -1.5px 0 0 #0D0A1C, 0 -1.5px 0 #0D0A1C, 0 2.5px 0 #0D0A1C';
+    const raretes = [
+      { nom: 'Commun', pct: '60 %', light: '#E4E3E6', hex: '#A3A2A5', dark: '#5C5B60', badgeTexte: '#0D0A1C' },
+      { nom: 'Rare', pct: '25 %', light: '#6CC0FF', hex: '#0078FF', dark: '#003A80', badgeTexte: '#FFFFFF' },
+      { nom: 'Légendaire', pct: '10 %', light: '#FFE98A', hex: '#FFBE00', dark: '#8A5A00', badgeTexte: '#0D0A1C' },
+      { nom: 'Mythique', pct: '4,9 %', light: '#EBA0FF', hex: '#C800FF', dark: '#5A0080', badgeTexte: '#FFFFFF' },
+      { nom: 'Secret', pct: '0,1 %', light: '#FF9A9A', hex: '#FF2828', dark: '#6E0606', badgeTexte: '#FFFFFF', secret: true },
+    ].map(r => ({ ...r, maj: r.nom.toUpperCase() }));
+    const mk = (nom, label, c1, c2, c3, ombre, texte, ts, gloss, lis) => ({ nom, label, c1, c2, c3, ombre, texte, ts, gloss, liseré: lis, curseur: 'pointer', hover: 'scale(1.05)', active: 'translateY(3px)', bright: 1.08,
+      etats: [{ ombre: 3, transform: 'none', bright: 1 }, { ombre: 3, transform: 'scale(1.05)', bright: 1.1 }, { ombre: 0, transform: 'translateY(3px)', bright: .95 }] });
+    const boutons = [
+      mk('Principal', 'Jouer', '#B49CFF', '#7454F0', '#5235C4', '#2E1C8A', '#FFFFFF', TS, .2, .4),
+      mk('Secondaire', 'Retour', '#7E78A8', '#4A4570', '#36315C', '#1E1A38', '#FFFFFF', TS, .12, .25),
+      mk('Or', 'Acheter', '#FFF0A8', '#FFC93C', '#F29A12', '#94570A', '#4A2600', '0 1px 0 rgba(255,255,255,.6)', .3, .6),
+      mk('Danger', 'Recycler', '#FF8C96', '#F0414F', '#C42234', '#7A1020', '#FFFFFF', TS, .2, .4),
+      { ...mk('Désactivé', 'Bloqué', '#3A3558', '#322D4E', '#2A2644', '#18152C', '#6E6890', 'none', .04, .08), curseur: 'not-allowed', hover: 'none', active: 'none', bright: 1 },
+    ];
+    boutons[4].etats = boutons[4].etats.map(() => ({ ombre: 3, transform: 'none', bright: 1 }));
+    const onglets = ['Lot 1', 'Lot 2', 'Lot 3'].map((label, i) => { const a = this.state.onglet === i;
+      return { label, bg: a ? 'linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4)' : 'transparent', gloss: a ? .2 : 0, couleur: a ? '#FFFFFF' : '#A9A2CC', choisir: () => this.setState({ onglet: i }) }; });
+    return {
+      palette: [
+        { nom: 'Fond', hex: '#16122A', fond: '#16122A', gloss: 0 }, { nom: 'Panneau', hex: '#2A2350 → #17132E', fond: 'linear-gradient(180deg,#2A2350,#17132E)', gloss: 0 },
+        { nom: 'Zone contenu', hex: '#1C1738', fond: '#1C1738', gloss: 0 }, { nom: 'Liseré', hex: '#5A4E9E / #3E3478', fond: '#5A4E9E', gloss: 0 },
+        { nom: 'Trait sombre', hex: '#0D0A1C (2 px)', fond: '#0D0A1C', gloss: 0 }, { nom: 'Texte discret', hex: '#A9A2CC', fond: '#A9A2CC', gloss: 0 },
+        { nom: 'Or (argent)', hex: '#FFF0A8 · #FFC93C · #F29A12', fond: 'linear-gradient(180deg,#FFF0A8,#FFC93C 50%,#F29A12)', gloss: .25 },
+        { nom: 'Filet doré', hex: '#FFD66B', fond: '#FFD66B', gloss: 0 },
+        { nom: 'Vert (gains)', hex: '#B6FFB0 · #5EE06A · #2FAE45', fond: 'linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45)', gloss: .25 },
+        { nom: 'Principal', hex: '#B49CFF · #7454F0 · #5235C4', fond: 'linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4)', gloss: .2 },
+        { nom: 'Danger', hex: '#FF8C96 · #F0414F · #C42234', fond: 'linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234)', gloss: .2 },
+        { nom: 'Pastille', hex: '#FF7A92 → #F0244A', fond: 'linear-gradient(180deg,#FF7A92,#F0244A)', gloss: .2 },
+      ],
+      raretes, boutons, onglets,
+      icoBtns: [{ src: 'icons2/teleport.svg', badge: '!', c1: '#9EEFFF', c2: '#22B8F0', c3: '#0B5FA8' }, { src: 'icons2/inventaire.svg', badge: '3', c1: '#DCC6FF', c2: '#9B6BFF', c3: '#5226C0' }, { src: 'icons2/rebirth.svg', badge: null, c1: '#FFB8D8', c2: '#FF4F9A', c3: '#A8124F' }, { src: 'icons2/boutique.svg', badge: null, c1: '#C2FFB8', c2: '#3FD45E', c3: '#137A2C' }, { src: 'icons2/index.svg', badge: null, c1: '#FFD596', c2: '#FF962A', c3: '#B85000' }, { src: 'icons2/parametres.svg', badge: null, c1: '#D2DCFF', c2: '#7A8CD6', c3: '#38448A' }],
+      sheen: React.createElement('div', { style: { position: 'absolute', top: '-40px', left: 0, width: '36px', height: '280px', background: 'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0))', animation: 'sheen 2.6s ease-in-out infinite', pointerEvents: 'none' } }),
+      toasts: [
+        { msg: 'Personnage posé !', c1: '#B6FFB0', c2: '#3FCB52', c3: '#1E8A33', src: 'icons2/etoile.svg' },
+        { msg: '+1,23K $ collectés', c1: '#FFF0A8', c2: '#FFC93C', c3: '#C27A08', src: 'icons/billets.png' },
+        { msg: 'Pas assez d\u2019argent', c1: '#FF8C96', c2: '#F0414F', c3: '#C42234', src: 'icons2/fermer.svg' },
+        { msg: 'Nouveau : Sabreur (Mythique)', c1: '#EBA0FF', c2: '#C800FF', c3: '#5A0080', src: 'icons2/etoile.svg' },
+      ],
+      icones: [['teleport', 'Téléport.'], ['index', 'Index'], ['inventaire', 'Inventaire'], ['rebirth', 'Rebirth'], ['boutique', 'Boutique'], ['parametres', 'Paramètres'], ['centre', 'Centre Hub'], ['evolutions', 'Évolutions'], ['etoiles_stand', 'Étoiles'], ['atelier', 'Atelier'], ['recyclage', 'Recyclage'], ['classements', 'Classements'], ['base', 'Ma base'], ['piece', 'Pièce'], ['etoile', 'Étoile'], ['cadenas', 'Cadenas'], ['loupe', 'Recherche'], ['fermer', 'Fermer']].map(([f, n]) => ({ n, src: `icons2/${f}.svg` })),
+      specs: [
+        { k: 'Polices', v: 'Titres FredokaOne · texte GothamMedium/Bold (maquette : Montserrat 500–800)' },
+        { k: 'Tailles texte', v: 'titre fenêtre 24 · bouton 18–19 · nom carte 15 · corps 13 · ruban 9–11 (Gotham Black, espacement 0,8)' },
+        { k: 'Trait', v: 'UIStroke #0D0A1C 2 px (1,5 px badges) · texte blanc : UIStroke Contextual 1,5 px' },
+        { k: 'Liseré intérieur', v: 'Frame enfant inset 2–3 px, fond transparent, UIStroke 1 px blanc transp. 0,6 (boutons) / #5A4E9E (fenêtres)' },
+        { k: 'Bouton', v: 'H 50 (46 en fenêtre), coins 12, UIGradient 3 tons (0 / 0,5 / 1) · reflet : Frame blanche 48 % de haut, transp. 0,8, coins seulement en haut' },
+        { k: 'Ombre', v: 'Frame derrière, Y +3 px, couleur ombre du bouton, pas de flou · appui : Y +3 et ombre 0' },
+        { k: 'Bouton icône', v: '60 × 60, coins 14, icône 42 · fond coloré par fonction : dégradé 160° 3 tons + trame + reflet' },
+        { k: 'Fenêtre', v: 'coins 16, dégradé #2A2350 → #17132E, en-tête H 58, filet doré 2 px #FFD66B → transparent, fermer 38 × 38 coins 10' },
+        { k: 'Ruban titre', v: 'PNG 9-slice en biais 76 × 40 teinté par fonction, icône 44 qui dépasse de 6 px en haut' },
+        { k: 'Carte', v: '140 × 184, coins 12 · fond dégradé 160° rareté · lueur derrière le perso (PNG) · render 136 × 150 · plaque bas H 64 #0D0A1C transp. 0,08 · ruban rareté H 18' },
+        { k: 'Carte Légendaire+', v: '+ rayons fixes (Lég.) / tournants 16 s (Myth.) / 8 s (Secret) + losanges dans les coins + trame (Myth., Secret) + reflet animé (Secret)' },
+        { k: 'Perso animé', v: 'spritesheet 1024² en 4 × 4, ImageRectSize 256, 10 img/s' },
+        { k: 'Toast', v: '380 × 50, coins 12, ruban icône 56 en biais couleur du type, barre bas 3 px' },
+        { k: 'Progression', v: '300 × 24, coins 12, fond #120E26, remplissage vert 3 tons + curseur blanc 6 px' },
+      ],
+      pngs: [
+        { f: 'ic_*.png (18 icônes rendues, 2 px de marge)', t: '256 × 256' }, { f: 'perso_<id>_pied.png · _portrait.png', t: '1024² / 512²' },
+        { f: 'perso_<id>_idle.png (4 × 4)', t: '1024 × 1024' }, { f: 'perso_<id>_silhouette.png', t: '512 × 512' },
+        { f: 'lueur_douce.png (halo blanc, teinté)', t: '256 × 256' }, { f: 'rayons_carte.png', t: '512 × 512' },
+        { f: 'trame_points.png (tile)', t: '16 × 16' }, { f: 'ruban_biais.png (9-slice)', t: '64 × 40' },
+        { f: 'losange_coin.png', t: '24 × 24' }, { f: 'lignes_vitesse.png', t: '1024 × 1024' },
+        { f: 'eclat_impact.png', t: '512 × 512' }, { f: 'reflet_bande.png', t: '64 × 512' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script>window.OM_SCENES = '[{"name":"Apparition","dur":1.6,"desc":"Un rig Roblox classique tout noir apparaît sous un projecteur"},{"name":"Montee","dur":3.8,"desc":"La rareté grimpe palier par palier : onde de choc, couleur, titre et jauge à chaque niveau"},{"name":"Impact","dur":0.7,"desc":"Deux cases manga noir/blanc avec le rig, flash blanc"},{"name":"Revelation","dur":3,"desc":"Le perso remplace le rig (silhouette puis couleurs), rayons, titre de rareté, ruban du nom, étoiles"},{"name":"Pose","dur":2.5,"desc":"Poussée caméra, revenu et bouton Super, retour au noir"}]';</script>
+<script>window.OM_PLAYBACK = '{"mode":"loop"}';</script>
+<script>window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "rarete": "Secret",
+  "perso": "B",
+  "etoiles": 4,
+  "motionEditor": true
+}/*EDITMODE-END*/;</script>
+<style>html,body{margin:0;background:#0B0918;color:#FFFFFF;font-family:Montserrat,sans-serif}a{color:#FFD66B}a:hover{color:#FFE9A8}</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:40px 40px 80px;display:flex;flex-direction:column;gap:22px">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <img src="icons2/etoile.svg" style="width:42px;height:42px">
+      <h1 style="margin:0;font:400 40px 'Fredoka One';text-shadow:0 3px 0 #0D0A1C">Tirage — révélation du rig</h1>
+      
+    </div>
+    <p style="margin:0;max-width:880px;color:#C9C3E6;font-size:14px;line-height:1.55;text-wrap:pretty">Plus de carte : un rig Roblox R6 classique en 3D, tout noir, qui tourne sur lui-même (un quart de tour à chaque palier), apparaît sous un projecteur. La rareté monte palier par palier (Commun, puis Rare, puis Légendaire…) jusqu'à celle obtenue. À chaque palier : onde de choc, liseré et halo à la couleur du palier, titre qui claque, jauge qui s'allume, secousse de plus en plus forte. Puis 2 cases manga, et le vrai personnage remplace le rig : d'abord en silhouette, puis en couleurs. Dans Tweaks, choisis la rareté finale : Commun = 1 palier, Secret = 5.</p>
+  </header>
+  <x-import component-from-global-scope="TirageAnim" from="./animations-v3.jsx ./tweaks-panel.jsx ./tirage-anim.jsx" hint-size="1100px,700px" style="display:block;position:relative;width:1100px;height:700px"></x-import>
+  <section style="background:#F4F1FA;color:#1A1530;border:2px solid #0D0A1C;border-radius:16px;padding:26px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:26px">
+    <div style="display:flex;flex-direction:column;gap:0">
+      <h2 style="margin:0 0 10px;font:400 24px 'Fredoka One'">Fiche technique — séquence</h2>
+      <sc-for list="{{ specs }}" as="s" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid #DAD4EA;font-size:13px">
+          <div style="font-weight:700">{{ s.k }}</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;color:#3A3456">{{ s.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:700 13px Montserrat">PNG à produire (fond transparent, sans texte)</div>
+      <sc-for list="{{ pngs }}" as="p" hint-placeholder-count="8">
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #DAD4EA;font:500 12px ui-monospace,Menlo,monospace"><span>{{ p.f }}</span><span style="color:#6A6488;white-space:nowrap">{{ p.t }}</span></div>
+      </sc-for>
+      
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      specs: [
+        { k: '0 – 1,6 s', v: 'Projecteur (PNG cône + ellipse au sol) · rig R6 noir #050308 : tête 68² coins 18, torse 112 × 114, bras et jambes 54 × 112, liseré 2 px · monte de 40 px, UIScale 0,85 → 1 (Back) · bras qui se balancent ±5°' },
+        { k: '1,6 – 5,4 s', v: 'Paliers répartis sur la section (1 à 5 selon la rareté). Chaque palier : onde Ø 120 → ×4,8 en 0,7 s · liseré, halo et projecteur passent à la couleur du palier · titre Fredoka 58 (contour 4, ombre couleur 7/9) qui claque ×2,2 → ×1 · un segment de jauge s\u2019allume · secousse 3 px + 2,5 px par palier · le rig grossit de 8 % puis revient' },
+        { k: '5,4 – 6,1 s', v: 'Rig qui blanchit · case 1 (0,14 s) : fond noir, lignes blanches, rig blanc · case 2 (0,16 s) : inversé · flash blanc 0,6 s · secousse ±10 px' },
+        { k: '6,1 – 9,1 s', v: 'Rayons 800² ×2 couronnes · le perso monte de 60 px (Back), en silhouette noire qui disparaît en 0,6 s (ImageColor3 noir → blanc) · « MYTHIQUE ! » Fredoka 64 · ruban 620 × 92 · étoiles 46 px une par une (0,22 s)' },
+        { k: '9,1 – 11,6 s', v: 'Poussée caméra +5 % · revenu + « Super ! » · fondu au noir 0,8 s' },
+        { k: 'Jauge', v: '5 segments 52 × 12 penchés (PNG), y 552, éteint #1C1738 / allumé dégradé de la rareté + halo' },
+        { k: 'Durée', v: 'Commun : passer à ≈ 6 s en coupant les paliers · bouton « Passer » conseillé après l\u2019Impact' },
+        { k: 'Rig en jeu', v: 'un vrai rig R6 noir dans un ViewportFrame qui tourne (CFrame.Angles), lumière de contour = Highlight à la couleur du palier — la maquette projette 6 pavés en 3D comme repère, matériau SmoothPlastic noir + Highlight (OutlineColor = palier). Sinon, ImageLabels par partie' },
+      ],
+      pngs: [
+        { f: 'projecteur_cone.png · projecteur_sol.png', t: '512 × 1024 / 512 × 128' }, { f: 'onde_anneau.png (blanc, teinté)', t: '256 × 256' },
+        { f: 'jauge_segment.png (penché)', t: '64 × 16' }, { f: 'lueur_douce.png', t: '512 × 512' },
+        { f: 'lignes_vitesse_blanc.png / _noir.png', t: '1024 × 1024' }, { f: 'rayons_larges.png · rayons_fins.png', t: '1024 × 1024' },
+        { f: 'ruban_nom.png (biais, fondu à droite)', t: '640 × 96' }, { f: 'trame_points.png', t: '16 × 16' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

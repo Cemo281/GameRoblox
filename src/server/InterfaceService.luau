@@ -54,8 +54,9 @@ function InterfaceService.EnvoyerCollecte(player: Player, montant: number)
 	Remotes.Evenement("Collecte"):FireClient(player, montant)
 end
 
-function InterfaceService.Notifier(player: Player, texte: string)
-	Remotes.Evenement("Notification"):FireClient(player, texte)
+-- `typeToast` : "succes", "argent", "erreur" (par défaut), "info" ou un Id de rareté.
+function InterfaceService.Notifier(player: Player, texte: string, typeToast: Remotes.TypeNotification?)
+	Remotes.Evenement("Notification"):FireClient(player, texte, typeToast or "erreur")
 end
 
 -- Renvoie l'uid si c'est bien un personnage du joueur, sinon nil.

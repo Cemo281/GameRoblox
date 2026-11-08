@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0B1A;color:#FFFFFF;font-family:Montserrat,sans-serif}
+a{color:#FFCD3C}a:hover{color:#FFE27A}
+input::placeholder{color:#7A7596}
+::-webkit-scrollbar{width:12px}::-webkit-scrollbar-track{background:#120E22;border-radius:6px}::-webkit-scrollbar-thumb{background:#605096;border-radius:6px;border:2px solid #120E22}
+@keyframes popIn{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+@keyframes toastIn{0%{transform:translateY(-30px) scale(.8);opacity:0}60%{transform:translateY(4px) scale(1.04);opacity:1}100%{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:48px 40px 80px;display:flex;flex-direction:column;gap:28px">
+
+<header style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <img src="icons/inventaire.svg" style="width:40px;height:40px">
+    <h1 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:44px;text-shadow:0 4px 0 #120E22">Inventaire + Index</h1>
+    <span style="font:700 12px Montserrat;color:#120E22;background:#FFCD3C;border:2px solid #120E22;border-radius:8px;padding:4px 8px">ÉCRANS 4 ET 5 / 11</span>
+    <a href="HUD v3 offres.dc.html" style="font:600 13px Montserrat">← HUD v3</a>
+  </div>
+  <p style="margin:0;max-width:860px;color:#B9B4D2;font-size:15px;line-height:1.55;text-wrap:pretty">Une seule maquette 1100 × 650 : ouvre l'Inventaire ou l'Index avec la barre de gauche. Inventaire d'exemple : 37 cartes de 7 personnages, 6 emplacements débloqués sur 10. Noms provisoires. Chances par personnage = chance de la rareté ÷ nombre de persos de cette rareté (équiprobabilité à confirmer dans le wiki).</p>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;align-items:baseline;gap:12px"><h2 style="margin:0;font:400 26px 'Fredoka One'">PC — 1100 × 650</h2><span style="font-size:13px;color:#B9B4D2">Clique une carte, filtre, trie, cherche, pose ou recycle.</span></div>
+  <div style="position:relative;width:1100px;height:650px;flex:none;overflow:hidden;border-radius:14px;border:3px solid #120E22;background:linear-gradient(180deg,#2B2550 0%,#22384A 55%,#1C2E2A 100%)">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 14px,transparent 14px 28px)"></div>
+    <div style="position:absolute;left:0;right:0;top:300px;text-align:center;font:500 13px ui-monospace,Menlo,monospace;color:rgba(185,180,210,.55)">VUE 3D DU JEU — ta base</div>
+    <div style="position:absolute;left:12px;top:140px;display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+        <div onClick="{{ m.click }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;width:64px;cursor:pointer">
+          <div style="position:relative;width:58px;height:58px;box-sizing:border-box;border-radius:18px;border:3px solid #120E22;background:linear-gradient(180deg,#8A6CFF,#6448D2);box-shadow:{{ m.ring }};display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(4px)">
+            <div style="position:absolute;left:6px;right:6px;top:4px;height:13px;border-radius:7px;background:rgba(255,255,255,.28)"></div>
+            <div style="position:relative;width:38px;height:38px;background:url({{ m.src }}) center/contain no-repeat"></div>
+          </div>
+          <div style="font:400 12px 'Fredoka One';text-shadow:0 2px 0 #120E22,1px 0 0 #120E22,-1px 0 0 #120E22,0 -1px 0 #120E22;white-space:nowrap">{{ m.nom }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="position:absolute;left:0;right:0;top:12px;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:60">
+      <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+        <div style="min-width:300px;height:52px;box-sizing:border-box;border-radius:26px;border:3px solid #120E22;background:linear-gradient(180deg,{{ t.top }},{{ t.base }});box-shadow:0 5px 0 {{ t.ombre }};display:flex;align-items:center;gap:10px;padding:0 20px 0 5px;animation:toastIn .35s ease-out">
+          <div style="width:38px;height:38px;border-radius:19px;background:#120E22;display:flex;align-items:center;justify-content:center"><div style="width:26px;height:26px;background:url({{ t.src }}) center/contain no-repeat"></div></div>
+          <div style="font:400 17px 'Fredoka One';text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22">{{ t.msg }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ ouvertInv }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ fermer }}" style="position:absolute;inset:0;background:rgba(10,8,20,.6);z-index:20"></div>
+      <div style="position:absolute;left:20px;top:64px;width:1060px;height:570px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:22px;border:3px solid #120E22;background:#181626;box-shadow:0 6px 0 #120E22;display:flex;flex-direction:column">
+          <div style="position:relative;height:56px;flex:none;border-radius:19px 19px 0 0;background:linear-gradient(180deg,#C7A9FF,#8A5CF0);border-bottom:3px solid #120E22;display:flex;align-items:center;gap:10px;padding:0 20px;overflow:hidden">
+            <div style="position:absolute;left:10px;right:70px;top:5px;height:14px;border-radius:7px;background:rgba(255,255,255,.28)"></div>
+            <img src="icons/inventaire.svg" style="position:relative;width:36px;height:36px">
+            <div style="position:relative;font:400 26px 'Fredoka One';text-shadow:0 3px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22">Inventaire</div>
+            <div style="position:relative;margin-left:auto;margin-right:40px;height:34px;padding:0 14px 0 6px;display:flex;align-items:center;gap:6px;border-radius:17px;background:#120E22;font:400 18px 'Fredoka One';color:{{ compteurCouleur }}"><img src="icons/inventaire.svg" style="width:24px;height:24px">{{ compteur }} / 100</div>
+          </div>
+          <div onClick="{{ fermer }}" style="position:absolute;right:-14px;top:-14px;width:52px;height:52px;box-sizing:border-box;border-radius:26px;border:3px solid #120E22;background:linear-gradient(180deg,#FF7A85,#E8323F);box-shadow:0 5px 0 #8E1420;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(8deg)" style-active="transform:translateY(4px)"><img src="icons/fermer.svg" style="width:26px;height:26px"></div>
+          <div style="flex:1;min-height:0;display:flex;gap:16px;padding:14px 18px 18px">
+            <div style="width:772px;flex:none;display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="height:40px;flex:none;display:flex;align-items:center;gap:6px">
+                <sc-for list="{{ filtres }}" as="f" hint-placeholder-count="6">
+                  <div onClick="{{ f.click }}" style="height:34px;padding:0 11px;display:flex;align-items:center;gap:6px;box-sizing:border-box;border-radius:17px;border:3px solid #120E22;background:{{ f.bg }};font:400 14px 'Fredoka One';color:{{ f.texte }};cursor:pointer;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-2px)">
+                    <div style="width:10px;height:10px;border-radius:5px;background:{{ f.dot }};border:2px solid #120E22"></div>{{ f.nom }}
+                  </div>
+                </sc-for>
+                <div style="flex:1"></div>
+                <div style="height:36px;width:176px;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:0 10px;border-radius:18px;background:#120E22;border:2px solid #605096">
+                  <img src="icons/loupe.svg" style="width:20px;height:20px">
+                  <input value="{{ recherche }}" onChange="{{ chercher }}" placeholder="Rechercher…" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#FFFFFF;font:600 13px Montserrat">
+                </div>
+              </div>
+              <div style="height:34px;flex:none;display:flex;align-items:center;gap:8px">
+                <div style="font:700 11px Montserrat;color:#B9B4D2;letter-spacing:1px">TRIER PAR</div>
+                <div style="display:flex;gap:4px;padding:3px;border-radius:14px;background:#120E22">
+                  <sc-for list="{{ tris }}" as="o" hint-placeholder-count="3">
+                    <div onClick="{{ o.click }}" style="height:28px;padding:0 14px;display:flex;align-items:center;border-radius:11px;background:{{ o.bg }};font:400 14px 'Fredoka One';color:{{ o.texte }};cursor:pointer">{{ o.nom }}</div>
+                  </sc-for>
+                </div>
+                <div style="margin-left:auto;font:600 12px Montserrat;color:#B9B4D2">{{ nbAffiches }} affichés · posés {{ nbPoses }} / {{ slots }} emplacements</div>
+              </div>
+              <div style="flex:1;min-height:0;overflow-y:auto;padding:6px 6px 10px 4px">
+                <div style="display:grid;grid-template-columns:repeat(5,140px);gap:12px">
+                  <sc-for list="{{ grille }}" as="k" hint-placeholder-count="10">
+                    <div onClick="{{ k.click }}" style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:16px;border:3px solid #120E22;background:{{ k.hex }};box-shadow:{{ k.ring }};padding:4px;cursor:pointer;transform:{{ k.lift }};transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+                      <div style="position:relative;height:100%;border-radius:12px;background:#2A2642;overflow:hidden;display:flex;flex-direction:column">
+                        <div style="position:relative;height:104px;flex:none;background:linear-gradient(180deg,{{ k.light }} 0%,{{ k.hex }} 60%,{{ k.dark }} 100%);overflow:hidden">
+                          <div style="position:absolute;left:24px;top:8px;width:80px;height:96px;background:url({{ k.img }}) center/contain no-repeat"></div>
+                          <div style="position:absolute;left:5px;top:5px;padding:2px 7px;border-radius:8px;background:{{ k.dark }};border:2px solid #120E22;font:700 9px Montserrat;letter-spacing:.5px">{{ k.rareteMaj }}</div>
+                          <sc-if value="{{ k.pose }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:5px;bottom:5px;padding:2px 6px;border-radius:8px;background:#3FCB52;border:2px solid #120E22;font:700 9px Montserrat;color:#0B2A10">POSÉ</div></sc-if>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 6px">
+                          <div style="font:400 15px 'Fredoka One';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ k.nom }}</div>
+                          <div style="display:flex;gap:1px">
+                            <sc-for list="{{ k.etoiles }}" as="s" hint-placeholder-count="5"><div style="width:14px;height:14px;background:url({{ s }}) center/contain no-repeat"></div></sc-for>
+                          </div>
+                          <div style="display:flex;align-items:center;gap:3px;font:700 12px Montserrat;color:#6EE678"><img src="icons/billets.png" style="width:13px;height:13px">{{ k.revenu }} $/s</div>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ vide }}" hint-placeholder-val="{{ false }}"><div style="padding:60px 0;text-align:center;font:400 18px 'Fredoka One';color:#7A7596">Aucun personnage ne correspond.</div></sc-if>
+              </div>
+            </div>
+
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+              <sc-if value="{{ sel.ok }}" hint-placeholder-val="{{ true }}">
+                <div style="position:relative;height:196px;flex:none;box-sizing:border-box;border-radius:16px;border:3px solid #120E22;background:linear-gradient(180deg,{{ sel.light }},{{ sel.hex }} 60%,{{ sel.dark }});overflow:hidden">
+                  <div style="position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg 12deg,rgba(255,255,255,.14) 12deg 18deg);animation:spinSlow 14s linear infinite"></div>
+                  <div style="position:absolute;left:50%;bottom:16px;width:130px;height:22px;margin-left:-65px;border-radius:50%;background:rgba(18,14,34,.45)"></div>
+                  <div style="position:absolute;left:50%;top:14px;width:130px;height:160px;margin-left:-65px;background:url({{ sel.img }}) center/contain no-repeat;animation:bob 2.2s ease-in-out infinite"></div>
+                  <div style="position:absolute;left:8px;bottom:6px;font:500 9px ui-monospace,Menlo,monospace;color:rgba(255,255,255,.7)">ViewportFrame · modèle 3D animé</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font:400 24px 'Fredoka One';line-height:26px">{{ sel.nom }}</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="height:24px;padding:0 10px;display:flex;align-items:center;border-radius:12px;background:linear-gradient(180deg,{{ sel.light }},{{ sel.hex }});border:3px solid #120E22;font:700 11px Montserrat;color:{{ sel.badgeTexte }}">{{ sel.rarete }}</div>
+                    <div style="display:flex;gap:1px"><sc-for list="{{ sel.etoiles }}" as="s" hint-placeholder-count="5"><div style="width:18px;height:18px;background:url({{ s }}) center/contain no-repeat"></div></sc-for></div>
+                  </div>
+                </div>
+                <div style="border-radius:14px;background:#2A2642;border:2px solid #605096;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 12px Montserrat;color:#B9B4D2">Revenu</span><span style="display:flex;align-items:center;gap:4px;font:400 18px 'Fredoka One';color:#6EE678"><img src="icons/billets.png" style="width:18px;height:18px">{{ sel.revenu }} $/s</span></div>
+                  <div style="font:500 11px Montserrat;color:#B9B4D2">{{ sel.calcul }}</div>
+                  <div style="height:2px;background:#3A3462"></div>
+                  <div style="display:flex;justify-content:space-between"><span style="font:600 12px Montserrat;color:#B9B4D2">État</span><span style="font:700 12px Montserrat;color:{{ sel.etatCouleur }}">{{ sel.etat }}</span></div>
+                </div>
+                <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+                  <div onClick="{{ sel.action }}" style="position:relative;height:50px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:14px;border:3px solid #120E22;background:{{ sel.actionBg }};box-shadow:0 5px 0 {{ sel.actionOmbre }};font:400 20px 'Fredoka One';text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22;cursor:pointer;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(4px)">
+                    <div style="position:absolute;left:8px;right:8px;top:4px;height:14px;border-radius:7px;background:rgba(255,255,255,.25)"></div><span style="position:relative">{{ sel.actionNom }}</span>
+                  </div>
+                  <div onClick="{{ sel.recycler }}" style="position:relative;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;border:3px solid #120E22;background:{{ sel.recBg }};box-shadow:0 5px 0 {{ sel.recOmbre }};font:400 17px 'Fredoka One';color:{{ sel.recTexte }};cursor:{{ sel.recCurseur }};transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:{{ sel.recHover }}" style-active="transform:{{ sel.recActive }}">
+                    <img src="icons/recyclage.svg" style="width:24px;height:24px">Recycler
+                  </div>
+                  <div style="font:500 11px Montserrat;color:#7A7596;text-align:center;height:14px">{{ sel.recNote }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ confirm.ok }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(10,8,20,.6);z-index:40"></div>
+      <div style="position:absolute;left:330px;top:205px;width:440px;z-index:41;animation:popIn .25s ease-out">
+        <div style="box-sizing:border-box;border-radius:22px;border:3px solid #120E22;background:#181626;box-shadow:0 6px 0 #120E22;overflow:hidden">
+          <div style="height:52px;background:linear-gradient(180deg,#FF7A85,#E8323F);border-bottom:3px solid #120E22;display:flex;align-items:center;justify-content:center;font:400 22px 'Fredoka One';text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22">Recycler ?</div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:14px;align-items:center">
+            <div style="font:600 15px/1.45 Montserrat;text-align:center">{{ confirm.nom }} disparaîtra pour toujours.</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="display:flex;align-items:center;gap:6px;font:400 26px 'Fredoka One';color:#FFCD3C;text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22"><img src="icons/billets.png" style="width:30px;height:30px">+{{ confirm.prix }}</div>
+              <div style="height:20px;padding:0 7px;display:flex;align-items:center;border-radius:6px;background:repeating-linear-gradient(135deg,#FFCD3C 0 6px,#FFB21F 6px 12px);border:2px solid #120E22;font:700 9px Montserrat;letter-spacing:1px;color:#3A2500">EXEMPLE</div>
+            </div>
+            <div style="display:flex;gap:12px;width:100%">
+              <div onClick="{{ confirm.non }}" style="flex:1;height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:14px;border:3px solid #120E22;background:linear-gradient(180deg,#5E5A80,#464260);box-shadow:0 5px 0 #2A2740;font:400 18px 'Fredoka One';cursor:pointer;transition:transform .12s" style-hover="transform:scale(1.04)" style-active="transform:translateY(4px)">Garder</div>
+              <div onClick="{{ confirm.oui }}" style="flex:1;height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:14px;border:3px solid #120E22;background:linear-gradient(180deg,#FF7A85,#E8323F);box-shadow:0 5px 0 #8E1420;font:400 18px 'Fredoka One';text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22;cursor:pointer;transition:transform .12s" style-hover="transform:scale(1.04)" style-active="transform:translateY(4px)">Recycler</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ ouvertIdx }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fermer }}" style="position:absolute;inset:0;background:rgba(10,8,20,.6);z-index:20"></div>
+      <div style="position:absolute;left:20px;top:64px;width:1060px;height:570px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:22px;border:3px solid #120E22;background:#181626;box-shadow:0 6px 0 #120E22;display:flex;flex-direction:column">
+          <div style="position:relative;height:56px;flex:none;border-radius:19px 19px 0 0;background:linear-gradient(180deg,#FFC47A,#F08A1C);border-bottom:3px solid #120E22;display:flex;align-items:center;gap:10px;padding:0 20px;overflow:hidden">
+            <div style="position:absolute;left:10px;right:70px;top:5px;height:14px;border-radius:7px;background:rgba(255,255,255,.3)"></div>
+            <img src="icons/index.svg" style="position:relative;width:36px;height:36px">
+            <div style="position:relative;font:400 26px 'Fredoka One';text-shadow:0 3px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22">Index</div>
+          </div>
+          <div onClick="{{ fermer }}" style="position:absolute;right:-14px;top:-14px;width:52px;height:52px;box-sizing:border-box;border-radius:26px;border:3px solid #120E22;background:linear-gradient(180deg,#FF7A85,#E8323F);box-shadow:0 5px 0 #8E1420;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(8deg)" style-active="transform:translateY(4px)"><img src="icons/fermer.svg" style="width:26px;height:26px"></div>
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:14px 18px 18px">
+            <div style="height:78px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:22px;padding:0 16px;border-radius:16px;background:#2A2642;border:2px solid #605096">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font:400 17px 'Fredoka One'">Collection du Lot 1</div>
+                <div style="position:relative;width:360px;height:28px;box-sizing:border-box;border-radius:14px;border:3px solid #120E22;background:#181626;overflow:hidden">
+                  <div style="position:absolute;left:0;top:0;bottom:0;width:{{ progPct }}%;border-radius:11px;background:linear-gradient(180deg,#9AF59F,#3FCB52)"></div>
+                  <div style="position:absolute;left:6px;top:3px;width:{{ progPctGloss }}%;height:7px;border-radius:4px;background:rgba(255,255,255,.4)"></div>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 16px 'Fredoka One';text-shadow:0 2px 0 #120E22,2px 0 0 #120E22,-2px 0 0 #120E22,0 -2px 0 #120E22">{{ possedes }} / 11</div>
+                </div>
+              </div>
+              <div style="flex:1;display:flex;justify-content:flex-end;gap:10px">
+                <sc-for list="{{ recompenses }}" as="r" hint-placeholder-count="3">
+                  <div style="width:150px;height:56px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 8px;border-radius:12px;background:#181626;border:3px solid {{ r.bord }}">
+                    <div style="position:relative;width:38px;height:38px;flex:none;box-sizing:border-box;border-radius:9px;border:2px solid #120E22;background:repeating-linear-gradient(135deg,#3A3462 0 5px,#2A2642 5px 10px)">
+                      <sc-if value="{{ r.ok }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-7px;bottom:-7px;width:20px;height:20px;border-radius:10px;background:#3FCB52;border:2px solid #120E22;box-sizing:border-box"></div></sc-if>
+                      <sc-if value="{{ r.lock }}" hint-placeholder-val="{{ true }}"><img src="icons/cadenas.svg" style="position:absolute;left:6px;top:6px;width:22px;height:22px"></sc-if>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <div style="font:400 14px 'Fredoka One';color:{{ r.couleur }}">{{ r.seuil }} / 11</div>
+                      <div style="font:500 10px Montserrat;color:#B9B4D2;line-height:1.2">Récompense<br>à définir</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="height:44px;flex:none;display:flex;gap:8px;background:#120E22;padding:5px;border-radius:16px;align-self:flex-start">
+              <sc-for list="{{ lots }}" as="o" hint-placeholder-count="3">
+                <div onClick="{{ o.click }}" style="height:34px;padding:0 16px;display:flex;align-items:center;gap:6px;border-radius:12px;background:{{ o.bg }};box-shadow:0 {{ o.ombre }}px 0 #3A2788;font:400 17px 'Fredoka One';color:{{ o.texte }};cursor:pointer">
+                  <sc-if value="{{ o.lock }}" hint-placeholder-val="{{ false }}"><img src="icons/cadenas.svg" style="width:20px;height:20px"></sc-if>{{ o.nom }}
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ lot1 }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 4px 10px">
+                <div style="display:grid;grid-template-columns:repeat(6,140px);gap:14px 18px;justify-content:center">
+                  <sc-for list="{{ index }}" as="k" hint-placeholder-count="11">
+                    <div style="position:relative;width:140px;height:184px;box-sizing:border-box;border-radius:16px;border:3px solid #120E22;background:{{ k.cadre }};box-shadow:0 5px 0 #120E22;padding:4px;transition:transform .14s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateY(-4px) scale(1.04)">
+                      <div style="position:relative;height:100%;border-radius:12px;background:#2A2642;overflow:hidden;display:flex;flex-direction:column">
+                        <div style="position:relative;height:100px;flex:none;background:{{ k.fond }};overflow:hidden">
+                          <div style="position:absolute;left:26px;top:8px;width:76px;height:92px;background:url({{ k.img }}) center/contain no-repeat;opacity:{{ k.op }}"></div>
+                          <div style="position:absolute;left:5px;top:5px;padding:2px 7px;border-radius:8px;background:{{ k.dark }};border:2px solid #120E22;font:700 9px Montserrat;letter-spacing:.5px">{{ k.rareteMaj }}</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 6px">
+                          <div style="font:400 15px 'Fredoka One';color:{{ k.nomCouleur }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ k.nom }}</div>
+                          <div style="font:700 11px Montserrat;color:#B9B4D2">Chance {{ k.chance }}</div>
+                          <div style="display:flex;align-items:center;gap:3px">
+                            <span style="font:600 9px Montserrat;color:#7A7596">MEILLEUR</span>
+                            <sc-for list="{{ k.etoiles }}" as="s" hint-placeholder-count="5"><div style="width:12px;height:12px;background:url({{ s }}) center/contain no-repeat"></div></sc-for>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ lotVerrou.ok }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;min-height:0;position:relative;border-radius:16px;background:repeating-linear-gradient(135deg,#1F1B36 0 16px,#1A1730 16px 32px);border:2px dashed #605096;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+                <img src="icons/cadenas.svg" style="width:96px;height:96px">
+                <div style="font:400 30px 'Fredoka One';text-shadow:0 3px 0 #120E22">{{ lotVerrou.nom }} verrouillé</div>
+                <div style="height:34px;padding:0 16px;display:flex;align-items:center;gap:8px;border-radius:17px;background:#120E22;border:2px solid #FF5FA2;font:400 17px 'Fredoka One';color:#FF8FC0"><img src="icons/rebirth.svg" style="width:22px;height:22px">{{ lotVerrou.cond }}</div>
+                <div style="font:500 13px Montserrat;color:#B9B4D2">11 nouveaux personnages · contenu à définir</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<section style="background:#F4F1FA;color:#1A1530;border:3px solid #120E22;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Fiche technique — Inventaire + Index</h2>
+    <span style="font:600 12px Montserrat;color:#5A547A">px à 1100 × 650</span>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ specs }}" as="s" hint-placeholder-count="12">
+        <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid #DAD4EA;font-size:13px">
+          <div style="font-weight:700">{{ s.k }}</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;color:#3A3456">{{ s.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:700 13px Montserrat">Images PNG à produire (fond transparent, sans texte)</div>
+      <sc-for list="{{ pngs }}" as="p" hint-placeholder-count="6">
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #DAD4EA;font:500 12px ui-monospace,Menlo,monospace"><span>{{ p.f }}</span><span style="color:#6A6488">{{ p.t }}</span></div>
+      </sc-for>
+      <div style="margin-top:8px;font:700 13px Montserrat">Comportement</div>
+      <div style="font-size:12px;line-height:1.55;color:#3A3456">Grille : ScrollingFrame + UIGridLayout (CellSize 140 × 184, CellPadding 12), AutomaticCanvasSize Y. Sélection : anneau blanc 4 px (UIStroke #FFFFFF) + carte levée de 4 px. Recycler désactivé tant que le perso est posé. Le compteur passe en rouge à partir de 95 / 100 (la machine refuse de tirer à 100). Index : silhouette = même image en ImageColor3 #000000, nom « ??? » en #7A7596.</div>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { vue: 'inv', sel: null, filtre: 'Tous', tri: 'rarete', recherche: '', confirm: null, lot: 1, toasts: [], items: null };
+  R = {
+    Commun: { hex: '#A3A2A5', dark: '#5C5B60', light: '#D6D5D8', o: 1, pct: 60, badgeTexte: '#120E22' },
+    Rare: { hex: '#0078FF', dark: '#003F8A', light: '#5CB0FF', o: 2, pct: 25, badgeTexte: '#FFFFFF' },
+    'Légendaire': { hex: '#FFBE00', dark: '#9A6A00', light: '#FFE070', o: 3, pct: 10, badgeTexte: '#120E22' },
+    Mythique: { hex: '#C800FF', dark: '#6A0090', light: '#E58CFF', o: 4, pct: 4.9, badgeTexte: '#FFFFFF' },
+    Secret: { hex: '#FF2828', dark: '#8A0A0A', light: '#FF8A8A', o: 5, pct: 0.1, badgeTexte: '#FFFFFF' },
+  };
+  P = [
+    ['navigatrice', 'Navigatrice', 'Commun', 10, 'orange'], ['tireur', 'Tireur', 'Commun', 12, 'noir'], ['medecin', 'Médecin', 'Commun', 15, 'rose'],
+    ['charpentier', 'Charpentier', 'Rare', 30, 'bleu'], ['musicien', 'Musicien', 'Rare', 35, 'blond'],
+    ['archeologue', 'Archéologue', 'Légendaire', 60, 'noir'], ['timonier', 'Timonier', 'Légendaire', 70, 'bleu'],
+    ['cuisinier', 'Cuisinier', 'Mythique', 85, 'blond'], ['sabreur', 'Sabreur', 'Mythique', 90, 'vert'], ['capitaine', 'Capitaine', 'Mythique', 100, 'orange'],
+    ['capitaine_eveille', 'Capitaine Éveillé', 'Secret', 1000, 'rose'],
+  ].map(([id, nom, rarete, base, img]) => ({ id, nom, rarete, base, img: `img/chibi_${img}.svg` }));
+  SLOTS = 6;
+  componentDidMount() {
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const counts = { navigatrice: 8, tireur: 7, medecin: 6, charpentier: 6, musicien: 4, archeologue: 4, sabreur: 2 };
+    const items = []; let uid = 1;
+    for (const [id, n] of Object.entries(counts)) for (let i = 0; i < n; i++) { const r = rnd(); items.push({ uid: uid++, id, etoiles: r < .5 ? 1 : r < .8 ? 2 : r < .95 ? 3 : r < .99 ? 4 : 5, pose: false }); }
+    [...items].sort((a, b) => this.rev(b) - this.rev(a)).slice(0, 6).forEach(it => it.pose = true);
+    this.setState({ items, sel: items.find(i => i.id === 'sabreur').uid });
+  }
+  perso(id) { return this.P.find(p => p.id === id); }
+  rev(it) { return this.perso(it.id).base * (1 + 0.2 * it.etoiles); }
+  fmt(n) { if (n < 1000) return String(Math.round(n * 10) / 10).replace('.', ','); const S = ['', 'K', 'M', 'B']; let v = n, r = 0; while (v >= 1000 && r < 3) { v /= 1000; r++; } return (Math.floor(v * 100) / 100).toString().replace('.', ',') + S[r]; }
+  stars(n) { return [1, 2, 3, 4, 5].map(i => i <= n ? 'icons/etoile.svg' : 'icons/etoile_vide.svg'); }
+  toast(type, msg) {
+    const T = { succes: ['#9AF59F', '#3FCB52', '#1E8A33', 'etoile'], argent: ['#FFE27A', '#FFB81F', '#B97A00', 'piece'], erreur: ['#FF7A85', '#E8323F', '#8E1420', 'fermer'] }[type];
+    const id = Math.random();
+    this.setState(s => ({ toasts: [...s.toasts.slice(-2), { id, msg, top: T[0], base: T[1], ombre: T[2], src: `icons/${T[3]}.svg` }] }));
+    setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(t => t.id !== id) })), 2600);
+  }
+  maj(uid, f) { this.setState(s => ({ items: s.items.map(i => i.uid === uid ? { ...i, ...f } : i) })); }
+  renderVals() {
+    const s = this.state, items = s.items || [], R = this.R;
+    const nbPoses = items.filter(i => i.pose).length;
+    let liste = items.filter(i => { const p = this.perso(i.id); return (s.filtre === 'Tous' || p.rarete === s.filtre) && p.nom.toLowerCase().includes(s.recherche.toLowerCase()); });
+    const cmp = { rarete: (a, b) => R[this.perso(b.id).rarete].o - R[this.perso(a.id).rarete].o || this.rev(b) - this.rev(a), etoiles: (a, b) => b.etoiles - a.etoiles || this.rev(b) - this.rev(a), revenu: (a, b) => this.rev(b) - this.rev(a) }[s.tri];
+    liste = [...liste].sort((a, b) => (b.pose - a.pose) || cmp(a, b));
+    const grille = liste.map(i => { const p = this.perso(i.id), r = R[p.rarete], on = s.sel === i.uid;
+      return { ...r, nom: p.nom, rareteMaj: p.rarete.toUpperCase(), img: p.img, pose: i.pose, etoiles: this.stars(i.etoiles), revenu: this.fmt(this.rev(i)),
+        ring: on ? '0 0 0 4px #FFFFFF, 0 5px 0 #120E22' : '0 5px 0 #120E22', lift: on ? 'translateY(-4px)' : 'none', click: () => this.setState({ sel: i.uid }) }; });
+    const it = items.find(i => i.uid === s.sel);
+    let sel = { ok: false };
+    if (it) { const p = this.perso(it.id), r = R[p.rarete];
+      const slot = it.pose ? items.filter(i => i.pose).sort((a, b) => a.uid - b.uid).findIndex(i => i.uid === it.uid) + 1 : 0;
+      sel = { ok: true, ...r, nom: p.nom, rarete: p.rarete, img: p.img, etoiles: this.stars(it.etoiles), revenu: this.fmt(this.rev(it)),
+        calcul: `base ${p.base} $/s × (1 + 0,2 × ${it.etoiles} étoile${it.etoiles > 1 ? 's' : ''})`,
+        etat: it.pose ? `Posé · emplacement ${slot}` : 'Dans l\u2019inventaire', etatCouleur: it.pose ? '#6EE678' : '#B9B4D2',
+        actionNom: it.pose ? 'Retirer' : 'Poser', actionBg: it.pose ? 'linear-gradient(180deg,#5E5A80,#464260)' : 'linear-gradient(180deg,#8A6CFF,#6448D2)', actionOmbre: it.pose ? '#2A2740' : '#3A2788',
+        action: () => { if (it.pose) { this.maj(it.uid, { pose: false }); this.toast('succes', `${p.nom} rangé dans l’inventaire`); } else if (nbPoses >= this.SLOTS) this.toast('erreur', 'Plus d’emplacement libre !'); else { this.maj(it.uid, { pose: true }); this.toast('succes', `${p.nom} posé !`); } },
+        recBg: it.pose ? '#3A3752' : 'linear-gradient(180deg,#FF7A85,#E8323F)', recOmbre: it.pose ? '#24213A' : '#8E1420', recTexte: it.pose ? '#7A7596' : '#FFFFFF', recCurseur: it.pose ? 'not-allowed' : 'pointer',
+        recHover: it.pose ? 'none' : 'scale(1.05)', recActive: it.pose ? 'none' : 'translateY(4px)', recNote: it.pose ? 'Retire-le d’abord pour le recycler' : '',
+        recycler: () => { if (!it.pose) this.setState({ confirm: it.uid }); } };
+    }
+    const c = items.find(i => i.uid === s.confirm);
+    const confirm = c ? { ok: true, nom: this.perso(c.id).nom, prix: this.fmt(this.rev(c) * 10) + ' $',
+      non: () => this.setState({ confirm: null }),
+      oui: () => { const prix = this.fmt(this.rev(c) * 10); this.setState(st => { const rest = st.items.filter(i => i.uid !== c.uid); return { items: rest, confirm: null, sel: (liste.find(i => i.uid !== c.uid) || {}).uid ?? null }; }); this.toast('argent', `+${prix} $ (recyclage)`); } } : { ok: false };
+    const filtres = ['Tous', ...Object.keys(R)].map(nom => { const on = s.filtre === nom, r = R[nom];
+      return { nom, bg: on ? (r ? `linear-gradient(180deg,${r.light},${r.hex})` : 'linear-gradient(180deg,#8A6CFF,#6448D2)') : '#2A2642', texte: on && r && r.badgeTexte === '#120E22' ? '#120E22' : '#FFFFFF', dot: r ? r.hex : '#FFFFFF', click: () => this.setState({ filtre: nom }) }; });
+    const tris = [['rarete', 'Rareté'], ['etoiles', 'Étoiles'], ['revenu', 'Revenu']].map(([id, nom]) => ({ nom, bg: s.tri === id ? 'linear-gradient(180deg,#8A6CFF,#6448D2)' : 'transparent', texte: s.tri === id ? '#FFFFFF' : '#B9B4D2', click: () => this.setState({ tri: id }) }));
+    const best = {}; items.forEach(i => best[i.id] = Math.max(best[i.id] || 0, i.etoiles));
+    const nbR = {}; this.P.forEach(p => nbR[p.rarete] = (nbR[p.rarete] || 0) + 1);
+    const index = this.P.map(p => { const r = R[p.rarete], own = !!best[p.id];
+      return { ...r, cadre: r.hex, rareteMaj: p.rarete.toUpperCase(), img: own ? p.img : 'img/chibi_silhouette.svg', op: own ? 1 : .9,
+        fond: own ? `linear-gradient(180deg,${r.light} 0%,${r.hex} 60%,${r.dark} 100%)` : 'linear-gradient(180deg,#3A3462,#1F1B36)',
+        nom: own ? p.nom : '???', nomCouleur: own ? '#FFFFFF' : '#7A7596', chance: (r.pct / nbR[p.rarete]).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' %', etoiles: this.stars(best[p.id] || 0) }; });
+    const possedes = Object.keys(best).length;
+    const recompenses = [4, 8, 11].map(seuil => { const ok = possedes >= seuil; return { seuil, ok, lock: !ok, bord: ok ? '#3FCB52' : '#3A3462', couleur: ok ? '#6EE678' : '#FFFFFF' }; });
+    const lots = [[1, 'Lot 1', null], [2, 'Lot 2', 'Débloqué au rebirth 1'], [3, 'Lot 3', 'Débloqué au rebirth X (à définir)']].map(([n, nom, cond]) => ({ nom, lock: !!cond, bg: s.lot === n ? 'linear-gradient(180deg,#8A6CFF,#6448D2)' : 'transparent', ombre: s.lot === n ? 4 : 0, texte: s.lot === n ? '#FFFFFF' : '#B9B4D2', click: () => this.setState({ lot: n }), cond }));
+    const lv = lots[s.lot - 1];
+    const menu = [['teleport', 'Téléportation'], ['index', 'Index'], ['inventaire', 'Inventaire'], ['rebirth', 'Rebirth'], ['boutique', 'Boutique'], ['parametres', 'Paramètres']].map(([id, nom]) => {
+      const v = id === 'inventaire' ? 'inv' : id === 'index' ? 'idx' : null, on = v && s.vue === v;
+      return { nom, src: `icons/${id}.svg`, ring: on ? '0 0 0 4px #FFFFFF, 0 5px 0 #3A2788' : '0 5px 0 #3A2788', click: () => v ? this.setState({ vue: v }) : this.toast('erreur', `${nom} : autre maquette`) }; });
+    return {
+      menu, toasts: s.toasts, ouvertInv: s.vue === 'inv', ouvertIdx: s.vue === 'idx', fermer: () => this.setState({ vue: null }),
+      compteur: items.length, compteurCouleur: items.length >= 95 ? '#FF7A85' : '#FFFFFF', filtres, tris, grille, vide: grille.length === 0 && !!s.items,
+      nbAffiches: grille.length, nbPoses, slots: this.SLOTS, sel, confirm,
+      recherche: s.recherche, chercher: e => this.setState({ recherche: e.target.value }),
+      index, possedes, progPct: possedes / 11 * 100, progPctGloss: Math.max(0, possedes / 11 * 100 - 6), recompenses, lots, lot1: s.lot === 1, lotVerrou: s.lot === 1 ? { ok: false } : { ok: true, nom: lv.nom, cond: lv.cond },
+      specs: [
+        { k: 'Fenêtre', v: '1060 × 570 à (20, 64) — sous les coins Roblox · titre H 56 · fermer Ø 52 à −14/−14' },
+        { k: 'Titre Inventaire', v: 'dégradé #C7A9FF → #8A5CF0 · compteur pilule H 34 #120E22, Fredoka 18' },
+        { k: 'Titre Index', v: 'dégradé #FFC47A → #F08A1C' },
+        { k: 'Filtres', v: 'pilules H 34, coins 17, trait 3 · actif = dégradé de la rareté · inactif #2A2642 + pastille Ø 10' },
+        { k: 'Tri', v: 'plateau #120E22 coins 14 · onglets H 28 coins 11, Fredoka 14' },
+        { k: 'Recherche', v: 'TextBox 176 × 36, coins 18, fond #120E22, UIStroke #605096 2 px, Gotham 13' },
+        { k: 'Grille', v: 'zone 772 de large · 5 colonnes de 140 × 184, écart 12 · défilement vertical' },
+        { k: 'Panneau détail', v: 'L ≈ 236 · ViewportFrame H 196 coins 16 · nom Fredoka 24 · étoiles 18 · bloc stats #2A2642 coins 14' },
+        { k: 'Boutons détail', v: 'Poser/Retirer H 50 · Recycler H 44 (danger, désactivé si posé)' },
+        { k: 'Confirmation', v: '440 de large, titre danger H 52, deux boutons H 48' },
+        { k: 'Index — bandeau', v: 'H 78 #2A2642 · barre 360 × 28 · récompenses 150 × 56 (contour vert si atteinte)' },
+        { k: 'Index — cartes', v: '6 colonnes 140 × 184, écart 18/14 · portrait H 100 · « Chance » Gotham 11 · meilleur score étoiles 12 px' },
+        { k: 'Lot verrouillé', v: 'zone rayée #1F1B36 / #1A1730 contour pointillé #605096 · cadenas 96 · condition pilule contour #FF5FA2' },
+      ],
+      pngs: [
+        { f: 'chibi_<id>.png (portraits, en attendant les vrais)', t: '256 × 320' }, { f: 'chibi_silhouette.png ou ImageColor3 noir', t: '256 × 320' },
+        { f: 'rayons_fond_detail.png (derrière le perso 3D)', t: '512 × 512' }, { f: 'ombre_sol.png (ellipse sous le perso)', t: '128 × 32' },
+        { f: 'motif_raye_verrou.png (tile)', t: '32 × 32' }, { f: 'ic_cadenas.png · ic_loupe.png · ic_recyclage.png', t: '128 × 128' },
+        { f: 'coffre_recompense.png (à définir)', t: '128 × 128' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

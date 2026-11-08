@@ -1,80 +1,150 @@
 --!strict
--- Notifications : messages courts en haut au centre de l'écran (inventaire plein, emplacements occupés…).
-
-local TweenService = game:GetService("TweenService")
+-- Notifications : toasts en haut au centre, sous la barre rapide (planche de style v2).
+-- Types : "succes" (vert), "argent" (or), "erreur" (rouge), "info" (violet) ou un Id de rareté (Mythique…).
 
 local Ui = require(script.Parent.Ui)
 
 local Notifications = {}
 
-local DUREE = 3
+local DUREE = 2.6
 local MAX_VISIBLES = 3
 
-local pile: Frame
+export type Type = string
 
-function Notifications.Init(ecran: ScreenGui)
+local TYPES: { [string]: { Teinte: Ui.Teinte, Icone: string } } = {
+	succes = { Teinte = Ui.Teintes.Vert, Icone = "etoile" },
+	argent = { Teinte = Ui.Teintes.Or, Icone = "billets" },
+	erreur = { Teinte = Ui.Teintes.Danger, Icone = "fermer" },
+	info = { Teinte = Ui.Teintes.Principal, Icone = "teleport" },
+}
+
+local pile: Frame
+local compteur = 0
+
+function Notifications.Init(racine: Frame)
 	pile = Ui.Creer("Frame", {
 		Name = "Notifications",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 16),
-		Size = UDim2.fromOffset(460, 0),
+		Position = UDim2.new(0.5, 0, 0, 72),
+		Size = UDim2.fromOffset(600, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
-		ZIndex = 20,
-		Parent = ecran,
+		ZIndex = 40,
+		Parent = racine,
 	}, {
-		Ui.Creer("UIListLayout", {
-			Padding = UDim.new(0, 6),
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-		}),
+		Ui.Liste(Enum.FillDirection.Vertical, 8, { HorizontalAlignment = Enum.HorizontalAlignment.Center }),
 	})
-	Ui.Adapter(pile)
 end
 
-local compteur = 0
-function Notifications.Montrer(texte: string)
+function Notifications.Montrer(texte: string, typeToast: Type?)
+	if typeof(texte) ~= "string" then
+		return
+	end
+	local t = TYPES[typeToast or "info"]
+	local teinte = if t then t.Teinte else Ui.Rarete(typeToast or "")
+	local icone = if t then t.Icone else "etoile"
+	if not t and not Ui.Raretes[typeToast or ""] then
+		teinte, icone = TYPES.info.Teinte, TYPES.info.Icone
+	end
+
 	compteur += 1
-	local messages = {}
+	local toasts = {}
 	for _, enfant in pile:GetChildren() do
-		if enfant:IsA("TextLabel") then
-			table.insert(messages, enfant)
+		if enfant:IsA("Frame") then
+			table.insert(toasts, enfant)
 		end
 	end
-	if #messages >= MAX_VISIBLES then
-		table.sort(messages, function(a, b)
+	if #toasts >= MAX_VISIBLES then
+		table.sort(toasts, function(a, b)
 			return a.LayoutOrder < b.LayoutOrder
 		end)
-		messages[1]:Destroy()
+		toasts[1]:Destroy()
 	end
 
-	local label = Ui.Texte({
-		Name = "Message",
+	-- Conteneur (taille du toast) → Ombre (+3 px) + Face qui glisse depuis le haut → Rangée (ruban, message) + barre
+	local toast = Ui.Creer("Frame", {
+		Name = "Toast",
 		LayoutOrder = compteur,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 0.1,
-		BackgroundColor3 = Ui.Couleurs.Fond,
-		TextSize = 18,
-		TextWrapped = true,
-		TextXAlignment = Enum.TextXAlignment.Center,
-		Text = texte,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 53),
+		BackgroundTransparency = 1,
 		Parent = pile,
 	})
-	Ui.Coins(10).Parent = label
-	Ui.Contour(Ui.Couleurs.Or).Parent = label
-	Ui.Marges(10).Parent = label
+	Ui.Creer("Frame", {
+		Name = "Ombre",
+		Position = UDim2.fromOffset(0, 3),
+		Size = UDim2.new(1, 0, 0, 50),
+		BackgroundColor3 = Ui.C.Trait,
+		Parent = toast,
+	}, { Ui.Coins(12) })
+	local face = Ui.Creer("Frame", {
+		Name = "Face",
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(320, 50),
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		ClipsDescendants = true,
+		ZIndex = 2,
+		Parent = toast,
+	}, {
+		Ui.Coins(12),
+		Ui.Trait(2),
+		Ui.Degrade2(Ui.C.PanneauHaut, Ui.C.PanneauBas),
+	})
+	local rangee = Ui.Creer("Frame", {
+		Name = "Rangee",
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 50),
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Parent = face,
+	}, {
+		Ui.Liste(Enum.FillDirection.Horizontal, 12, { VerticalAlignment = Enum.VerticalAlignment.Center }),
+		Ui.Marges(0, 20, 0, 0),
+	})
+	local ruban = Ui.Creer("Frame", {
+		Name = "Ruban",
+		LayoutOrder = 1,
+		Size = UDim2.fromOffset(56, 50),
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		BorderSizePixel = 0,
+		ZIndex = 2,
+		Parent = rangee,
+	}, { Ui.Degrade(teinte, 90) })
+	Ui.Icone(icone, 30, {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.45, 0.5),
+		ZIndex = 3,
+		Parent = ruban,
+	})
+	Ui.Texte({
+		Name = "Message",
+		LayoutOrder = 2,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 50),
+		TextSize = 17,
+		Text = texte,
+		Contour = true,
+		ZIndex = 2,
+		Parent = rangee,
+	})
+	Ui.Creer("Frame", {
+		Name = "BarreBas",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.new(1, 0, 0, 3),
+		BackgroundColor3 = teinte.Base,
+		BorderSizePixel = 0,
+		ZIndex = 3,
+		Parent = face,
+	})
+
+	face.Position = UDim2.fromOffset(0, -24)
+	Ui.Tween(face, 0.3, { Position = UDim2.new() }, Enum.EasingStyle.Back)
 
 	task.delay(DUREE, function()
-		if not label.Parent then
-			return
+		if toast.Parent then
+			toast:Destroy()
 		end
-		local tween =
-			TweenService:Create(label, TweenInfo.new(0.3), { TextTransparency = 1, BackgroundTransparency = 1 })
-		tween.Completed:Connect(function()
-			label:Destroy()
-		end)
-		tween:Play()
 	end)
 end
 

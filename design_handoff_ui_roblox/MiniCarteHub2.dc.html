@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position:relative;width:{{ size }}px;height:{{ size }}px;flex:none">
+  <div style="position:absolute;left:0;top:0;width:420px;height:420px;transform:scale({{ k }});transform-origin:0 0">
+    <div style="position:absolute;inset:0;border-radius:16px;background:radial-gradient(circle at 50% 50%,#2C5A4C 0%,#1C3A34 55%,#122420 100%);border:2px solid #0D0A1C;box-sizing:border-box;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.06) 1.2px,rgba(255,255,255,0) 1.8px) 0 0/9px 9px"></div>
+    </div>
+    <div style="position:absolute;left:12px;top:12px;width:396px;height:396px;box-sizing:border-box;border-radius:50%;border:1.5px dashed rgba(201,195,230,.3)"></div>
+    <sc-for list="{{ chemins }}" as="p" hint-placeholder-count="7">
+      <div style="position:absolute;left:202px;top:40px;width:16px;height:42px;box-sizing:border-box;border-radius:3px;background:linear-gradient(90deg,#8C80C8,#B4AAE6 50%,#8C80C8);border:1.5px solid #0D0A1C;transform-origin:8px 170px;transform:rotate({{ p.a }}deg)"></div>
+    </sc-for>
+    <sc-for list="{{ bases }}" as="b" hint-placeholder-count="6">
+      <div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:36px;height:36px;box-sizing:border-box;border-radius:8px;background:linear-gradient(180deg,#3A3462,#221C42);border:1.5px solid #0D0A1C;display:flex;align-items:center;justify-content:center;font:400 14px 'Fredoka One';color:#7A7596">{{ b.n }}</div>
+    </sc-for>
+    <div onMouseEnter="{{ base.enter }}" onMouseLeave="{{ leave }}" onClick="{{ base.go }}" style="position:absolute;left:{{ base.x }}px;top:{{ base.y }}px;width:48px;height:48px;box-sizing:border-box;border-radius:11px;background:linear-gradient(180deg,#B8F7E8,#5FE6C6 50%,#2EAE90);border:2px solid #0D0A1C;box-shadow:{{ base.ring }};display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.12)" style-active="transform:translateY(3px)">
+      <div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.25)"></div>
+      <img src="icons2/base.svg" style="position:relative;width:34px;height:34px">
+    </div>
+    <div style="position:absolute;left:78px;top:78px;width:264px;height:264px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle at 50% 35%,#5A5096 0%,#3A3270 55%,#262050 100%);border:2px solid #0D0A1C;box-shadow:0 4px 0 #0D0A1C"></div>
+    <div style="position:absolute;left:84px;top:84px;width:252px;height:252px;box-sizing:border-box;border-radius:50%;border:1px solid rgba(201,182,255,.35)"></div>
+    <div style="position:absolute;left:146px;top:146px;width:128px;height:128px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle,#7468B8,#564A98);border:2px solid #0D0A1C"></div>
+    <sc-for list="{{ libres }}" as="f" hint-placeholder-count="2">
+      <div style="position:absolute;left:{{ f.x }}px;top:{{ f.y }}px;width:28px;height:28px;box-sizing:border-box;border-radius:50%;border:1.5px dashed #8A80C0"></div>
+    </sc-for>
+    <sc-for list="{{ stands }}" as="s" hint-placeholder-count="5">
+      <div onMouseEnter="{{ s.enter }}" onMouseLeave="{{ leave }}" onClick="{{ s.go }}" style="position:absolute;left:{{ s.x }}px;top:{{ s.y }}px;width:56px;height:56px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle at 50% 30%,{{ s.l }} 0%,{{ s.c }} 55%,{{ s.d }} 100%);border:2px solid #0D0A1C;box-shadow:{{ s.ring }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.14)" style-active="transform:translateY(3px)">
+        <div style="position:absolute;inset:2px;border-radius:50%;border:1px solid rgba(255,255,255,.55)"></div>
+        <div style="position:relative;width:36px;height:36px;background:url({{ s.src }}) center/contain no-repeat"></div>
+      </div>
+    </sc-for>
+    {{ rayons }}
+    <div onMouseEnter="{{ centre.enter }}" onMouseLeave="{{ leave }}" onClick="{{ centre.go }}" style="position:absolute;left:166px;top:162px;width:88px;height:88px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle at 50% 30%,#FFF6C8 0%,#FFC93C 55%,#D8860A 100%);border:2px solid #0D0A1C;box-shadow:{{ centre.ring }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1)" style-active="transform:translateY(4px)">
+      <div style="position:absolute;inset:3px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7)"></div>
+      <img src="icons2/centre.svg" style="position:relative;width:52px;height:52px">
+    </div>
+    <div style="position:absolute;left:160px;top:254px;width:100px;display:flex;justify-content:center;pointer-events:none">
+      <div style="padding:2px 9px;border-radius:6px;background:#0D0A1C;border:1px solid #FFD66B;font:400 12px 'Fredoka One';color:#FFD66B;white-space:nowrap">Centre du Hub</div>
+    </div>
+    <sc-if value="{{ tip.show }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ tip.x }}px;top:{{ tip.y }}px;width:220px;box-sizing:border-box;border-radius:10px;background:linear-gradient(180deg,#2A2350,#17132E);border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C;pointer-events:none;z-index:5;overflow:hidden;display:flex">
+        <div style="width:5px;flex:none;background:{{ tip.c }}"></div>
+        <div style="padding:7px 11px;display:flex;flex-direction:column;gap:2px">
+          <div style="font:400 15px 'Fredoka One';color:{{ tip.c }}">{{ tip.nom }}</div>
+          <div style="font:500 12px/1.35 Montserrat;color:#FFFFFF">{{ tip.desc }}</div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:420},&quot;size&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:420,&quot;tsType&quot;:&quot;number&quot;},&quot;hover&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;lieux&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;any[]&quot;},&quot;onHover&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(id:string|null)=&gt;void&quot;},&quot;onGo&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(id:string)=&gt;void&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const size = this.props.size ?? 420, C = 210, hov = this.props.hover;
+    const lieux = this.props.lieux ?? [];
+    const pos = (a, r) => ({ x: C + r * Math.sin(a * Math.PI / 180), y: C - r * Math.cos(a * Math.PI / 180) });
+    const step = 360 / 7;
+    const on = id => () => this.props.onHover && this.props.onHover(id);
+    const go = id => () => this.props.onGo && this.props.onGo(id);
+    const ring = (id, d) => hov === id ? `0 0 0 3px #FFFFFF, 0 3px 0 ${d}` : `0 3px 0 ${d}`;
+    const stands = lieux.filter(l => l.angle != null).map(l => { const p = pos(l.angle, 100); return { ...l, src: `icons2/${l.icon}.svg`, x: p.x - 28, y: p.y - 28, cx: p.x, cy: p.y, ring: ring(l.id, l.d), enter: on(l.id), go: go(l.id) }; });
+    const bases = [2, 3, 4, 5, 6, 7].map(n => { const p = pos((n - 1) * step, 188); return { n, x: p.x - 18, y: p.y - 18 }; });
+    const bp = pos(0, 186);
+    let tip = { show: false };
+    const L = lieux.find(l => l.id === hov);
+    if (L) {
+      let cx = C, cy = C, h = 44;
+      if (L.id === 'base') { cx = bp.x; cy = bp.y; } else if (L.angle != null) { const s = stands.find(s => s.id === L.id); cx = s.cx; cy = s.cy; } else h = 50;
+      const below = cy < 150;
+      tip = { show: true, nom: L.nom, desc: L.desc, c: L.c, x: Math.max(6, Math.min(194, cx - 110)), y: below ? cy + h - 8 : cy - h - 62 };
+    }
+    return {
+      size, k: size / 420, chemins: [0, 1, 2, 3, 4, 5, 6].map(i => ({ a: i * step })),
+      bases, base: { x: bp.x - 24, y: bp.y - 24, ring: ring('base', '#1F7F6A'), enter: on('base'), go: go('base') },
+      centre: { ring: ring('centre', '#94570A'), enter: on('centre'), go: go('centre') }, stands, tip, leave: on(null),
+      libres: [180, 334.29].map(a => { const p = pos(a, 100); return { x: p.x - 14, y: p.y - 14 }; }),
+      rayons: React.createElement('div', { style: { position: 'absolute', left: 140, top: 136, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(closest-side,rgba(255,214,107,0) 40%,rgba(255,214,107,0) 100%),repeating-conic-gradient(from 0deg,rgba(255,214,107,.45) 0deg 6deg,rgba(255,214,107,0) 6deg 30deg)', animation: 'spin 12s linear infinite', pointerEvents: 'none' } }),
+    };
+  }
+}
+</script>
+</body>
+</html>

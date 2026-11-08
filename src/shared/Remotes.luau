@@ -11,7 +11,7 @@ local NOM_DOSSIER = "Remotes"
 -- Serveur → client
 export type NomEvenement = "Inventaire" | "ResultatTirage" | "Collecte" | "Notification"
 -- Client → serveur (renvoient true si l'action a été faite)
-export type NomFonction = "Poser" | "Retirer"
+export type NomFonction = "Poser" | "Retirer" | "Teleporter"
 
 export type PersonnageInventaire = {
 	Uid: string,
@@ -27,6 +27,9 @@ export type EtatInventaire = {
 	Max: number, -- nombre max de personnages (posés + inventaire)
 }
 
+-- Type de toast de la remote "Notification" : "succes", "argent", "erreur", "info" ou un Id de rareté
+export type TypeNotification = string
+
 export type ResultatTirage = {
 	Id: string,
 	Etoiles: number,
@@ -36,7 +39,7 @@ export type ResultatTirage = {
 
 -- Doit lister tous les noms des types ci-dessus.
 local EVENEMENTS: { NomEvenement } = { "Inventaire", "ResultatTirage", "Collecte", "Notification" }
-local FONCTIONS: { NomFonction } = { "Poser", "Retirer" }
+local FONCTIONS: { NomFonction } = { "Poser", "Retirer", "Teleporter" }
 
 -- Côté serveur, crée le dossier avec toutes les remotes d'un coup : le client peut ainsi brancher
 -- chacune sans attendre qu'elle serve une première fois.

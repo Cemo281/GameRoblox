@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html{background:#0B0918}body{margin:0;background:#0B0918;color:#FFFFFF;font-family:Montserrat,sans-serif}
+a{color:#FFD66B}a:hover{color:#FFE9A8}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(255,255,255,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#FFD66B;color:#0D0A1C;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Montserrat;color:#FFFFFF}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(255,255,255,.12);color:#FFFFFF;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:600 13px/1.3 Montserrat;color:#C9C3E6}
+.dv-card{max-width:100%;background:#16122A;border:1px solid #3E3478;border-radius:12px;overflow:hidden}
+.dv-opt:target .dv-oid{background:#FFD66B;color:#0D0A1C}
+.dv-next{margin:22px 0 0;font:12px/1.5 Montserrat;color:#A9A2CC}
+@keyframes pulse{0%,100%{transform:rotate(8deg) scale(1)}50%{transform:rotate(8deg) scale(1.12)}}
+@keyframes sheen{0%{transform:translateX(-120px) rotate(20deg)}60%,100%{transform:translateX(320px) rotate(20deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+</style>
+</helmet>
+<section class="dv-turn" id="t2">
+  <div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Tes idées : progression, chance, potions, pass, quêtes</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt" id="2a">
+      <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Améliorations de la base</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;background:linear-gradient(160deg,#6A4BD8,#3FA8C8);display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ amelio }}" as="u" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 10px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);box-shadow:0 3px 0 #0D0A1C">
+              <div style="position:relative;width:44px;height:44px;flex:none;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ u.c1 }},{{ u.c2 }} 50%,{{ u.c3 }});display:flex;align-items:center;justify-content:center">
+                <div style="width:28px;height:28px;background:url({{ u.icon }}) center/contain no-repeat"></div>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font:400 16px 'Fredoka One'">{{ u.nom }}</span><span style="font:700 10px Montserrat;color:#F2EFFF">NIV. {{ u.lvl }} / 5</span></div>
+                <div style="display:flex;gap:3px">
+                  <sc-for list="{{ u.pips }}" as="pp" hint-placeholder-count="5"><div style="flex:1;height:7px;border-radius:3px;border:1px solid #0D0A1C;background:{{ pp }}"></div></sc-for>
+                </div>
+                <div style="font:600 11px Montserrat;color:#FFFFFF">{{ u.effet }}</div>
+              </div>
+              <div onClick="{{ u.up }}" style="height:38px;min-width:96px;padding:0 10px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:10px;border:2px solid #0D0A1C;background:{{ u.btn }};cursor:pointer;font:400 13px 'Fredoka One';color:{{ u.btnTxt }}">{{ u.btnLbl }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Dépenser son argent pour progresser</b>
+          Trois améliorations payées en argent du jeu (pas en Robux), 5 niveaux chacune. On voit l'effet actuel → suivant avant d'acheter. Clique « Améliorer » pour tester. Coûts et valeurs à définir.
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : niveaux sauvés en DataStore · bonus appliqués côté serveur</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="2b">
+      <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Icône « Mes stats »</div>
+      <div class="dv-card" style="width:500px">
+        <div style="position:relative;height:400px;background:linear-gradient(180deg,#3B2E6E,#2F5A6A);padding:14px 0 0 12px;box-sizing:border-box">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div onClick="{{ toggleStats }}" style="position:relative;width:46px;height:46px;flex:none;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FFF3B0,#FFC93C 50%,#B87800);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;cursor:pointer">
+              <div style="position:absolute;inset:2px;border-radius:9px;border:1.5px solid rgba(255,255,255,.65)"></div>
+              <img src="icons2/classements.svg" style="position:relative;width:30px;height:30px">
+            </div>
+            <sc-if value="{{ statsOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="width:360px;box-sizing:border-box;padding:12px;border-radius:14px;border:2px solid #0D0A1C;background:rgba(255,255,255,.16);backdrop-filter:blur(10px);box-shadow:0 3px 0 #0D0A1C,inset 0 0 0 1.5px rgba(255,255,255,.35);display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><div style="font:400 18px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Mes stats</div><div onClick="{{ toggleStats }}" style="width:24px;height:24px;border-radius:7px;border:1.5px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F);display:flex;align-items:center;justify-content:center;cursor:pointer"><img src="icons2/fermer.svg" style="width:12px;height:12px"></div></div>
+                <div style="font:800 9px Montserrat;letter-spacing:1px;color:#FFFFFF">BONUS ACTIFS</div>
+                <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;border-radius:8px;background:rgba(13,10,28,.3)">
+                    <div style="width:20px;height:20px;flex:none;background:url({{ st.icon }}) center/contain no-repeat"></div>
+                    <span style="flex:1;font:700 11px Montserrat;color:#FFFFFF">{{ st.k }}</span>
+                    <span style="font:400 15px 'Fredoka One';color:{{ st.c }};text-shadow:0 1.5px 0 #0D0A1C">{{ st.v }}</span>
+                  </div>
+                </sc-for>
+                <div style="font:800 9px Montserrat;letter-spacing:1px;color:#FFFFFF;margin-top:2px">MA PARTIE</div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+                  <sc-for list="{{ compteurs }}" as="cp" hint-placeholder-count="9">
+                    <div style="box-sizing:border-box;padding:6px 4px;border-radius:9px;border:1.5px solid #0D0A1C;background:linear-gradient(160deg,{{ cp.c1 }},{{ cp.c2 }});display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center">
+                      <div style="font:400 17px 'Fredoka One';color:#FFFFFF;text-shadow:0 1.5px 0 #0D0A1C,1px 0 0 #0D0A1C,-1px 0 0 #0D0A1C">{{ cp.v }}</div>
+                      <div style="font:700 9px/1.2 Montserrat;color:#FFFFFF">{{ cp.k }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Comprendre d'où vient sa puissance</b>
+          <span>Un petit bouton sous l'argent ouvre le total des bonus, puis les compteurs de la partie : temps de jeu, tirages, meilleure rareté, argent gagné… Le joueur voit l'effet de ses améliorations (<a href="#2a">2a</a>) et de ses potions (<a href="#2d">2d</a>). Clique l'icône pour fermer ou ouvrir.</span>
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Icône provisoire (classements) : une icône « stats » dédiée reste à créer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="2c">
+      <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Roulette de la chance</div>
+      <div class="dv-card" style="width:500px">
+        <div style="height:270px;background:linear-gradient(160deg,#6A4BD8,#3FA8C8);display:flex;align-items:center;gap:22px;padding:0 22px;box-sizing:border-box">
+          <div style="position:relative;width:210px;height:210px;flex:none">
+            <div style="position:absolute;inset:0;border-radius:50%;border:4px solid #0D0A1C;box-sizing:border-box;box-shadow:0 4px 0 #0D0A1C;overflow:hidden;transform:rotate({{ rot }}deg);transition:transform 3.2s cubic-bezier(.17,.67,.2,1);background:conic-gradient(#9AA3B5 0 45deg,#3FCB52 45deg 90deg,#9AA3B5 90deg 135deg,#22B8F0 135deg 180deg,#9AA3B5 180deg 225deg,#9B6BFF 225deg 270deg,#3FCB52 270deg 315deg,#FFBE00 315deg 360deg)">
+              <sc-for list="{{ segs }}" as="sg" hint-placeholder-count="8">
+                <div style="position:absolute;left:50%;top:0;width:0;height:50%;transform-origin:bottom;transform:rotate({{ sg.r }}deg)">
+                  <div style="position:absolute;left:-24px;top:14px;width:48px;text-align:center;font:400 12px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1px 0 0 #0D0A1C,-1px 0 0 #0D0A1C">{{ sg.t }}</div>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(13,10,28,.35);border:3px solid #0D0A1C;box-sizing:border-box"></div>
+            </div>
+            <div style="position:absolute;left:50%;top:-10px;margin-left:-11px;width:22px;height:26px;background:#FFFFFF;border:2.5px solid #0D0A1C;box-sizing:border-box;clip-path:polygon(0 0,100% 0,50% 100%)"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+            <div style="font:400 20px 'Fredoka One'">Roulette</div>
+            <div style="font:600 12px/1.4 Montserrat;color:#FFFFFF">1 tour gratuit par jour + 1 tour par quête du jour finie</div>
+            <div style="display:flex;align-items:center;gap:6px;font:700 11px Montserrat;color:#F2EFFF">TOURS <span style="font:400 18px 'Fredoka One';color:#FFD66B">{{ tours }}</span></div>
+            <div onClick="{{ tourner }}" style="height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:{{ spinBtn }};box-shadow:0 3px 0 #0D0A1C;cursor:pointer;font:400 17px 'Fredoka One';color:#0B2A10">Tourner</div>
+            <div style="min-height:18px;font:400 14px 'Fredoka One';color:#FFD66B">{{ resultat }}</div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Gratuite, jamais payante</b>
+          Les tours se gagnent en jouant, pas en Robux : un tirage payant au hasard pose problème pour un public de 8–14 ans (et certains pays l'interdisent). Lots = argent, potions courtes, chance. Clique « Tourner ».
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : résultat tiré côté serveur, puis l'animation s'arrête sur la bonne case</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="2d">
+      <div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Potions ×2</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;background:linear-gradient(160deg,#6A4BD8,#3FA8C8);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <sc-for list="{{ potions }}" as="po" hint-placeholder-count="2">
+            <div style="position:relative;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;display:flex;flex-direction:column">
+              <div style="position:relative;height:96px;background:linear-gradient(160deg,{{ po.c1 }},{{ po.c2 }} 50%,{{ po.c3 }});display:flex;align-items:center;justify-content:center">
+                <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+                <div style="position:relative;width:62px;height:62px;border-radius:50% 50% 46% 46%;border:3px solid #0D0A1C;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.7),rgba(255,255,255,0) 40%),{{ po.c2 }};display:flex;align-items:center;justify-content:center;animation:bob 2.4s ease-in-out infinite">
+                  <div style="width:30px;height:30px;background:url({{ po.icon }}) center/contain no-repeat"></div>
+                </div>
+                <div style="position:absolute;right:8px;top:6px;font:400 22px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C">×2</div>
+                <div style="position:absolute;left:8px;top:8px;height:20px;padding:0 7px;display:flex;align-items:center;border-radius:6px;background:rgba(13,10,28,.8);font:700 10px Montserrat;color:#FFFFFF">EN STOCK : {{ po.stock }}</div>
+              </div>
+              <div style="padding:10px;display:flex;flex-direction:column;gap:4px">
+                <div style="font:400 16px 'Fredoka One'">{{ po.nom }}</div>
+                <div style="font:600 11px Montserrat;color:#F2EFFF">15 min · s'additionne en temps, pas en ×</div>
+                <div style="margin-top:6px;display:flex;gap:6px">
+                  <div onClick="{{ po.boire }}" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid #0D0A1C;background:{{ po.btn }};cursor:pointer;font:400 13px 'Fredoka One';color:#0B2A10">Boire</div>
+                  <div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4);font:400 12px 'Fredoka One'">R$ à définir</div>
+                </div>
+                <sc-if value="{{ po.actif }}" hint-placeholder-val="{{ false }}"><div style="font:700 10px ui-monospace,Menlo,monospace;color:#B6FFB0">ACTIVE · {{ po.reste }}</div></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">À gagner ou à acheter</b>
+          <span>Une potion bue devient une pastille de boost dans le HUD (<a href="#1f">1f</a>). Boire une 2ᵉ potion du même type rallonge le temps au lieu de passer à ×4 : l'économie reste sous contrôle. On les gagne aussi via roulette, quêtes et pass.</span>
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : Developer Product (achetable plusieurs fois) · stock en DataStore</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="2e">
+      <div class="dv-olabel"><a class="dv-oid" href="#2e">2e</a>Pass de saison</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;background:linear-gradient(160deg,#6A4BD8,#3FA8C8);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font:400 18px 'Fredoka One'">Saison 1</div>
+            <div style="flex:1;height:12px;border-radius:6px;border:1.5px solid #0D0A1C;background:rgba(13,10,28,.35);overflow:hidden"><div style="width:62%;height:100%;background:linear-gradient(180deg,#FFF0A8,#FFC93C)"></div></div>
+            <div style="font:700 10px Montserrat;color:#F2EFFF">PALIER 3 · 62 %</div>
+          </div>
+          <div style="display:grid;grid-template-columns:62px repeat(6,minmax(0,1fr));gap:5px;align-items:center">
+            <div style="font:800 9px Montserrat;letter-spacing:.8px;color:#F2EFFF">GRATUIT</div>
+            <sc-for list="{{ passFree }}" as="pf" hint-placeholder-count="6">
+              <div style="position:relative;height:52px;box-sizing:border-box;border-radius:9px;border:2px solid {{ pf.bord }};background:rgba(13,10,28,.35);display:flex;align-items:center;justify-content:center;opacity:{{ pf.op }}">
+                <div style="width:26px;height:26px;background:url({{ pf.icon }}) center/contain no-repeat"></div>
+                <sc-if value="{{ pf.ok }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-5px;top:-5px;width:16px;height:16px;border-radius:8px;background:#3FCB52;border:2px solid #0D0A1C;box-sizing:border-box"></div></sc-if>
+              </div>
+            </sc-for>
+            <div style="font:400 13px 'Fredoka One';color:#EBA0FF">Premium</div>
+            <sc-for list="{{ passPrem }}" as="pr" hint-placeholder-count="6">
+              <div style="position:relative;height:52px;box-sizing:border-box;border-radius:9px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#EBA0FF,#C800FF 50%,#5A0080);display:flex;align-items:center;justify-content:center;opacity:{{ pr.op }}">
+                <div style="width:26px;height:26px;background:url({{ pr.icon }}) center/contain no-repeat"></div>
+                <img src="icons2/cadenas.svg" style="position:absolute;right:2px;bottom:2px;width:14px;height:14px">
+              </div>
+            </sc-for>
+            <div></div>
+            <sc-for list="{{ paliers }}" as="pn" hint-placeholder-count="6"><div style="text-align:center;font:400 12px 'Fredoka One';color:{{ pn.c }}">{{ pn.n }}</div></sc-for>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;font:600 11px/1.4 Montserrat;color:#F2EFFF">On monte en jouant (quêtes, tirages). Fin de saison réelle, affichée.</div>
+            <div style="height:36px;padding:0 14px;display:flex;align-items:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);font:400 14px 'Fredoka One';color:#0B2A10">Premium · R$ à définir</div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Deux pistes de récompenses</b>
+          <span>La ligne gratuite est pour tout le monde, la ligne Premium s'ajoute si on l'achète. Ça se distingue des passes permanents (<a href="#1d">1d</a>). Récompenses à définir, avec un perso exclusif au dernier palier.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="2f">
+      <div class="dv-olabel"><a class="dv-oid" href="#2f">2f</a>Quêtes du jour</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;background:linear-gradient(160deg,#6A4BD8,#3FA8C8);display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><div style="font:400 18px 'Fredoka One'">Quêtes du jour</div><div style="height:22px;padding:0 8px;display:flex;align-items:center;border-radius:6px;background:#0D0A1C;border:1px solid #3E3478;font:700 10px ui-monospace,Menlo,monospace;color:#FFFFFF">NOUVELLES DANS&nbsp;{{ timer }}</div></div>
+          <sc-for list="{{ quetes }}" as="q" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;height:58px;padding:0 10px;box-sizing:border-box;border-radius:12px;border:2px solid {{ q.bord }};background:rgba(255,255,255,.16);backdrop-filter:blur(8px)">
+              <div style="width:34px;height:34px;flex:none;background:url({{ q.icon }}) center/contain no-repeat"></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:600 12px Montserrat;color:#FFFFFF">{{ q.t }}</span><span style="font:400 13px 'Fredoka One';color:#FFD66B">{{ q.prog }}</span></div>
+                <div style="height:8px;border-radius:4px;border:1px solid #0D0A1C;background:rgba(13,10,28,.35);overflow:hidden"><div style="width:{{ q.pct }}%;height:100%;background:linear-gradient(180deg,#B6FFB0,#3FCB52)"></div></div>
+              </div>
+              <div onClick="{{ q.claim }}" style="height:34px;min-width:88px;padding:0 8px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:9px;border:2px solid #0D0A1C;background:{{ q.btn }};cursor:{{ q.cur }};font:400 12px 'Fredoka One';color:{{ q.btnTxt }}">{{ q.lbl }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#FFFFFF">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Des objectifs simples chaque jour</b>
+          <span>3 quêtes qui suivent la boucle du jeu. Chaque quête finie donne un lot, un tour de roulette (<a href="#2c">2c</a>) et des points de pass (<a href="#2e">2e</a>). Clique « Récupérer » sur la quête terminée.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="dv-next">Tout s'enchaîne : quêtes → tours de roulette + points de pass → potions → argent → améliorations de base → stats. Suite possible : « intègre <a class="dv-oid" href="#2a">2a</a> et <a class="dv-oid" href="#2b">2b</a> au HUD v3 ».</p>
+</section>
+<section class="dv-turn" id="t1">
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px;max-width:900px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <img src="icons2/boutique.svg" style="width:40px;height:40px">
+      <h1 style="margin:0;font:400 38px 'Fredoka One';text-shadow:0 3px 0 #0D0A1C">Idées : offres, promos, récompenses</h1>
+      <a href="HUD v3 offres.dc.html" style="font:600 13px Montserrat">← HUD v3</a>
+    </div>
+    <p style="margin:0;color:#C9C3E6;font-size:14px;line-height:1.55;text-wrap:pretty">Six pistes dans le style v2, à combiner. Aucun prix Robux n'est inventé : tous sont « R$ à définir ». Comme le public a 8–14 ans, rien de trompeur : prix toujours visible, bouton « Plus tard » aussi gros que l'achat, pas de faux compte à rebours, et pas d'achat payant au hasard (le tirage reste gratuit).</p>
+  </div>
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Six pistes pour la boutique et les promos</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Bouton Boutique qui signale une promo</div>
+      <div class="dv-card" style="width:500px">
+        <div style="position:relative;height:200px;background:linear-gradient(180deg,#3B2E6E,#2F5A6A);display:flex;justify-content:flex-end;padding:14px 72px 0 0;box-sizing:border-box">
+          <div style="position:absolute;right:0;top:0;width:60px;height:60px;border:1.5px dashed #FF6B6B;box-sizing:border-box;font:700 9px Montserrat;color:#FF9A9A;display:flex;align-items:center;justify-content:center">Roblox</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="position:relative;width:46px;height:46px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#C2FFB8,#3FD45E 50%,#137A2C);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center">
+              <div style="position:absolute;inset:0;border-radius:10px;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+              <div style="position:absolute;inset:2px;border-radius:9px;border:1.5px solid rgba(255,255,255,.65)"></div>
+              <img src="icons2/boutique.svg" style="position:relative;width:30px;height:30px">
+              <div style="position:absolute;top:-10px;right:-18px;padding:2px 6px;background:#FFFFFF;color:#F0244A;border:2px solid #0D0A1C;font:400 13px 'Fredoka One';box-shadow:2px 2px 0 #F0244A;animation:pulse 1.4s ease-in-out infinite">PROMO</div>
+            </div>
+            <div style="height:20px;padding:0 8px;display:flex;align-items:center;border-radius:6px;background:#0D0A1C;border:1px solid #FF7A92;font:700 11px ui-monospace,Menlo,monospace;color:#FFB3C2">{{ timer }}</div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Le plus simple</b>
+          Pastille « PROMO » blanche à ombre rouge façon manga, qui pulse, sur le petit bouton Boutique. Le temps restant s'affiche dessous seulement s'il y a une vraie fin.
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : TextLabel rotation 8° + UIScale animé · minuteur côté serveur</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Encart « Offre du moment » sous la Boutique</div>
+      <div class="dv-card" style="width:500px">
+        <div style="position:relative;height:200px;background:linear-gradient(180deg,#3B2E6E,#2F5A6A);padding:14px 14px 0 0;box-sizing:border-box;display:flex;justify-content:flex-end">
+          <div style="position:relative;width:250px;height:104px;box-sizing:border-box;margin-top:52px;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FFE98A,#FFBE00 50%,#8A5A00);box-shadow:0 3px 0 #0D0A1C;overflow:hidden">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+            <div style="position:absolute;top:-40px;left:0;width:34px;height:200px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0));animation:sheen 3s ease-in-out infinite"></div>
+            <img src="img/perso_a_pied.png" style="position:absolute;left:-6px;top:-4px;width:110px;height:110px;object-fit:contain">
+            <div style="position:absolute;left:100px;top:10px;right:10px;display:flex;flex-direction:column;gap:3px">
+              <div style="font:800 9px Montserrat;letter-spacing:1px;color:#4A2600">OFFRE DU MOMENT</div>
+              <div style="font:400 18px 'Fredoka One';color:#FFFFFF;text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">Pack Capitaine</div>
+              <div style="display:flex;gap:6px;margin-top:4px">
+                <div style="height:30px;padding:0 12px;display:flex;align-items:center;border-radius:8px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4);font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">Voir</div>
+                <div style="height:30px;padding:0 8px;display:flex;align-items:center;border-radius:8px;background:rgba(13,10,28,.75);font:700 10px ui-monospace,Menlo,monospace;color:#FFF0A8">{{ timer }}</div>
+              </div>
+            </div>
+            <div style="position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:6px;background:rgba(13,10,28,.6);display:flex;align-items:center;justify-content:center"><img src="icons2/fermer.svg" style="width:11px;height:11px"></div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Visible sans gêner</b>
+          Encart de 250 × 104 en haut à droite, avec le render du perso et un reflet qui passe. Il se ferme avec la croix et revient au prochain changement d'offre.
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : Frame + UIGradient Offset animé · ouvre la page de la Boutique</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Pack de départ après le 1er tirage</div>
+      <div class="dv-card" style="width:500px">
+        <div style="position:relative;height:280px;background:rgba(8,6,18,.85);display:flex;align-items:center;justify-content:center">
+          <div style="position:relative;width:440px;height:240px;box-sizing:border-box;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C;overflow:hidden">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:170px;background:linear-gradient(160deg,#EBA0FF,#C800FF 50%,#5A0080)">
+              <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.2px,rgba(255,255,255,0) 1.7px) 0 0/7px 7px"></div>
+              <img src="img/perso_b_pied.png" style="position:absolute;left:0;top:20px;width:170px;height:200px;object-fit:contain;animation:bob 2.4s ease-in-out infinite">
+              <div style="position:absolute;left:8px;top:10px;padding:2px 8px;background:#FFFFFF;color:#0D0A1C;border:2px solid #0D0A1C;font:400 13px 'Fredoka One';transform:rotate(-5deg);box-shadow:2px 2px 0 #F0244A">1 SEULE FOIS</div>
+            </div>
+            <div style="position:absolute;left:186px;right:14px;top:14px;bottom:14px;display:flex;flex-direction:column;gap:8px">
+              <div style="font:400 22px 'Fredoka One'">Pack de départ</div>
+              <div style="height:2px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+              <sc-for list="{{ contenu }}" as="c" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:8px;font:600 12px Montserrat;color:#C9C3E6"><div style="width:26px;height:26px;border-radius:7px;background:#1C1738;border:1px solid #3E3478;display:flex;align-items:center;justify-content:center"><div style="width:18px;height:18px;flex:none;background:url({{ c.icon }}) center/contain no-repeat"></div></div>{{ c.t }}</div>
+              </sc-for>
+              <div style="margin-top:auto;display:flex;gap:8px">
+                <div style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#7E78A8,#4A4570 50%,#36315C);font:400 15px 'Fredoka One'">Plus tard</div>
+                <div style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);font:400 15px 'Fredoka One';color:#0B2A10">R$ à définir</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Au bon moment</b>
+          S'affiche une seule fois, après le premier tirage, quand le joueur a compris la boucle. Il reste ensuite dans la Boutique. Le contenu est à définir.
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1d">
+      <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Passes de jeu (achats permanents)</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:#1C1738">
+          <sc-for list="{{ passes }}" as="p" hint-placeholder-count="4">
+            <div style="position:relative;height:178px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;display:flex;flex-direction:column;align-items:center">
+              <div style="position:relative;width:100%;height:76px;background:linear-gradient(160deg,{{ p.c1 }},{{ p.c2 }} 50%,{{ p.c3 }});display:flex;align-items:center;justify-content:center">
+                <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+                <div style="position:relative;width:44px;height:44px;flex:none;background:url({{ p.icon }}) center/contain no-repeat"></div>
+                <div style="position:absolute;right:5px;top:5px;font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C">{{ p.tag }}</div>
+              </div>
+              <div style="padding:8px 6px 0;text-align:center;display:flex;flex-direction:column;gap:3px">
+                <div style="font:400 14px 'Fredoka One'">{{ p.nom }}</div>
+                <div style="font:500 10px/1.3 Montserrat;color:#A9A2CC">{{ p.desc }}</div>
+              </div>
+              <div style="margin-top:auto;margin-bottom:8px;height:26px;padding:0 10px;display:flex;align-items:center;border-radius:7px;border:1.5px solid #0D0A1C;background:{{ p.btn }};font:400 12px 'Fredoka One';color:{{ p.btnTxt }}">{{ p.prix }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">La base d'une boutique Roblox</b>
+          Des cartes au même gabarit que les personnages. Un pass déjà acheté affiche « Possédé ». Les effets sont des exemples, à valider avec l'économie.
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#8A82B4">Roblox : MarketplaceService:PromptGamePassPurchase · prix lu en direct (GetProductInfo)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1e">
+      <div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Cadeaux gratuits pour revenir</div>
+      <div class="dv-card" style="width:500px">
+        <div style="padding:16px;background:#1C1738;display:flex;flex-direction:column;gap:12px">
+          <div style="font:800 10px Montserrat;letter-spacing:1.2px;color:#A9A2CC">CONNEXION 7 JOURS</div>
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">
+            <sc-for list="{{ jours }}" as="j" hint-placeholder-count="7">
+              <div style="position:relative;height:74px;box-sizing:border-box;border-radius:10px;border:2px solid {{ j.bord }};background:{{ j.bg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+                <div style="font:400 12px 'Fredoka One';color:{{ j.txt }}">J{{ j.n }}</div>
+                <div style="width:30px;height:30px;border-radius:8px;background:repeating-linear-gradient(135deg,#3A3462 0 4px,#2A2350 4px 8px);border:1.5px solid #0D0A1C;opacity:{{ j.op }}"></div>
+                <sc-if value="{{ j.ok }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:9px;background:#3FCB52;border:2px solid #0D0A1C;box-sizing:border-box"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;width:52px;height:52px;flex:none;border-radius:50%;background:conic-gradient(#FFC93C 0 68%,#2A2350 68% 100%);border:2px solid #0D0A1C;box-sizing:border-box;display:flex;align-items:center;justify-content:center">
+              <div style="width:38px;height:38px;border-radius:50%;background:#17132E;display:flex;align-items:center;justify-content:center"><img src="icons2/inventaire.svg" style="width:24px;height:24px"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px"><div style="font:400 15px 'Fredoka One'">Cadeau de temps de jeu</div><div style="font:600 11px Montserrat;color:#A9A2CC">Prochain dans 4:12 · 3 / 8 aujourd'hui</div></div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Gratuit, et ça fidélise</b>
+          Un calendrier de 7 jours et un cadeau qui se remplit en jouant (anneau). Les récompenses sont à définir. Ça donne une raison de revenir sans rien payer.
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-opt" id="1f">
+      <div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Boosts actifs visibles dans le HUD</div>
+      <div class="dv-card" style="width:500px">
+        <div style="position:relative;height:170px;background:linear-gradient(180deg,#3B2E6E,#2F5A6A);padding:14px 0 0 72px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px">
+          <div style="position:relative;height:50px;width:200px;box-sizing:border-box;padding:0 18px 0 56px;display:flex;align-items:center;border-radius:12px;background:linear-gradient(180deg,#2A2350,#17132E);border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C">
+            <img src="icons/billets.png" style="position:absolute;left:-6px;top:-6px;width:58px;height:58px">
+            <div style="font:400 30px 'Fredoka One';color:#FFD66B;text-shadow:0 2px 0 #0D0A1C">12,4K</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ boosts }}" as="b" hint-placeholder-count="2">
+              <div style="position:relative;height:28px;padding:0 10px 0 4px;display:flex;align-items:center;gap:5px;border-radius:8px;border:1.5px solid #0D0A1C;background:linear-gradient(180deg,{{ b.c1 }},{{ b.c2 }});overflow:hidden">
+                <div style="position:absolute;left:0;bottom:0;height:3px;width:{{ b.pct }}%;background:#FFFFFF"></div>
+                <div style="width:20px;height:20px;flex:none;background:url({{ b.icon }}) center/contain no-repeat"></div>
+                <span style="font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">{{ b.nom }}</span>
+                <span style="font:700 10px ui-monospace,Menlo,monospace;color:#FFFFFF">{{ b.temps }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#C9C3E6">
+          <b style="color:#fff;font:400 17px 'Fredoka One'">Montrer ce qui est actif</b>
+          Une pastille par boost (gagné, offert ou acheté) sous l'argent, avec le temps restant et une barre qui se vide. Le joueur voit tout de suite pourquoi il gagne plus.
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="dv-next">Pistes suivantes : « fais la page Boutique complète avec <a class="dv-oid" href="#1d">1d</a> et <a class="dv-oid" href="#1c">1c</a> » · « intègre <a class="dv-oid" href="#1a">1a</a> et <a class="dv-oid" href="#1f">1f</a> au HUD v2 » · « détaille <a class="dv-oid" href="#1e">1e</a> en fenêtre ».</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { t: 2 * 3600 + 14 * 60 + 9, lvl: { tirage: 2, etoile: 1, argent: 3 }, statsOpen: true, rot: 0, tours: 2, res: '', spinning: false, stock: { argent: 3, chance: 1 }, actif: {}, claimed: false };
+  SEGS = ['500', 'Chance', '1K', '×2 5 min', '2K', 'Étoile +', 'Chance', '10K'];
+  tourner() {
+    const s = this.state; if (s.spinning || s.tours < 1) return;
+    const i = Math.floor(Math.random() * 8), target = (360 - (i * 45 + 22.5)) % 360, cur = s.rot % 360;
+    this.setState({ spinning: true, res: '', tours: s.tours - 1, rot: s.rot + 1800 + ((target - cur + 360) % 360) });
+    setTimeout(() => this.setState({ spinning: false, res: 'Gagné : ' + this.SEGS[i] }), 3300);
+  }
+  componentDidMount() { this.iv = setInterval(() => this.setState(s => ({ t: Math.max(0, s.t - 1) })), 1000); }
+  componentWillUnmount() { clearInterval(this.iv); }
+  renderVals() {
+    const t = this.state.t, p = n => String(n).padStart(2, '0');
+    const s = this.state, P = 'icons/billets.png', g = 'linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45)';
+    const A = [['tirage', 'Chance de tirage', 'icons2/teleport.svg', '#9EEFFF', '#22B8F0', '#0B5FA8', 5, ''], ['etoile', 'Chance étoile', 'icons2/etoile.svg', '#EBA0FF', '#C800FF', '#5A0080', 2, ''], ['argent', 'Argent par seconde', P, '#FFF0A8', '#FFC93C', '#C27A08', 10, '']];
+    const ext = {
+      amelio: A.map(([id, nom, icon, c1, c2, c3, step]) => { const l = s.lvl[id], max = l >= 5; return { nom, icon, c1, c2, c3, lvl: l,
+        pips: [1, 2, 3, 4, 5].map(n => n <= l ? c2 : 'rgba(255,255,255,.25)'),
+        effet: max ? `+${l * step} % · niveau max` : `+${l * step} % → +${(l + 1) * step} % (exemple)`,
+        btn: max ? 'rgba(13,10,28,.35)' : g, btnTxt: max ? '#FFFFFF' : '#0B2A10', btnLbl: max ? 'Max' : 'Améliorer',
+        up: () => { if (!max) this.setState(st => ({ lvl: { ...st.lvl, [id]: st.lvl[id] + 1 } })); } }; }),
+      statsOpen: s.statsOpen, toggleStats: () => this.setState(st => ({ statsOpen: !st.statsOpen })),
+      stats: [
+        { k: 'Chance de tirage', v: `+${s.lvl.tirage * 5} %`, icon: 'icons2/teleport.svg', c: '#9EEFFF' },
+        { k: 'Chance étoile', v: `+${s.lvl.etoile * 2} %`, icon: 'icons2/etoile.svg', c: '#EBA0FF' },
+        { k: 'Argent par seconde', v: `+${s.lvl.argent * 10} %` + (s.actif.argent ? ' ×2' : ''), icon: P, c: '#FFD66B' },
+      ],
+      compteurs: [
+        { k: 'heures de jeu', v: '12 h 40', c1: '#9EEFFF', c2: '#1A88D0' },
+        { k: 'tirages', v: '1 284', c1: '#B6FFB0', c2: '#2FAE45' },
+        { k: 'meilleur tirage', v: 'Mythique', c1: '#EBA0FF', c2: '#8A10C0' },
+        { k: 'argent gagné', v: '4,2M', c1: '#FFF0A8', c2: '#E8960C' },
+        { k: 'étoiles obtenues', v: '37', c1: '#FFD596', c2: '#E07000' },
+        { k: 'index', v: '14 / 40', c1: '#DCC6FF', c2: '#6A3FE0' },
+        { k: 'rebirths', v: '3', c1: '#FFB8D8', c2: '#D0287A' },
+        { k: 'jours connecté', v: '9', c1: '#C2F7EA', c2: '#17A07C' },
+        { k: 'quêtes finies', v: '21', c1: '#FFE07A', c2: '#C27A08' },
+      ],
+      rot: s.rot, tours: s.tours, resultat: s.res, tourner: () => this.tourner(),
+      spinBtn: s.tours > 0 && !s.spinning ? g : 'rgba(13,10,28,.35)',
+      segs: this.SEGS.map((t, i) => ({ t, r: i * 45 + 22.5 })),
+      potions: [['argent', 'Potion d\'argent', P, '#FFF0A8', '#FFC93C', '#C27A08'], ['chance', 'Potion de chance', 'icons2/etoile.svg', '#EBA0FF', '#C800FF', '#5A0080']].map(([id, nom, icon, c1, c2, c3]) => {
+        const st = s.stock[id], a = s.actif[id] || 0;
+        return { nom, icon, c1, c2, c3, stock: st, actif: a > 0, reste: `${a * 15}:00`, btn: st > 0 ? g : 'rgba(13,10,28,.35)',
+          boire: () => { if (st > 0) this.setState(x => ({ stock: { ...x.stock, [id]: st - 1 }, actif: { ...x.actif, [id]: a + 1 } })); } };
+      }),
+      passFree: [P, 'icons2/etoile.svg', P, 'icons2/base.svg', P, 'icons2/etoile.svg'].map((icon, i) => ({ icon, ok: i < 3, op: i < 3 ? .55 : 1, bord: i === 3 ? '#FFD66B' : '#0D0A1C' })),
+      passPrem: [P, 'icons2/etoile.svg', 'icons2/base.svg', P, 'icons2/etoile.svg', 'icons2/index.svg'].map(icon => ({ icon, op: .9 })),
+      paliers: [1, 2, 3, 4, 5, 6].map(n => ({ n, c: n === 4 ? '#FFD66B' : '#FFFFFF' })),
+      quetes: [
+        { t: 'Fais 10 tirages', prog: '6 / 10', pct: 60, icon: 'icons2/teleport.svg' },
+        { t: 'Obtiens un Épique ou mieux', prog: '0 / 1', pct: 0, icon: 'icons2/etoile.svg' },
+        { t: 'Gagne 50K d\'argent', prog: '50K / 50K', pct: 100, icon: P, done: true },
+      ].map(q => { const c = q.done && s.claimed, ready = q.done && !s.claimed;
+        return { ...q, bord: ready ? '#FFD66B' : '#0D0A1C', lbl: c ? 'Récupéré' : ready ? 'Récupérer' : 'En cours', btn: ready ? g : 'rgba(13,10,28,.35)', btnTxt: ready ? '#0B2A10' : '#FFFFFF', cur: ready ? 'pointer' : 'default',
+          claim: () => { if (ready) this.setState(x => ({ claimed: true, tours: x.tours + 1 })); } }; }),
+    };
+    return {
+      ...ext,
+      timer: `${p(Math.floor(t / 3600))}:${p(Math.floor(t / 60) % 60)}:${p(t % 60)}`,
+      contenu: [{ icon: 'icons2/etoile.svg', t: 'Un personnage garanti (à définir)' }, { icon: 'icons/billets.png', t: 'Argent de départ (à définir)' }, { icon: 'icons2/base.svg', t: 'Emplacement bonus (à définir)' }],
+      passes: [
+        { nom: 'Argent ×2', desc: 'Revenu doublé pour toujours (exemple)', icon: 'icons/billets.png', tag: '×2', c1: '#FFF0A8', c2: '#FFC93C', c3: '#C27A08', prix: 'R$ à définir', btn: 'linear-gradient(180deg,#B6FFB0,#3FCB52)', btnTxt: '#0B2A10' },
+        { nom: 'Tirage auto', desc: 'La machine tire toute seule (exemple)', icon: 'icons2/teleport.svg', tag: '', c1: '#9EEFFF', c2: '#22B8F0', c3: '#0B5FA8', prix: 'R$ à définir', btn: 'linear-gradient(180deg,#B6FFB0,#3FCB52)', btnTxt: '#0B2A10' },
+        { nom: '+2 emplacements', desc: 'Deux cases en plus dans la base (exemple)', icon: 'icons2/base.svg', tag: '+2', c1: '#C2F7EA', c2: '#4FDDBB', c3: '#17705C', prix: 'Possédé', btn: '#322D4E', btnTxt: '#A9A2CC' },
+        { nom: 'VIP', desc: 'Nom doré et bonus à définir (exemple)', icon: 'icons2/etoile.svg', tag: '', c1: '#EBA0FF', c2: '#C800FF', c3: '#5A0080', prix: 'R$ à définir', btn: 'linear-gradient(180deg,#B6FFB0,#3FCB52)', btnTxt: '#0B2A10' },
+      ],
+      jours: [1, 2, 3, 4, 5, 6, 7].map(n => ({ n, ok: n < 3, op: n < 3 ? .5 : 1, bord: n === 3 ? '#FFD66B' : n === 7 ? '#C800FF' : '#3E3478', bg: n === 3 ? '#2E2660' : '#17132E', txt: n === 3 ? '#FFD66B' : '#FFFFFF' })),
+      boosts: [
+        { nom: '×2 Argent', temps: '14:32', pct: 60, icon: 'icons/billets.png', c1: '#FFE07A', c2: '#E8960C' },
+        { nom: 'Chance +', temps: '04:05', pct: 25, icon: 'icons2/etoile.svg', c1: '#E58CFF', c2: '#8A10C0' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

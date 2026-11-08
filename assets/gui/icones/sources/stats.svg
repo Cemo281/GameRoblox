@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="128" height="128">
+  <!-- Icône « stats » (Mes stats, idée 2b du handoff) : même style que icons2/ (trait #0D0A1C 1,8, dégradés 3 tons, reflet, ombre décalée) -->
+  <defs>
+    <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1edff"/><stop offset=".5" stop-color="#cfc5fb"/><stop offset="1" stop-color="#9d8fdc"/></linearGradient>
+    <linearGradient id="vert" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b6ffb0"/><stop offset=".5" stop-color="#5ee06a"/><stop offset="1" stop-color="#2fae45"/></linearGradient>
+    <linearGradient id="bleu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a4c5ff"/><stop offset=".5" stop-color="#5a95ff"/><stop offset="1" stop-color="#3f64b0"/></linearGradient>
+    <linearGradient id="or" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe194"/><stop offset=".5" stop-color="#ffc93c"/><stop offset="1" stop-color="#d08a12"/></linearGradient>
+    <linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <g transform="translate(0 1.6)" opacity=".55" fill="#0D0A1C" stroke="#0D0A1C" stroke-width="1.8" stroke-linejoin="round">
+    <rect x="3" y="3.5" width="26" height="25" rx="4"/>
+  </g>
+  <rect x="3" y="3.5" width="26" height="25" rx="4" fill="url(#fond)" stroke="#0D0A1C" stroke-width="1.8" stroke-linejoin="round"/>
+  <ellipse cx="12" cy="6.6" rx="6.5" ry="1.6" fill="url(#hl)"/>
+  <g stroke="#0D0A1C" stroke-width="1.6" stroke-linejoin="round">
+    <rect x="6.5" y="18" width="5" height="7" rx="1.2" fill="url(#vert)"/>
+    <rect x="13.5" y="14" width="5" height="11" rx="1.2" fill="url(#bleu)"/>
+    <rect x="20.5" y="10" width="5" height="15" rx="1.2" fill="url(#or)"/>
+  </g>
+  <polyline points="7,14.5 14,10.5 19.5,11.5 25.5,6.5" fill="none" stroke="#0D0A1C" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="7,14.5 14,10.5 19.5,11.5 25.5,6.5" fill="none" stroke="#FF4F9A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25.5" cy="6.5" r="2" fill="#FF7AB0" stroke="#0D0A1C" stroke-width="1.4"/>
+</svg>

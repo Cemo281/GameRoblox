@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+html{background:#0B0918}body{margin:0;background:#0B0918;color:#FFFFFF;font-family:Montserrat,sans-serif}
+a{color:#FFD66B}a:hover{color:#FFE9A8}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes popIn{0%{transform:scale(.8) translateY(20px);opacity:0}70%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
+@keyframes toastIn{0%{transform:translateY(-24px);opacity:0}60%{transform:translateY(3px);opacity:1}100%{transform:none;opacity:1}}
+@keyframes gainUp{0%{transform:translateY(0) scale(.8);opacity:0}15%{transform:translateY(-6px) scale(1.15);opacity:1}100%{transform:translateY(-46px) scale(1);opacity:0}}
+@keyframes tpFade{0%{opacity:0}18%{opacity:1}74%{opacity:1}100%{opacity:0}}
+@keyframes tpZoom{from{transform:scale(.7) rotate(0deg)}to{transform:scale(1.9) rotate(14deg)}}
+@keyframes tpText{0%{transform:rotate(-4deg) scale(2.2);opacity:0}22%{transform:rotate(-4deg) scale(.95);opacity:1}30%{transform:rotate(-4deg) scale(1)}75%{transform:rotate(-4deg) scale(1.04);opacity:1}100%{transform:rotate(-4deg) scale(1.3);opacity:0}}
+@keyframes flashW{0%{opacity:1}100%{opacity:0}}
+@keyframes pulseTag{0%,100%{transform:rotate(8deg) scale(1)}50%{transform:rotate(8deg) scale(1.12)}}
+@keyframes sheenX{0%{transform:translateX(-120px) rotate(20deg)}60%,100%{transform:translateX(320px) rotate(20deg)}}
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:48px 40px 80px;display:flex;flex-direction:column;gap:28px">
+
+<header style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <img src="icons2/teleport.svg" style="width:44px;height:44px">
+    <h1 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:44px;text-shadow:0 3px 0 #0D0A1C">HUD v3 — offres et boutique</h1>
+    <span style="font:800 11px Montserrat;color:#0D0A1C;background:linear-gradient(180deg,#FFF0A8,#FFC93C);border:1.5px solid #0D0A1C;border-radius:6px;padding:4px 8px;letter-spacing:1px">GACHA MODERNE + MANGA</span>
+    <a href="Planche de style v2.dc.html" style="font:600 13px Montserrat">← Planche v2</a>
+    <a href="Idees offres et promotions.dc.html" style="font:600 13px Montserrat">Idées 1a–1f</a>
+  </div>
+  <p style="margin:0;max-width:880px;color:#C9C3E6;font-size:15px;line-height:1.55;text-wrap:pretty">Les 6 idées intégrées sur PC : <b style="color:#fff">1a</b> pastille PROMO + minuteur sur Boutique · <b style="color:#fff">1b</b> encart « Offre du moment » (refermable) · <b style="color:#fff">1c</b> pack de départ après le 1er tirage · <b style="color:#fff">1d</b> Boutique avec passes · <b style="color:#fff">1e</b> bouton Cadeaux (connexion 7 jours + temps de jeu) · <b style="color:#fff">1f</b> boosts actifs sous l'argent. Achète un boost dans la Boutique pour le voir apparaître. Tous les prix sont « R$ à définir ».</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px">
+    <div onClick="{{ collecter }}" style="position:relative;height:44px;padding:0 18px;display:flex;align-items:center;gap:8px;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FFF0A8,#FFC93C 50%,#F29A12);box-shadow:0 3px 0 #94570A;font:400 17px 'Fredoka One';color:#4A2600;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><img src="icons/billets.png" style="position:relative;width:26px;height:26px"><span style="position:relative">Simuler la collecte</span></div>
+    <div onClick="{{ notifTest }}" style="position:relative;height:44px;padding:0 18px;display:flex;align-items:center;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#7E78A8,#4A4570 50%,#36315C);box-shadow:0 3px 0 #1E1A38;font:400 17px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.12)"></div><span style="position:relative">Simuler une notif</span></div>
+    <div onClick="{{ simPack }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#7E78A8,#4A4570 50%,#36315C);box-shadow:0 3px 0 #1E1A38;font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;cursor:pointer;overflow:hidden;height:44px;font-size:17px;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.12)"></div><span style="position:relative">Simuler le 1er tirage (pack)</span></div>
+  </div>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;align-items:baseline;gap:12px"><h2 style="margin:0;font:400 26px 'Fredoka One'">PC — 1100 × 650</h2><span style="font-size:13px;color:#A9A2CC">Téléportation complète dans la barre de gauche ; raccourcis Hub, Évolutions, Étoiles en haut.</span></div>
+  <div style="position:relative;width:1100px;height:650px;flex:none;overflow:hidden;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#3B2E6E 0%,#5A4A8A 35%,#2F5A6A 62%,#1E3A2E 100%)">
+    <image-slot id="capture-pc" shape="rect" placeholder="Glisse ici une capture du jeu (1100 × 650)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+    <sc-if value="{{ guides }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:0;top:0;width:60px;height:60px;border:1.5px dashed #FF6B6B;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 9px Montserrat;color:#FF9A9A;text-align:center;pointer-events:none">menu<br>Roblox</div>
+      <div style="position:absolute;right:0;top:0;width:60px;height:60px;border:1.5px dashed #FF6B6B;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 9px Montserrat;color:#FF9A9A;pointer-events:none">Roblox</div>
+    </sc-if>
+
+    <div style="position:absolute;left:72px;top:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+      <div style="position:relative;height:50px;min-width:210px;box-sizing:border-box;padding:0 22px 0 56px;display:flex;align-items:center;border-radius:12px;background:linear-gradient(180deg,rgba(42,35,80,.94),rgba(23,19,46,.94));border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C">
+        <div style="position:absolute;inset:2px;border-radius:9px;border:1px solid #5A4E9E"></div>
+        <div style="position:absolute;left:14px;right:14px;bottom:4px;height:2px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+        <img src="icons/billets.png" style="position:absolute;left:-6px;top:-6px;width:58px;height:58px">
+        <div style="position:relative;font:400 30px 'Fredoka One';color:#FFD66B;text-shadow:0 2px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">{{ argentTxt }}</div>
+        <div style="position:absolute;left:60px;top:-4px;pointer-events:none">{{ gainsEl }}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div style="position:relative;height:28px;padding:0 11px;display:flex;align-items:center;border-radius:8px;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);border:1.5px solid #0D0A1C;font:400 15px 'Fredoka One';color:#0B2A10;overflow:hidden"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.3)"></div><span style="position:relative">+{{ rpsTxt }} $/s</span></div>
+        <div style="height:28px;padding:0 11px 0 5px;display:flex;align-items:center;gap:6px;border-radius:8px;background:rgba(13,10,28,.9);border:1.5px solid #3E3478">
+          <img src="icons/billets.png" style="width:20px;height:20px">
+          <span style="font:700 10px Montserrat;color:#A9A2CC;letter-spacing:.4px">À COLLECTER</span>
+          <span style="font:400 15px 'Fredoka One';color:#FFD66B">{{ collectTxt }}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <sc-for list="{{ boosts }}" as="b" hint-placeholder-count="0">
+          <div style="position:relative;height:28px;padding:0 10px 0 4px;display:flex;align-items:center;gap:5px;border-radius:8px;border:1.5px solid #0D0A1C;background:linear-gradient(180deg,{{ b.c1 }},{{ b.c2 }});overflow:hidden">
+            <div style="position:absolute;left:0;bottom:0;height:3px;width:{{ b.pct }}%;background:#FFFFFF"></div>
+            <div style="width:20px;height:20px;background:url({{ b.src }}) center/contain no-repeat"></div>
+            <span style="font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">{{ b.nom }}</span>
+            <span style="font:700 10px ui-monospace,Menlo,monospace;color:#FFFFFF">{{ b.temps }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+<div style="position:absolute;right:72px;top:12px;display:flex;gap:8px">
+      <sc-for list="{{ menu2 }}" as="m" hint-placeholder-count="2">
+        <div onClick="{{ m.click }}" title="{{ m.nom }}" style="position:relative;width:46px;height:46px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ m.c1 }} 0%,{{ m.c2 }} 50%,{{ m.c3 }} 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+          <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+          <div style="position:absolute;left:0;right:0;top:0;height:44%;background:rgba(255,255,255,.2)"></div>
+          <div style="position:absolute;inset:2px;border-radius:9px;border:1.5px solid rgba(255,255,255,.65)"></div>
+          <div style="position:relative;width:30px;height:30px;background:url({{ m.src }}) center/contain no-repeat"></div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ promoOn }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;right:110px;top:2px;padding:1px 6px;background:#FFFFFF;color:#F0244A;border:2px solid #0D0A1C;font:400 12px 'Fredoka One';box-shadow:2px 2px 0 #F0244A;pointer-events:none;animation:pulseTag 1.4s ease-in-out infinite">PROMO</div>
+      <div style="position:absolute;right:118px;top:64px;width:62px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:#0D0A1C;border:1px solid #FF7A92;font:700 10px ui-monospace,Menlo,monospace;color:#FFB3C2;pointer-events:none">{{ promoTxt }}</div>
+    </sc-if>
+    <sc-if value="{{ encart }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;right:12px;top:92px;width:250px;height:104px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FFE98A,#FFBE00 50%,#8A5A00);box-shadow:0 3px 0 #0D0A1C;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+        <div style="position:absolute;top:-40px;left:0;width:34px;height:200px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0));animation:sheenX 3s ease-in-out infinite;pointer-events:none"></div>
+        <img src="img/perso_a_pied.png" style="position:absolute;left:-6px;top:-4px;width:110px;height:110px;object-fit:contain;pointer-events:none">
+        <div style="position:absolute;left:100px;top:10px;right:10px;display:flex;flex-direction:column;gap:3px">
+          <div style="font:800 9px Montserrat;letter-spacing:1px;color:#4A2600">OFFRE DU MOMENT</div>
+          <div style="font:400 18px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">Pack Capitaine</div>
+          <div style="display:flex;gap:6px;margin-top:4px;align-items:center">
+            <div onClick="{{ voirOffre }}" style="position:relative;height:30px;padding:0 12px;display:flex;align-items:center;border-radius:8px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B49CFF,#7454F0 50%,#5235C4);font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;cursor:pointer;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.06)" style-active="transform:translateY(2px)">Voir</div>
+            <div style="height:30px;padding:0 8px;display:flex;align-items:center;border-radius:8px;background:rgba(13,10,28,.75);font:700 10px ui-monospace,Menlo,monospace;color:#FFF0A8">{{ promoTxt }}</div>
+          </div>
+        </div>
+        <div onClick="{{ fermerEncart }}" style="position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:6px;background:rgba(13,10,28,.6);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:rgba(13,10,28,.9)"><img src="icons2/fermer.svg" style="width:11px;height:11px"></div>
+      </div>
+    </sc-if>
+    <div onClick="{{ ouvrirCadeaux }}" style="position:absolute;right:12px;top:{{ cadeauTop }}px;display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;cursor:pointer">
+      <div style="position:relative;width:58px;height:58px;box-sizing:border-box;border-radius:50%;border:2px solid #0D0A1C;background:conic-gradient(#FFC93C 0 {{ cadeauPct }}%,#2A2350 {{ cadeauPct }}% 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#FFB8D8,#FF4F9A 50%,#A8124F);border:1.5px solid #0D0A1C;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+          <img src="icons2/inventaire.svg" style="position:relative;width:30px;height:30px">
+        </div>
+        <sc-if value="{{ cadeauPret }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;box-sizing:border-box;padding:0 5px;border-radius:11px;background:linear-gradient(180deg,#FF7A92,#F0244A);border:2px solid #0D0A1C;font:400 13px 'Fredoka One';display:flex;align-items:center;justify-content:center">!</div></sc-if>
+      </div>
+      <div style="font:400 12px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;white-space:nowrap">{{ cadeauTxt }}</div>
+    </div>
+    <div style="position:absolute;left:12px;top:220px;display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+        <div onClick="{{ m.click }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;cursor:pointer">
+          <div style="position:relative;width:58px;height:58px;box-sizing:border-box;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ m.c1 }} 0%,{{ m.c2 }} 50%,{{ m.c3 }} 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+            <div style="position:absolute;inset:0;border-radius:12px;overflow:hidden">
+              
+              <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+              <div style="position:absolute;left:0;right:0;top:0;height:44%;background:rgba(255,255,255,.2)"></div>
+            </div>
+            <div style="position:absolute;inset:2px;border-radius:11px;border:1.5px solid rgba(255,255,255,.65)"></div>
+            <div style="position:relative;width:40px;height:40px;background:url({{ m.src }}) center/contain no-repeat"></div>
+            <sc-if value="{{ m.badge }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;box-sizing:border-box;padding:0 5px;border-radius:11px;background:linear-gradient(180deg,#FF7A92,#F0244A);border:2px solid #0D0A1C;font:400 13px 'Fredoka One';display:flex;align-items:center;justify-content:center">{{ m.badge }}</div></sc-if>
+          </div>
+          <div style="font:400 12px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;white-space:nowrap">{{ m.nom }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ pinned }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:0;right:0;top:12px;display:flex;justify-content:center;gap:10px;pointer-events:none">
+        <sc-for list="{{ quick }}" as="q" hint-placeholder-count="3">
+          <div onClick="{{ q.go }}" style="position:relative;width:150px;height:46px;box-sizing:border-box;padding:0 12px 0 8px;display:flex;align-items:center;gap:8px;border-radius:11px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ q.l }} 0%,{{ q.c }} 50%,{{ q.d }} 100%);box-shadow:{{ q.ring }};cursor:pointer;overflow:hidden;pointer-events:auto;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.06) translateY(1px)" style-active="transform:translateY(3px)">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+            <div style="position:absolute;left:0;right:0;top:0;height:46%;background:rgba(255,255,255,.22)"></div>
+            <div style="position:absolute;inset:2px;border-radius:8px;border:1.5px solid rgba(255,255,255,.6)"></div>
+            <div style="position:relative;width:30px;height:30px;flex:none;background:url({{ q.src }}) center/contain no-repeat"></div>
+            <div style="position:relative;font:400 17px 'Fredoka One';color:#FFFFFF;text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;white-space:nowrap">{{ q.court }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;left:0;right:0;top:72px;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:40">
+      <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+        <div style="position:relative;min-width:320px;height:50px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;gap:12px;padding-right:20px;overflow:hidden;animation:toastIn .3s ease-out">
+          <div style="width:56px;height:100%;flex:none;background:linear-gradient(180deg,{{ t.c1 }},{{ t.c2 }} 55%,{{ t.c3 }});clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);display:flex;align-items:center;justify-content:center"><div style="width:30px;height:30px;margin-right:6px;background:url({{ t.src }}) center/contain no-repeat"></div></div>
+          <div style="font:400 17px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">{{ t.msg }}</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:3px;background:{{ t.c2 }}"></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ openPC }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fermerPC }}" style="position:absolute;inset:0;background:rgba(8,6,18,.62);z-index:20"></div>
+      <div style="position:absolute;left:155px;top:64px;width:790px;height:514px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C">
+          <div style="position:absolute;inset:3px;border-radius:13px;border:1px solid #5A4E9E;pointer-events:none"></div>
+          <div style="position:relative;height:58px;display:flex;align-items:center;gap:12px;padding:0 14px">
+            <div style="position:relative;width:76px;height:40px;flex:none">
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,#7FE0FF,#2E9BE0);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)"></div>
+              <img src="icons2/teleport.svg" style="position:absolute;left:16px;top:-6px;width:46px;height:46px">
+            </div>
+            <div style="font:400 24px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Téléportation</div>
+            <div style="font:600 12px Montserrat;color:#A9A2CC">Clique un lieu sur la carte ou dans la liste</div>
+            <div onClick="{{ fermerPC }}" style="position:absolute;right:12px;top:10px;width:38px;height:38px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234);box-shadow:0 3px 0 #7A1020;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(6deg)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.22)"></div><img src="icons2/fermer.svg" style="position:relative;width:20px;height:20px"></div>
+          </div>
+          <div style="height:2px;margin:0 14px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+          <div style="display:flex;gap:18px;padding:14px 18px">
+            <dc-import name="MiniCarteHub2" size="{{ 420 }}" lieux="{{ lieux }}" hover="{{ hover }}" on-hover="{{ setHover }}" on-go="{{ goPC }}" hint-size="420px,420px"></dc-import>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+              <div style="font:800 10px Montserrat;color:#A9A2CC;letter-spacing:1.4px;height:16px">STANDS DU HUB</div>
+              <sc-for list="{{ liste }}" as="l" hint-placeholder-count="5">
+                <div onClick="{{ l.goPC }}" onMouseEnter="{{ l.enter }}" onMouseLeave="{{ leave }}" style="position:relative;height:50px;box-sizing:border-box;padding:0 12px 0 0;display:flex;align-items:center;gap:10px;border-radius:10px;background:{{ l.bg }};border:1.5px solid {{ l.bord }};cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:translateX(4px)" style-active="transform:translateY(2px)">
+                  <div style="width:5px;align-self:stretch;flex:none;background:{{ l.c }}"></div>
+                  <div style="position:relative;width:38px;height:38px;flex:none;box-sizing:border-box;border-radius:50%;border:1.5px solid #0D0A1C;background:radial-gradient(circle at 50% 30%,{{ l.l }} 0%,{{ l.c }} 55%,{{ l.d }} 100%);display:flex;align-items:center;justify-content:center"><div style="width:26px;height:26px;background:url({{ l.src }}) center/contain no-repeat"></div></div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                    <div style="font:400 17px 'Fredoka One';line-height:20px">{{ l.nom }}</div>
+                    <div style="font:500 11px Montserrat;color:#A9A2CC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.desc }}</div>
+                  </div>
+                  <div style="width:8px;height:8px;flex:none;border-top:2.5px solid {{ l.c }};border-right:2.5px solid {{ l.c }};transform:rotate(45deg)"></div>
+                </div>
+              </sc-for>
+              <div onClick="{{ goBasePC }}" style="position:relative;margin-top:6px;height:50px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B8F7E8,#5FE6C6 50%,#2EAE90);box-shadow:0 3px 0 #17705C;font:400 20px 'Fredoka One';color:#06352B;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.04)" style-active="transform:translateY(3px)">
+                <div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div>
+                <img src="icons2/base.svg" style="position:relative;width:34px;height:34px"><span style="position:relative">Ma base</span>
+              </div>
+              <div onClick="{{ togglePin }}" style="margin-top:6px;height:40px;display:flex;align-items:center;gap:10px;cursor:pointer">
+                <div style="position:relative;width:50px;height:28px;flex:none;box-sizing:border-box;border-radius:14px;border:1.5px solid #0D0A1C;background:{{ pinBg }}">
+                  <div style="position:absolute;top:2.5px;left:{{ pinX }}px;width:20px;height:20px;border-radius:10px;background:linear-gradient(180deg,#FFFFFF,#D2CDEB);border:1.5px solid #0D0A1C;box-sizing:border-box;transition:left .15s"></div>
+                </div>
+                <div style="font:600 13px Montserrat">Barre rapide à l'écran</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ shopOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fermerShop }}" style="position:absolute;inset:0;background:rgba(8,6,18,.62);z-index:20"></div>
+      <div style="position:absolute;left:155px;top:64px;width:790px;height:514px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C;display:flex;flex-direction:column">
+          <div style="position:absolute;inset:3px;border-radius:13px;border:1px solid #5A4E9E;pointer-events:none"></div>
+          <div style="position:relative;height:58px;display:flex;align-items:center;gap:12px;padding:0 14px">
+            <div style="position:relative;width:76px;height:40px;flex:none"><div style="position:absolute;inset:0;background:linear-gradient(180deg,#C2FFB8,#3FD45E);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)"></div><img src="icons2/boutique.svg" style="position:absolute;left:16px;top:-6px;width:46px;height:46px"></div>
+            <div style="font:400 24px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Boutique</div>
+            <div style="font:600 12px Montserrat;color:#A9A2CC">Tous les prix : R$ à définir</div>
+            <div onClick="{{ fermerShop }}" style="position:absolute;right:12px;top:10px;width:38px;height:38px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234);box-shadow:0 3px 0 #7A1020;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(6deg)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.22)"></div><img src="icons2/fermer.svg" style="position:relative;width:20px;height:20px"></div>
+          </div>
+          <div style="height:2px;margin:0 14px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+          <div style="display:flex;gap:4px;margin:12px 18px 0;padding:4px;border-radius:12px;background:#0D0A1C;border:1px solid #2E2758;align-self:flex-start">
+            <sc-for list="{{ shopTabs }}" as="o" hint-placeholder-count="4">
+              <div onClick="{{ o.click }}" style="position:relative;height:36px;padding:0 18px;display:flex;align-items:center;gap:6px;border-radius:9px;background:{{ o.bg }};font:400 16px 'Fredoka One';color:{{ o.couleur }};cursor:pointer;overflow:hidden">{{ o.nom }}<sc-if value="{{ o.dot }}" hint-placeholder-val="{{ false }}"><div style="width:8px;height:8px;border-radius:4px;background:#F0244A;border:1.5px solid #0D0A1C"></div></sc-if></div>
+            </sc-for>
+          </div>
+          <div style="flex:1;min-height:0;padding:14px 18px 18px;overflow-y:auto">
+            <sc-if value="{{ tabOffres }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+                <div style="position:relative;height:340px;box-sizing:border-box;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#FFE98A,#FFBE00 50%,#8A5A00);overflow:hidden">
+                  <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.2px,rgba(255,255,255,0) 1.7px) 0 0/7px 7px"></div>
+                  <img src="img/perso_a_pied.png" style="position:absolute;left:10px;top:24px;width:210px;height:230px;object-fit:contain">
+                  <div style="position:absolute;left:12px;top:12px;padding:2px 8px;background:#FFFFFF;color:#0D0A1C;border:2px solid #0D0A1C;font:400 13px 'Fredoka One';transform:rotate(-4deg);box-shadow:2px 2px 0 #F0244A">OFFRE DU MOMENT</div>
+                  <div style="position:absolute;right:12px;top:14px;height:22px;padding:0 8px;display:flex;align-items:center;border-radius:6px;background:#0D0A1C;font:700 11px ui-monospace,Menlo,monospace;color:#FFF0A8">{{ promoTxt }}</div>
+                  <div style="position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.94) 40%);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:12px;box-sizing:border-box">
+                    <div style="font:400 22px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">Pack Capitaine</div>
+                    <div style="font:500 12px Montserrat;color:#C9C3E6">Contenu à définir · fin réelle de l'offre côté serveur</div>
+                    <div style="display:flex;gap:8px;align-items:center"><div onClick="{{ acheterOffre }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);box-shadow:0 3px 0 #1E8A33;font:400 15px 'Fredoka One';color:#0B2A10;cursor:pointer;overflow:hidden;flex:1;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><span style="position:relative">R$ à définir</span></div><div style="height:18px;padding:0 6px;display:flex;align-items:center;border-radius:4px;background:repeating-linear-gradient(135deg,#FFD66B 0 6px,#F2A516 6px 12px);border:1.5px solid #0D0A1C;font:800 8.5px Montserrat;letter-spacing:1px;color:#3A2500">EXEMPLE</div></div>
+                  </div>
+                </div>
+                <div style="position:relative;height:340px;box-sizing:border-box;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(160deg,#EBA0FF,#C800FF 50%,#5A0080);overflow:hidden">
+                  <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.2px,rgba(255,255,255,0) 1.7px) 0 0/7px 7px"></div>
+                  <img src="img/perso_b_pied.png" style="position:absolute;left:10px;top:24px;width:210px;height:230px;object-fit:contain">
+                  <div style="position:absolute;left:12px;top:12px;padding:2px 8px;background:#FFFFFF;color:#0D0A1C;border:2px solid #0D0A1C;font:400 13px 'Fredoka One';transform:rotate(-4deg);box-shadow:2px 2px 0 #F0244A">1 SEULE FOIS</div>
+                  <div style="position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(13,10,28,0),rgba(13,10,28,.94) 40%);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:12px;box-sizing:border-box">
+                    <div style="font:400 22px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">Pack de départ</div>
+                    <div style="font:500 12px Montserrat;color:#C9C3E6">Perso garanti + argent + emplacement (à définir)</div>
+                    <sc-if value="{{ packDispo }}" hint-placeholder-val="{{ true }}"><div style="display:flex"><div onClick="{{ acheterPack }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);box-shadow:0 3px 0 #1E8A33;font:400 15px 'Fredoka One';color:#0B2A10;cursor:pointer;overflow:hidden;flex:1;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><span style="position:relative">R$ à définir</span></div></div></sc-if>
+                    <sc-if value="{{ packAchete }}" hint-placeholder-val="{{ false }}"><div style="height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#322D4E;font:400 15px 'Fredoka One';color:#A9A2CC">Possédé</div></sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tabPasses }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+                <sc-for list="{{ passes }}" as="p" hint-placeholder-count="4">
+                  <div style="position:relative;height:300px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;display:flex;flex-direction:column;align-items:center">
+                    <div style="position:relative;width:100%;height:130px;background:linear-gradient(160deg,{{ p.c1 }},{{ p.c2 }} 50%,{{ p.c3 }});display:flex;align-items:center;justify-content:center">
+                      <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+                      <div style="position:relative;width:72px;height:72px;background:url({{ p.src }}) center/contain no-repeat"></div>
+                      <div style="position:absolute;right:8px;top:6px;font:400 22px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">{{ p.tag }}</div>
+                    </div>
+                    <div style="padding:12px 10px 0;text-align:center;display:flex;flex-direction:column;gap:6px">
+                      <div style="font:400 18px 'Fredoka One'">{{ p.nom }}</div>
+                      <div style="font:500 12px/1.35 Montserrat;color:#A9A2CC">{{ p.desc }}</div>
+                    </div>
+                    <div onClick="{{ p.acheter }}" style="margin-top:auto;margin-bottom:12px;height:36px;padding:0 14px;display:flex;align-items:center;border-radius:9px;border:2px solid #0D0A1C;background:{{ p.btn }};font:400 14px 'Fredoka One';color:{{ p.btnTxt }};cursor:{{ p.curseur }}">{{ p.prix }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tabBoosts }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                <sc-for list="{{ boostsShop }}" as="b" hint-placeholder-count="3">
+                  <div style="position:relative;height:220px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C;overflow:hidden;display:flex;flex-direction:column;align-items:center">
+                    <div style="position:relative;width:100%;height:96px;background:linear-gradient(160deg,{{ b.c1 }},{{ b.c2 }});display:flex;align-items:center;justify-content:center">
+                      <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+                      <div style="position:relative;width:56px;height:56px;background:url({{ b.src }}) center/contain no-repeat"></div>
+                    </div>
+                    <div style="padding:10px;text-align:center;display:flex;flex-direction:column;gap:4px"><div style="font:400 18px 'Fredoka One'">{{ b.nom }}</div><div style="font:600 12px Montserrat;color:#A9A2CC">{{ b.duree }} · effet exemple</div></div>
+                    <div onClick="{{ b.acheter }}" style="margin-top:auto;margin-bottom:12px;height:36px;padding:0 14px;display:flex;align-items:center;border-radius:9px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#3FCB52);font:400 14px 'Fredoka One';color:#0B2A10;cursor:pointer" style-hover="transform:scale(1.05)" style-active="transform:translateY(2px)">R$ à définir</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tabArgent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                <sc-for list="{{ argentSlots }}" as="a" hint-placeholder-count="3">
+                  <div style="height:220px;box-sizing:border-box;border-radius:12px;border:2px dashed #5A4E9E;background:repeating-linear-gradient(135deg,#1F1B36 0 14px,#1A1730 14px 28px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                    <img src="icons/billets.png" style="width:56px;height:56px;opacity:.7">
+                    <div style="font:400 16px 'Fredoka One'">{{ a }}</div>
+                    <div style="font:600 11px Montserrat;color:#A9A2CC">contenu à définir</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ giftsOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fermerCadeaux }}" style="position:absolute;inset:0;background:rgba(8,6,18,.62);z-index:20"></div>
+      <div style="position:absolute;left:250px;top:110px;width:600px;height:400px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C;display:flex;flex-direction:column">
+          <div style="position:absolute;inset:3px;border-radius:13px;border:1px solid #5A4E9E;pointer-events:none"></div>
+          <div style="position:relative;height:58px;display:flex;align-items:center;gap:12px;padding:0 14px">
+            <div style="position:relative;width:76px;height:40px;flex:none"><div style="position:absolute;inset:0;background:linear-gradient(180deg,#FFB8D8,#FF4F9A);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)"></div><img src="icons2/inventaire.svg" style="position:absolute;left:16px;top:-6px;width:46px;height:46px"></div>
+            <div style="font:400 24px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Cadeaux</div>
+            <div style="font:600 12px Montserrat;color:#A9A2CC">Gratuits, pour récompenser ceux qui reviennent</div>
+            <div onClick="{{ fermerCadeaux }}" style="position:absolute;right:12px;top:10px;width:38px;height:38px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234);box-shadow:0 3px 0 #7A1020;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(6deg)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:45%;background:rgba(255,255,255,.22)"></div><img src="icons2/fermer.svg" style="position:relative;width:20px;height:20px"></div>
+          </div>
+          <div style="height:2px;margin:0 14px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+          <div style="padding:14px 18px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:8px"><div style="font:800 10px Montserrat;letter-spacing:1.2px;color:#A9A2CC">CONNEXION 7 JOURS</div><div style="height:18px;padding:0 6px;display:flex;align-items:center;border-radius:4px;background:repeating-linear-gradient(135deg,#FFD66B 0 6px,#F2A516 6px 12px);border:1.5px solid #0D0A1C;font:800 8.5px Montserrat;letter-spacing:1px;color:#3A2500">EXEMPLE</div></div>
+            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ jours }}" as="j" hint-placeholder-count="7">
+                <div onClick="{{ j.click }}" style="position:relative;height:96px;box-sizing:border-box;border-radius:10px;border:2px solid {{ j.bord }};background:{{ j.bg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:{{ j.curseur }}">
+                  <div style="font:400 13px 'Fredoka One';color:{{ j.txt }}">Jour {{ j.n }}</div>
+                  <div style="width:36px;height:36px;border-radius:8px;background:repeating-linear-gradient(135deg,#3A3462 0 4px,#2A2350 4px 8px);border:1.5px solid #0D0A1C;opacity:{{ j.op }}"></div>
+                  <div style="font:700 9px Montserrat;color:{{ j.txt }}">{{ j.etat }}</div>
+                  <sc-if value="{{ j.ok }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:10px;background:#3FCB52;border:2px solid #0D0A1C;box-sizing:border-box"></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font:800 10px Montserrat;letter-spacing:1.2px;color:#A9A2CC">CADEAUX DE TEMPS DE JEU</div>
+            <div style="display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;background:#1C1738;border:1px solid #3E3478">
+              <div style="position:relative;width:64px;height:64px;flex:none;border-radius:50%;background:conic-gradient(#FFC93C 0 {{ cadeauPct }}%,#2A2350 {{ cadeauPct }}% 100%);border:2px solid #0D0A1C;box-sizing:border-box;display:flex;align-items:center;justify-content:center"><div style="width:48px;height:48px;border-radius:50%;background:#17132E;display:flex;align-items:center;justify-content:center"><img src="icons2/inventaire.svg" style="width:30px;height:30px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px"><div style="font:400 17px 'Fredoka One'">{{ cadeauTitre }}</div><div style="font:600 12px Montserrat;color:#A9A2CC">{{ cadeauRecus }} / 8 aujourd'hui · récompense à définir</div></div>
+              <sc-if value="{{ cadeauPret }}" hint-placeholder-val="{{ false }}"><div onClick="{{ recupCadeau }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);box-shadow:0 3px 0 #1E8A33;font:400 15px 'Fredoka One';color:#0B2A10;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><span style="position:relative">Récupérer</span></div></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ packOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(8,6,18,.75);z-index:30"></div>
+      <div style="position:absolute;left:330px;top:205px;width:440px;height:240px;z-index:31;animation:popIn .3s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:16px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 4px 0 #0D0A1C;overflow:hidden">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:170px;background:linear-gradient(160deg,#EBA0FF,#C800FF 50%,#5A0080)">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.2px,rgba(255,255,255,0) 1.7px) 0 0/7px 7px"></div>
+            <img src="img/perso_b_pied.png" style="position:absolute;left:0;top:20px;width:170px;height:200px;object-fit:contain">
+            <div style="position:absolute;left:8px;top:10px;padding:2px 8px;background:#FFFFFF;color:#0D0A1C;border:2px solid #0D0A1C;font:400 13px 'Fredoka One';transform:rotate(-5deg);box-shadow:2px 2px 0 #F0244A">1 SEULE FOIS</div>
+          </div>
+          <div style="position:absolute;left:186px;right:14px;top:14px;bottom:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="font:400 22px 'Fredoka One'">Pack de départ</div>
+            <div style="height:2px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+            <div style="display:flex;align-items:center;gap:8px;font:600 12px Montserrat;color:#C9C3E6"><div style="width:26px;height:26px;border-radius:7px;background:#1C1738;border:1px solid #3E3478;display:flex;align-items:center;justify-content:center"><img src="icons2/etoile.svg" style="width:18px;height:18px"></div>Un personnage garanti (à définir)</div>
+            <div style="display:flex;align-items:center;gap:8px;font:600 12px Montserrat;color:#C9C3E6"><div style="width:26px;height:26px;border-radius:7px;background:#1C1738;border:1px solid #3E3478;display:flex;align-items:center;justify-content:center"><img src="icons/billets.png" style="width:18px;height:18px"></div>Argent de départ (à définir)</div>
+            <div style="display:flex;align-items:center;gap:8px;font:600 12px Montserrat;color:#C9C3E6"><div style="width:26px;height:26px;border-radius:7px;background:#1C1738;border:1px solid #3E3478;display:flex;align-items:center;justify-content:center"><img src="icons2/base.svg" style="width:18px;height:18px"></div>Emplacement bonus (à définir)</div>
+            <div style="margin-top:auto;display:flex;gap:8px"><div onClick="{{ fermerPack }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#7E78A8,#4A4570 50%,#36315C);box-shadow:0 3px 0 #1E1A38;font:400 15px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;cursor:pointer;overflow:hidden;flex:1;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.12)"></div><span style="position:relative">Plus tard</span></div><div onClick="{{ acheterPack }}" style="position:relative;height:40px;padding:0 16px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);box-shadow:0 3px 0 #1E8A33;font:400 15px 'Fredoka One';color:#0B2A10;cursor:pointer;overflow:hidden;flex:1;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.05)" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><span style="position:relative">R$ à définir</span></div></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    {{ fxPC }}
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;align-items:baseline;gap:12px"><h2 style="margin:0;font:400 26px 'Fredoka One'">Téléphone paysage — 800 × 400</h2><span style="font-size:13px;color:#A9A2CC">Zones tactiles ≥ 44 px · menu en bas au centre, entre joystick et saut.</span></div>
+  <div style="position:relative;width:800px;height:400px;flex:none;overflow:hidden;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#3B2E6E 0%,#5A4A8A 35%,#2F5A6A 62%,#1E3A2E 100%)">
+    <image-slot id="capture-tel" shape="rect" placeholder="Glisse ici une capture téléphone (800 × 400)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+    <sc-if value="{{ guides }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:0;top:0;width:60px;height:60px;border:1.5px dashed #FF6B6B;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 9px Montserrat;color:#FF9A9A;pointer-events:none">Roblox</div>
+      <div style="position:absolute;right:0;top:0;width:60px;height:60px;border:1.5px dashed #FF6B6B;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 9px Montserrat;color:#FF9A9A;pointer-events:none">Roblox</div>
+      <div style="position:absolute;left:24px;bottom:20px;width:130px;height:130px;border:1.5px dashed #FF6B6B;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 10px Montserrat;color:#FF9A9A;pointer-events:none">joystick</div>
+      <div style="position:absolute;right:28px;bottom:30px;width:90px;height:90px;border:1.5px dashed #FF6B6B;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 10px Montserrat;color:#FF9A9A;pointer-events:none">saut</div>
+    </sc-if>
+    <div style="position:absolute;left:68px;top:8px;display:flex;flex-direction:column;gap:5px;align-items:flex-start">
+      <div style="position:relative;height:40px;min-width:150px;box-sizing:border-box;padding:0 16px 0 44px;display:flex;align-items:center;border-radius:10px;background:linear-gradient(180deg,rgba(42,35,80,.94),rgba(23,19,46,.94));border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C">
+        <div style="position:absolute;inset:2px;border-radius:7px;border:1px solid #5A4E9E"></div>
+        <img src="icons/billets.png" style="position:absolute;left:-5px;top:-5px;width:46px;height:46px">
+        <div style="position:relative;font:400 23px 'Fredoka One';color:#FFD66B;text-shadow:0 2px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C">{{ argentTxt }}</div>
+        <div style="position:absolute;left:46px;top:-8px;pointer-events:none">{{ gainsEl }}</div>
+      </div>
+      <div style="display:flex;gap:5px">
+        <div style="height:22px;padding:0 8px;display:flex;align-items:center;border-radius:7px;background:linear-gradient(180deg,#B6FFB0,#5EE06A 50%,#2FAE45);border:1.5px solid #0D0A1C;font:400 12px 'Fredoka One';color:#0B2A10">+{{ rpsTxt }} $/s</div>
+        <div style="height:22px;padding:0 8px 0 3px;display:flex;align-items:center;gap:4px;border-radius:7px;background:rgba(13,10,28,.9);border:1.5px solid #3E3478"><img src="icons/billets.png" style="width:16px;height:16px"><span style="font:400 12px 'Fredoka One';color:#FFD66B">{{ collectTxt }}</span></div>
+      </div>
+    </div>
+<div style="position:absolute;right:68px;top:8px;display:flex;gap:8px">
+      <sc-for list="{{ menu2 }}" as="m" hint-placeholder-count="2">
+        <div onClick="{{ m.clickTel }}" title="{{ m.nom }}" style="position:relative;width:44px;height:44px;box-sizing:border-box;border-radius:11px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ m.c1 }} 0%,{{ m.c2 }} 50%,{{ m.c3 }} 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+          <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+          <div style="position:absolute;left:0;right:0;top:0;height:44%;background:rgba(255,255,255,.2)"></div>
+          <div style="position:absolute;inset:2px;border-radius:8px;border:1.5px solid rgba(255,255,255,.65)"></div>
+          <div style="position:relative;width:28px;height:28px;background:url({{ m.src }}) center/contain no-repeat"></div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ pinned }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:266px;right:172px;top:8px;display:flex;justify-content:center;gap:10px;pointer-events:none">
+        <sc-for list="{{ quick }}" as="q" hint-placeholder-count="3">
+          <div onClick="{{ q.goTel }}" style="position:relative;width:114px;height:44px;box-sizing:border-box;padding:0 7px 0 5px;display:flex;align-items:center;gap:4px;border-radius:11px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ q.l }} 0%,{{ q.c }} 50%,{{ q.d }} 100%);box-shadow:{{ q.ring }};cursor:pointer;overflow:hidden;pointer-events:auto;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.06) translateY(1px)" style-active="transform:translateY(3px)">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+            <div style="position:absolute;left:0;right:0;top:0;height:46%;background:rgba(255,255,255,.22)"></div>
+            <div style="position:absolute;inset:2px;border-radius:8px;border:1.5px solid rgba(255,255,255,.6)"></div>
+            <div style="position:relative;width:22px;height:22px;flex:none;background:url({{ q.src }}) center/contain no-repeat"></div>
+            <div style="position:relative;font:400 13px 'Fredoka One';color:#FFFFFF;text-shadow:0 1.5px 0 #0D0A1C,1.5px 0 0 #0D0A1C,-1.5px 0 0 #0D0A1C,0 -1.5px 0 #0D0A1C;white-space:nowrap">{{ q.court }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;pointer-events:none">
+      <div style="position:relative;display:flex;gap:8px;padding:6px 10px 3px;border-radius:14px;background:linear-gradient(180deg,rgba(42,35,80,.94),rgba(23,19,46,.94));border:2px solid #0D0A1C;box-shadow:0 3px 0 #0D0A1C;pointer-events:auto">
+        <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+          <div onClick="{{ m.clickTel }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer">
+            <div style="position:relative;width:52px;height:52px;box-sizing:border-box;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(160deg,{{ m.c1 }} 0%,{{ m.c2 }} 50%,{{ m.c3 }} 100%);box-shadow:0 3px 0 #0D0A1C;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(.3,1.8,.5,1)" style-hover="transform:scale(1.1) rotate(-4deg)" style-active="transform:translateY(3px)">
+            <div style="position:absolute;inset:0;border-radius:10px;overflow:hidden">
+              
+              <div style="position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.38) 1.1px,rgba(255,255,255,0) 1.6px) 0 0/6px 6px"></div>
+              <div style="position:absolute;left:0;right:0;top:0;height:44%;background:rgba(255,255,255,.2)"></div>
+            </div>
+            <div style="position:absolute;inset:2px;border-radius:9px;border:1.5px solid rgba(255,255,255,.65)"></div>
+            <div style="position:relative;width:36px;height:36px;background:url({{ m.src }}) center/contain no-repeat"></div>
+              <sc-if value="{{ m.badge }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;box-sizing:border-box;padding:0 4px;border-radius:10px;background:linear-gradient(180deg,#FF7A92,#F0244A);border:2px solid #0D0A1C;font:400 11px 'Fredoka One';display:flex;align-items:center;justify-content:center">{{ m.badge }}</div></sc-if>
+            </div>
+            <div style="font:400 10px 'Fredoka One';color:#C9C3E6">{{ m.court }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:60px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:40">
+      <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+        <div style="position:relative;min-width:250px;height:40px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);display:flex;align-items:center;gap:10px;padding-right:16px;overflow:hidden;animation:toastIn .3s ease-out">
+          <div style="width:44px;height:100%;flex:none;background:linear-gradient(180deg,{{ t.c1 }},{{ t.c2 }} 55%,{{ t.c3 }});clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);display:flex;align-items:center;justify-content:center"><div style="width:22px;height:22px;margin-right:5px;background:url({{ t.src }}) center/contain no-repeat"></div></div>
+          <div style="font:400 14px 'Fredoka One';text-shadow:0 1.5px 0 #0D0A1C">{{ t.msg }}</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:{{ t.c2 }}"></div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ openTel }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fermerTel }}" style="position:absolute;inset:0;background:rgba(8,6,18,.62);z-index:20"></div>
+      <div style="position:absolute;left:64px;top:12px;width:672px;height:376px;z-index:21;animation:popIn .28s ease-out">
+        <div style="position:relative;width:100%;height:100%;box-sizing:border-box;border-radius:14px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#2A2350,#17132E);box-shadow:0 3px 0 #0D0A1C">
+          <div style="position:absolute;inset:3px;border-radius:11px;border:1px solid #5A4E9E;pointer-events:none"></div>
+          <div style="position:relative;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px">
+            <div style="position:relative;width:60px;height:32px;flex:none">
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,#7FE0FF,#2E9BE0);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)"></div>
+              <img src="icons2/teleport.svg" style="position:absolute;left:13px;top:-5px;width:36px;height:36px">
+            </div>
+            <div style="font:400 20px 'Fredoka One';text-shadow:0 2px 0 #0D0A1C">Téléportation</div>
+            <div onClick="{{ fermerTel }}" style="position:absolute;right:8px;top:2px;width:44px;height:44px;box-sizing:border-box;border-radius:10px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#FF8C96,#F0414F 50%,#C42234);box-shadow:0 3px 0 #7A1020;display:flex;align-items:center;justify-content:center;cursor:pointer" style-active="transform:translateY(3px)"><img src="icons2/fermer.svg" style="width:20px;height:20px"></div>
+          </div>
+          <div style="height:2px;margin:0 12px;background:linear-gradient(90deg,#FFD66B,rgba(255,214,107,0))"></div>
+          <div style="display:flex;gap:12px;padding:10px 12px">
+            <dc-import name="MiniCarteHub2" size="{{ 300 }}" lieux="{{ lieux }}" hover="{{ hover }}" on-hover="{{ setHover }}" on-go="{{ goTel }}" hint-size="300px,300px"></dc-import>
+            <div style="flex:1;min-width:0;height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px">
+              <sc-for list="{{ liste }}" as="l" hint-placeholder-count="5">
+                <div onClick="{{ l.goTel }}" style="height:46px;flex:none;box-sizing:border-box;padding:0 10px 0 0;display:flex;align-items:center;gap:8px;border-radius:10px;background:#1C1738;border:1.5px solid #3E3478;cursor:pointer;overflow:hidden" style-active="transform:translateY(2px)">
+                  <div style="width:5px;align-self:stretch;flex:none;background:{{ l.c }}"></div>
+                  <div style="width:34px;height:34px;flex:none;box-sizing:border-box;border-radius:50%;border:1.5px solid #0D0A1C;background:radial-gradient(circle at 50% 30%,{{ l.l }} 0%,{{ l.c }} 55%,{{ l.d }} 100%);display:flex;align-items:center;justify-content:center"><div style="width:24px;height:24px;background:url({{ l.src }}) center/contain no-repeat"></div></div>
+                  <div style="flex:1;font:400 16px 'Fredoka One'">{{ l.nom }}</div>
+                  <div style="width:8px;height:8px;border-top:2.5px solid {{ l.c }};border-right:2.5px solid {{ l.c }};transform:rotate(45deg)"></div>
+                </div>
+              </sc-for>
+              <div onClick="{{ goBaseTel }}" style="position:relative;height:48px;flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;border:2px solid #0D0A1C;background:linear-gradient(180deg,#B8F7E8,#5FE6C6 50%,#2EAE90);box-shadow:0 3px 0 #17705C;font:400 18px 'Fredoka One';color:#06352B;cursor:pointer;overflow:hidden" style-active="transform:translateY(3px)"><div style="position:absolute;left:0;right:0;top:0;height:48%;background:rgba(255,255,255,.3)"></div><img src="icons2/base.svg" style="position:relative;width:30px;height:30px"><span style="position:relative">Ma base</span></div>
+              <div onClick="{{ togglePin }}" style="height:44px;flex:none;display:flex;align-items:center;gap:10px;cursor:pointer">
+                <div style="position:relative;width:50px;height:28px;flex:none;box-sizing:border-box;border-radius:14px;border:1.5px solid #0D0A1C;background:{{ pinBg }}"><div style="position:absolute;top:2.5px;left:{{ pinX }}px;width:20px;height:20px;border-radius:10px;background:linear-gradient(180deg,#FFFFFF,#D2CDEB);border:1.5px solid #0D0A1C;box-sizing:border-box;transition:left .15s"></div></div>
+                <div style="font:600 12px Montserrat">Barre rapide</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    {{ fxTel }}
+  </div>
+</section>
+
+<section style="background:#F4F1FA;color:#1A1530;border:2px solid #0D0A1C;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0;font-family:'Fredoka One';font-weight:400;font-size:26px">Fiche technique — HUD v3 (offres)</h2>
+    <span style="font:600 12px Montserrat;color:#5A547A">px à 1100 × 650 · téléphone entre parenthèses</span>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ specs }}" as="s" hint-placeholder-count="12">
+        <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid #DAD4EA;font-size:13px">
+          <div style="font-weight:700">{{ s.k }}</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;color:#3A3456">{{ s.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:700 13px Montserrat">Images PNG à produire (fond transparent, sans texte)</div>
+      <sc-for list="{{ pngs }}" as="p" hint-placeholder-count="8">
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #DAD4EA;font:500 12px ui-monospace,Menlo,monospace"><span>{{ p.f }}</span><span style="color:#6A6488;white-space:nowrap">{{ p.t }}</span></div>
+      </sc-for>
+      <div style="margin-top:8px;font:700 13px Montserrat">Téléportation (effet manga)</div>
+      <div style="font-size:12px;line-height:1.55;color:#3A3456">1,2 s au total. 0 s : flash blanc plein écran (transp. 0 → 1 en 0,25 s). Puis lignes_vitesse.png noires sur blanc, UIScale 0,7 → 1,9 et rotation +14°. Cartouche blanc 3 px de contour noir, rotation −4°, ombre rouge décalée de 6 px (Frame #F0244A derrière), icône du lieu + nom en Fredoka 40 noir : arrive en ×2,2 → ×0,95 → ×1. Le personnage est téléporté à 0,6 s, puis tout s'efface et un toast vert s'affiche. Variante « fondu » : fond #0D0A1C, sans lignes.</div>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;guides&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Affichage&quot;},&quot;effet&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;manga&quot;,&quot;fondu&quot;],&quot;default&quot;:&quot;manga&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Téléportation&quot;},&quot;barreRapide&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Téléportation&quot;}}">
+class Component extends DCLogic {
+  state = { argent: 12400, aff: 12400, rps: 320, collect: 1230, openPC: false, openTel: false, hover: null, qHover: null, lieu: 'base', pinned: null, fxPC: null, fxTel: null, toasts: [], gains: [], badges: { index: '!', inventaire: '3' }, promoT: 8049, encart: true, shopOpen: false, shopTab: 'offres', giftsOpen: false, packOpen: false, packSeen: false, packAchete: false, passes: { emplacements: true }, giftT: 252, giftRecus: 3, jour: 3, jourPris: false, boosts: [] };
+  COUL = { teleport: { c1: '#9EEFFF', c2: '#22B8F0', c3: '#0B5FA8' }, index: { c1: '#FFD596', c2: '#FF962A', c3: '#B85000' }, inventaire: { c1: '#DCC6FF', c2: '#9B6BFF', c3: '#5226C0' }, rebirth: { c1: '#FFB8D8', c2: '#FF4F9A', c3: '#A8124F' }, boutique: { c1: '#C2FFB8', c2: '#3FD45E', c3: '#137A2C' }, parametres: { c1: '#D2DCFF', c2: '#7A8CD6', c3: '#38448A' } };
+  componentDidMount() { this.tick = setInterval(() => this.setState(s => ({ collect: s.collect + s.rps, promoT: Math.max(0, s.promoT - 1), giftT: Math.max(0, s.giftT - 1), boosts: s.boosts.map(b => ({ ...b, reste: b.reste - 1 })).filter(b => b.reste > 0) })), 1000); }
+  hms(t) { const p = n => String(n).padStart(2, '0'); return `${p(Math.floor(t / 3600))}:${p(Math.floor(t / 60) % 60)}:${p(t % 60)}`; }
+  ms(t) { return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; }
+  ajouterBoost(id) { const B = { argent: ['×2 Argent', 'piece', '#FFE07A', '#E8960C'], chance: ['Chance +', 'etoile', '#E58CFF', '#8A10C0'], rapide: ['Tirage rapide', 'teleport', '#9EEFFF', '#1A88D0'] }[id]; this.setState(s => { const ex = s.boosts.find(b => b.id === id); const boosts = ex ? s.boosts.map(b => b.id === id ? { ...b, reste: b.reste + 900, total: b.total + 900 } : b) : [...s.boosts, { id, nom: B[0], icon: B[1], c1: B[2], c2: B[3], reste: 900, total: 900 }]; return { boosts }; }); this.toast('succes', `${B[0]} activé (achat simulé)`); }
+  componentWillUnmount() { clearInterval(this.tick); cancelAnimationFrame(this.raf); }
+  fmt(n) { if (n < 1000) return String(Math.floor(n)); const S = ['', 'K', 'M', 'B', 'T']; let v = n, r = 0; while (v >= 1000 && r < 4) { v /= 1000; r++; } const d = v < 10 ? 2 : v < 100 ? 1 : 0, f = 10 ** d; let t = (Math.floor(v * f) / f).toFixed(d); if (d) t = t.replace(/0+$/, '').replace(/\.$/, ''); return t.replace('.', ',') + S[r]; }
+  toast(type, msg) {
+    const T = { succes: ['#B6FFB0', '#3FCB52', '#1E8A33', 'etoile'], argent: ['#FFF0A8', '#FFC93C', '#C27A08', 'piece'], erreur: ['#FF8C96', '#F0414F', '#C42234', 'fermer'], mythique: ['#EBA0FF', '#C800FF', '#5A0080', 'etoile'], info: ['#B49CFF', '#7454F0', '#5235C4', 'teleport'] }[type];
+    const id = Math.random();
+    this.setState(s => ({ toasts: [...s.toasts.slice(-2), { id, msg, c1: T[0], c2: T[1], c3: T[2], src: T[3] === 'piece' ? 'icons/billets.png' : `icons2/${T[3]}.svg` }] }));
+    setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(t => t.id !== id) })), 2600);
+  }
+  collecter = () => {
+    const m = this.state.collect; if (!m) return;
+    const from = this.state.aff, to = this.state.argent + m, t0 = performance.now(), id = Math.random();
+    this.setState(s => ({ argent: to, collect: 0, gains: [...s.gains, { id, txt: this.fmt(m) }] }));
+    setTimeout(() => this.setState(s => ({ gains: s.gains.filter(g => g.id !== id) })), 1300);
+    const step = now => { const p = Math.min(1, (now - t0) / 400), e = 1 - (1 - p) * (1 - p); this.setState({ aff: from + (to - from) * e }); if (p < 1) this.raf = requestAnimationFrame(step); };
+    cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(step);
+    this.toast('argent', `+${this.fmt(m)} $ collectés`);
+  };
+  teleport(dest, frame) {
+    const key = frame === 'pc' ? 'fxPC' : 'fxTel';
+    if (this.state[key]) return;
+    this.setState({ openPC: false, openTel: false, hover: null, [key]: { dest, id: Math.random() } });
+    setTimeout(() => this.setState({ lieu: dest }), 600);
+    setTimeout(() => { this.setState({ [key]: null }); const L = this.lieux().find(l => l.id === dest); this.toast('succes', dest === 'base' ? 'Retour à ta base !' : `Arrivé : ${L.nom}`); }, 1200);
+  }
+  lieux() {
+    return [
+      { id: 'centre', nom: 'Centre du Hub', desc: 'Le piédestal d’événement, au cœur du Hub.', icon: 'centre', c: '#FFC93C', d: '#B06A08', l: '#FFF6C8' },
+      { id: 'evolutions', nom: 'Évolutions', desc: 'Fusionne tes doublons en perso évolué.', icon: 'evolutions', c: '#E45CFF', d: '#7A1A9A', l: '#F6C2FF', angle: 25.71 },
+      { id: 'etoiles', nom: 'Étoiles', desc: 'Relance les étoiles d’un personnage.', icon: 'etoiles_stand', c: '#FFCF3A', d: '#A07400', l: '#FFF1B0', angle: 128.57 },
+      { id: 'atelier', nom: 'Atelier', desc: 'Achète des bonus permanents.', icon: 'atelier', c: '#FF8A3D', d: '#A0460A', l: '#FFD2B0', angle: 231.43 },
+      { id: 'recyclage', nom: 'Recyclage', desc: 'Vends tes persos en trop contre de l’argent.', icon: 'recyclage', c: '#8BD346', d: '#467E10', l: '#D6F5AE', angle: 282.86 },
+      { id: 'classements', nom: 'Classements', desc: 'Les meilleurs joueurs du serveur.', icon: 'classements', c: '#4F8BFF', d: '#1C46A8', l: '#BCD3FF', angle: 77.14 },
+      { id: 'base', nom: 'Ma base', desc: 'Retour à ta machine et tes emplacements.', icon: 'base', c: '#4FDDBB', d: '#17705C', l: '#C2F7EA' },
+    ];
+  }
+  fx(f) {
+    if (!f) return null;
+    const L = this.lieux().find(l => l.id === f.dest), manga = (this.props.effet ?? 'manga') === 'manga', h = React.createElement;
+    return h('div', { key: f.id, style: { position: 'absolute', inset: 0, zIndex: 60, overflow: 'hidden', pointerEvents: 'none', background: manga ? '#FFFFFF' : '#0D0A1C', animation: 'tpFade 1.2s ease-in-out forwards', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+      manga && h('div', { style: { position: 'absolute', left: '-50%', top: '-50%', width: '200%', height: '200%', background: 'radial-gradient(closest-side,#FFFFFF 14%,rgba(255,255,255,0) 42%),repeating-conic-gradient(from 0deg,#0D0A1C 0deg 1.2deg,rgba(13,10,28,0) 1.2deg 4.5deg,#0D0A1C 4.5deg 5.4deg,rgba(13,10,28,0) 5.4deg 10deg)', animation: 'tpZoom 1.2s ease-in forwards' } }),
+      manga && h('div', { style: { position: 'absolute', inset: 0, background: 'radial-gradient(circle,rgba(13,10,28,.18) 1.5px,rgba(13,10,28,0) 2px) 0 0/9px 9px' } }),
+      h('div', { style: { position: 'relative', animation: 'tpText 1.2s ease-out forwards' } },
+        h('div', { style: { position: 'absolute', left: 6, top: 6, right: -6, bottom: -6, background: L.c, border: '3px solid #0D0A1C' } }),
+        h('div', { style: { position: 'relative', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 24px 10px 14px', background: '#FFFFFF', border: '3px solid #0D0A1C' } },
+          h('img', { src: `icons2/${L.icon}.svg`, style: { width: 56, height: 56 } }),
+          h('div', { style: { font: "400 40px 'Fredoka One'", color: '#0D0A1C' } }, L.nom))),
+      manga && h('div', { style: { position: 'absolute', inset: 0, background: '#FFFFFF', animation: 'flashW .3s ease-out forwards' } }));
+  }
+  renderVals() {
+    const s = this.state, lieux = this.lieux().map(l => ({ ...l, src: `icons2/${l.icon}.svg` })), pinned = s.pinned ?? (this.props.barreRapide ?? true);
+    const enter = id => () => this.setState({ hover: id });
+    const liste = ['evolutions', 'etoiles', 'atelier', 'recyclage', 'classements'].map(id => { const l = lieux.find(x => x.id === id), h = s.hover === id;
+      return { ...l, bg: h ? '#2E2660' : '#1C1738', bord: h ? l.c : '#3E3478', enter: enter(id), goPC: () => this.teleport(id, 'pc'), goTel: () => this.teleport(id, 'tel') }; });
+    const COURT = { centre: 'Hub', evolutions: 'Évolutions', etoiles: 'Étoiles' };
+    const quick = ['centre', 'evolutions', 'etoiles'].map(id => { const l = lieux.find(x => x.id === id), here = s.lieu === id;
+      return { ...l, court: COURT[id], tip: s.qHover === id, ring: here ? `0 0 0 3px #FFFFFF, 0 3px 0 #0D0A1C` : `0 3px 0 #0D0A1C`, ringS: here ? '0 0 0 3px #FFFFFF' : 'none', enter: () => this.setState({ qHover: id }), go: () => this.teleport(id, 'pc'), goTel: () => this.teleport(id, 'tel') }; });
+    const soon = (nom, id) => id === 'boutique' ? () => this.setState({ shopOpen: true, shopTab: 'offres' }) : () => { this.setState(st => ({ badges: { ...st.badges, [id]: null } })); this.toast('info', `${nom} : voir l’autre maquette`); };
+    const tous = [['teleport', 'Téléportation', 'Téléport.'], ['inventaire', 'Inventaire', 'Invent.'], ['index', 'Index', 'Index'], ['boutique', 'Boutique', 'Boutique'], ['parametres', 'Paramètres', 'Réglages']].map(([id, nom, court]) => ({
+      src: `icons2/${id}.svg`, ...this.COUL[id], nom, court, badge: s.badges[id] || null,
+      click: id === 'teleport' ? () => this.setState({ openPC: true }) : soon(nom, id),
+      clickTel: id === 'teleport' ? () => this.setState({ openTel: true }) : soon(nom, id) }));
+    const menu = tous.slice(0, 3), menu2 = tous.slice(3);
+    const h = React.createElement;
+    const gainsEl = h('div', { style: { position: 'relative' } }, s.gains.map(g => h('div', { key: g.id, style: { position: 'absolute', left: 0, top: 0, whiteSpace: 'nowrap', font: "400 28px 'Fredoka One'", color: '#7DF08A', textShadow: '0 2px 0 #0D0A1C, 1.5px 0 0 #0D0A1C, -1.5px 0 0 #0D0A1C, 0 -1.5px 0 #0D0A1C', animation: 'gainUp 1.2s ease-out forwards' } }, `+${g.txt} $`)));
+    return {
+      argentTxt: this.fmt(s.aff), rpsTxt: String(s.rps), collectTxt: this.fmt(s.collect), guides: this.props.guides ?? true,
+      menu, menu2, quick, liste, lieux, hover: s.hover, pinned, toasts: s.toasts, gainsEl, openPC: s.openPC, openTel: s.openTel,
+      fermerPC: () => this.setState({ openPC: false, hover: null }), fermerTel: () => this.setState({ openTel: false, hover: null }),
+      setHover: id => this.setState({ hover: id }), leave: () => this.setState({ hover: null }), qLeave: () => this.setState({ qHover: null }),
+      goPC: id => this.teleport(id, 'pc'), goTel: id => this.teleport(id, 'tel'), goBasePC: () => this.teleport('base', 'pc'), goBaseTel: () => this.teleport('base', 'tel'),
+      togglePin: () => this.setState({ pinned: !pinned }), pinBg: pinned ? 'linear-gradient(180deg,#B6FFB0,#3FCB52)' : '#322D4E', pinX: pinned ? 25 : 2.5,
+      collecter: this.collecter, notifTest: () => this.toast('mythique', 'Nouveau : Sabreur (Mythique)'),
+      fxPC: this.fx(s.fxPC), fxTel: this.fx(s.fxTel),
+      promoOn: s.promoT > 0, promoTxt: this.hms(s.promoT), encart: s.encart && s.promoT > 0, fermerEncart: () => this.setState({ encart: false }),
+      voirOffre: () => this.setState({ shopOpen: true, shopTab: 'offres' }), cadeauTop: s.encart && s.promoT > 0 ? 210 : 92,
+      cadeauPct: s.giftT > 0 ? Math.round((1 - s.giftT / 300) * 100) : 100, cadeauPret: s.giftT === 0 || (!s.jourPris), cadeauTxt: s.giftT > 0 ? this.ms(s.giftT) : 'Prêt !',
+      cadeauTitre: s.giftT > 0 ? 'Prochain cadeau dans ' + this.ms(s.giftT) : 'Cadeau prêt !', cadeauRecus: s.giftRecus,
+      ouvrirCadeaux: () => this.setState({ giftsOpen: true }), fermerCadeaux: () => this.setState({ giftsOpen: false }),
+      recupCadeau: () => { if (s.giftT === 0) { this.setState(st => ({ giftT: 300, giftRecus: st.giftRecus + 1 })); this.toast('succes', 'Cadeau récupéré !'); } else if (!s.jourPris) { this.setState({ jourPris: true }); this.toast('succes', 'Cadeau du jour 3 récupéré !'); } },
+      jours: [1, 2, 3, 4, 5, 6, 7].map(n => { const pris = n < s.jour || (n === s.jour && s.jourPris), dispo = n === s.jour && !s.jourPris; return { n, ok: pris, op: pris ? .45 : 1, etat: pris ? 'Récupéré' : dispo ? 'Récupérer !' : n === 7 ? 'Gros lot' : 'Bientôt', bord: dispo ? '#FFD66B' : n === 7 ? '#C800FF' : '#3E3478', bg: dispo ? '#2E2660' : '#17132E', txt: dispo ? '#FFD66B' : '#FFFFFF', curseur: dispo ? 'pointer' : 'default', click: () => { if (dispo) { this.setState({ jourPris: true }); this.toast('succes', 'Cadeau du jour 3 récupéré !'); } } }; }),
+      shopOpen: s.shopOpen, fermerShop: () => this.setState({ shopOpen: false }),
+      shopTabs: [['offres', 'Offres'], ['passes', 'Passes'], ['boosts', 'Boosts'], ['argent', 'Argent']].map(([id, nom]) => ({ nom, dot: id === 'offres' && s.promoT > 0, bg: s.shopTab === id ? 'linear-gradient(180deg,#B6FFB0,#3FCB52 50%,#2FAE45)' : 'transparent', couleur: s.shopTab === id ? '#0B2A10' : '#A9A2CC', click: () => this.setState({ shopTab: id }) })),
+      tabOffres: s.shopTab === 'offres', tabPasses: s.shopTab === 'passes', tabBoosts: s.shopTab === 'boosts', tabArgent: s.shopTab === 'argent',
+      acheterOffre: () => this.toast('argent', 'Achat Roblox (simulé)'), packDispo: !s.packAchete, packAchete: s.packAchete,
+      acheterPack: () => { this.setState({ packAchete: true, packOpen: false }); this.toast('succes', 'Pack de départ obtenu (simulé)'); },
+      packOpen: s.packOpen, fermerPack: () => this.setState({ packOpen: false }),
+      simPack: () => { if (s.packAchete) return this.toast('info', 'Pack déjà acheté'); if (s.packSeen) return this.toast('info', 'Déjà proposé : il reste dans la Boutique'); this.setState({ packOpen: true, packSeen: true }); },
+      passes: [['argent', 'Argent ×2', 'Revenu doublé pour toujours (exemple)', 'piece', '×2', '#FFF0A8', '#FFC93C', '#C27A08'], ['auto', 'Tirage auto', 'La machine tire toute seule (exemple)', 'teleport', '', '#9EEFFF', '#22B8F0', '#0B5FA8'], ['emplacements', '+2 emplacements', 'Deux cases en plus dans la base (exemple)', 'base', '+2', '#C2F7EA', '#4FDDBB', '#17705C'], ['vip', 'VIP', 'Nom doré et bonus à définir (exemple)', 'etoile', '', '#EBA0FF', '#C800FF', '#5A0080']].map(([id, nom, desc, icon, tag, c1, c2, c3]) => { const own = !!s.passes[id]; return { nom, desc, tag, c1, c2, c3, src: (icon === 'piece' ? 'icons/' : 'icons2/') + icon + '.svg', prix: own ? 'Possédé' : 'R$ à définir', btn: own ? '#322D4E' : 'linear-gradient(180deg,#B6FFB0,#3FCB52)', btnTxt: own ? '#A9A2CC' : '#0B2A10', curseur: own ? 'default' : 'pointer', acheter: () => { if (!own) { this.setState(st => ({ passes: { ...st.passes, [id]: true } })); this.toast('succes', nom + ' obtenu (simulé)'); } } }; }),
+      boostsShop: [['argent', '×2 Argent', 'piece', '#FFE07A', '#E8960C'], ['chance', 'Chance +', 'etoile', '#E58CFF', '#8A10C0'], ['rapide', 'Tirage rapide', 'teleport', '#9EEFFF', '#1A88D0']].map(([id, nom, icon, c1, c2]) => ({ nom, c1, c2, src: (icon === 'piece' ? 'icons/' : 'icons2/') + icon + '.svg', duree: '15 min', acheter: () => this.ajouterBoost(id) })),
+      argentSlots: ['Petit sac', 'Coffre', 'Trésor'],
+      boosts: s.boosts.map(b => ({ ...b, src: (b.icon === 'piece' ? 'icons/' : 'icons2/') + b.icon + '.svg', temps: this.ms(b.reste), pct: Math.round(b.reste / b.total * 100) })),
+      specs: [
+        { k: 'HUD argent', v: 'x 72, y 12 (68, 8) · H 50 (40), coins 12 (10), fond #2A2350 → #17132E transp. 0,06, trait 2 px #0D0A1C, liseré 1 px #5A4E9E, filet doré bas 2 px' },
+        { k: 'Montant', v: 'FredokaOne 30 (23) #FFD66B, UIStroke 1,5 px · pièce 58 (46) débordant de −6' },
+        { k: 'Pastilles', v: 'H 28 (22), coins 8 · revenu vert 3 tons, Fredoka 15, texte #0B2A10 · à collecter #0D0A1C transp. 0,1, contour #3E3478, Gotham Black 10' },
+        { k: 'Menu PC', v: '3 boutons essentiels (Téléport., Inventaire, Index) · x 12, y 220, colonne, écart 8 · bouton 58 × 58 coins 14, icône 40, libellé Fredoka 12' },
+        { k: 'Boutique + Réglages', v: 'petits boutons sans libellé en haut à droite, à gauche de la zone Roblox : right 72, y 12 (68, 8) · 46 × 46 (44) coins 12, icône 30, écart 8' },
+        { k: 'Fond boutons menu', v: 'UIGradient 160° 3 tons par fonction (Téléport. #9EEFFF/#22B8F0/#0B5FA8 · Index #FFD596/#FF962A/#B85000 · Invent. #DCC6FF/#9B6BFF/#5226C0 · Rebirth #FFB8D8/#FF4F9A/#A8124F · Boutique #C2FFB8/#3FD45E/#137A2C · Réglages #D2DCFF/#7A8CD6/#38448A) + trame points 38 % + reflet haut 20 % + liseré blanc 1,5 px' },
+        { k: 'Menu tél.', v: '3 boutons, bas centre, y −8 · plateau verre coins 14 · boutons 52 × 52 coins 12, icône 36, libellé 10' },
+        { k: 'Fenêtre TP', v: '790 × 514 (672 × 376) · en-tête H 58 (46), ruban cyan #7FE0FF → #2E9BE0 · filet doré · fermer 38 (44 sur tél.)' },
+        { k: 'Mini-carte', v: '420 × 420 (300) coins 16, sol PNG radial vert + trame · plateau Ø 264 · stands Ø 56 sur rayon 100 · Centre Ø 88 + rayons tournants 12 s' },
+        { k: 'Liste stands', v: 'lignes H 50 (46), coins 10, fond #1C1738, contour #3E3478 (couleur du stand au survol), barre gauche 5 px, orbe Ø 38' },
+        { k: 'Raccourcis TP', v: '3 rectangles en haut au centre (Hub, Évolutions, Étoiles) · y 12 (8) · 150 × 46 (114 × 44, centrés entre x 266 et 628), coins 11, écart 10 · dégradé 160° couleur du lieu + trame + reflet + liseré blanc · icône 30 (22) + Fredoka 17 (13) · lieu actuel : anneau blanc 3 px' },
+        { k: 'Toasts', v: 'haut centre sous les raccourcis, y 72 (60) · H 50 (40), coins 12, ruban icône 56 en biais, barre bas 3 px couleur du type' },
+        { k: '1a Promo', v: 'pastille « PROMO » blanche, trait 2 px, ombre #F0244A 2/2, Fredoka 12, rotation 8°, pulse ×1,12 toutes les 1,4 s · minuteur 62 × 18 sous le bouton, fond #0D0A1C contour #FF7A92' },
+        { k: '1b Encart', v: '250 × 104 à right 12, y 92, coins 12, dégradé Légendaire + trame + reflet qui passe (3 s) · render 110 · bouton Voir 30 de haut · croix 22 × 22' },
+        { k: '1c Pack départ', v: 'pop-up 440 × 240 centré, une seule fois après le 1er tirage · colonne render 170 (Mythique) · « Plus tard » et « Acheter » de même taille (H 40)' },
+        { k: '1d Boutique', v: 'fenêtre 790 × 514 · onglets Offres / Passes / Boosts / Argent (H 36, actif vert) · cartes offre 2 × 340 · passes 4 cartes H 300, tête colorée H 130, état Possédé gris #322D4E' },
+        { k: '1e Cadeaux', v: 'bouton rond Ø 58 à right 12 (y 210, ou 92 sans encart), anneau de progression (PNG radial + UIGradient) + médaillon rose Ø 44 · fenêtre 600 × 400 : 7 cases 96 de haut, case du jour contour or' },
+        { k: '1f Boosts actifs', v: 'pastilles H 28 sous l\u2019argent, dégradé couleur du boost, icône 20, nom Fredoka 14, temps mono 10, barre blanche 3 px qui se vide' },
+        { k: 'Couleurs lieux', v: 'Centre #FFC93C · Évol. #E45CFF · Étoiles #FFCF3A · Atelier #FF8A3D · Recycl. #8BD346 · Classem. #4F8BFF · Ma base #4FDDBB' },
+      ],
+      pngs: [
+        { f: 'ic_*.png (icônes rendues)', t: '256 × 256' }, { f: 'orbe_blanc.png (dégradé radial, teinté par ImageColor3)', t: '128 × 128' },
+        { f: 'ruban_biais.png (9-slice)', t: '64 × 40' },  { f: 'filet_dore.png (fondu vers la droite)', t: '256 × 4' },
+        { f: 'carte_sol_hub.png (radial vert + trame)', t: '512 × 512' }, { f: 'rayons_centre.png', t: '256 × 256' },
+        { f: 'lignes_vitesse.png (noir, centre vide)', t: '1024 × 1024' }, { f: 'trame_points.png (tile)', t: '16 × 16' }, { f: 'anneau_progression.png', t: '128 × 128' }, { f: 'coffre_cadeau.png (à définir)', t: '128 × 128' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
