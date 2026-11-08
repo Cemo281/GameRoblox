@@ -20,7 +20,6 @@ local INTERVALLE = 1 -- secondes
 local DELAI_COLLECTE = 1 -- secondes minimum entre deux collectes d'un même joueur
 
 local derniereCollecte: { [Player]: number } = {}
-local textesCollecteurs: { [BasePart]: TextLabel } = {}
 
 -- Revenu total par seconde des personnages posés sur les emplacements du joueur.
 function RevenuService.RevenuTotal(player: Player): number
@@ -48,14 +47,17 @@ local function mettreAJourAttributs(player: Player, revenu: number)
 	end
 end
 
-local function rafraichirCollecteur(collecteur: BasePart, label: TextLabel)
+-- Étiquette du collecteur (BillboardGui « Etiquette » de la zone : Montant + Aide), créée si absente.
+type Etiquette = { gui: BillboardGui, montant: TextLabel }
+
+local textesCollecteurs: { [BasePart]: Etiquette } = {}
+
+local function rafraichirCollecteur(collecteur: BasePart, etiquette: Etiquette)
 	local proprietaire = BaseService.GetProprietaire(collecteur)
 	local data = proprietaire and DataService.GetData(proprietaire)
-	if proprietaire and data then
-		local revenu = RevenuService.RevenuTotal(proprietaire)
-		label.Text = `{math.floor(data.ArgentNonCollecte)} $\n+{math.round(revenu * 10) / 10} $/s`
-	else
-		label.Text = "Collecteur"
+	etiquette.gui.Enabled = data ~= nil
+	if data then
+		etiquette.montant.Text = `{math.floor(data.ArgentNonCollecte)} $`
 	end
 end
 
@@ -77,9 +79,9 @@ local function onToucheCollecteur(collecteur: BasePart, autre: BasePart)
 	if montant > 0 then
 		mettreAJourAttributs(player, RevenuService.RevenuTotal(player))
 		InterfaceService.EnvoyerCollecte(player, montant)
-		local label = textesCollecteurs[collecteur]
-		if label then
-			rafraichirCollecteur(collecteur, label)
+		local etiquette = textesCollecteurs[collecteur]
+		if etiquette then
+			rafraichirCollecteur(collecteur, etiquette)
 		end
 	end
 end
@@ -90,23 +92,33 @@ local function installerCollecteur(instance: Instance)
 	end
 	local collecteur = instance
 
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.fromOffset(160, 60)
-	billboard.StudsOffset = Vector3.new(0, 4, 0)
-	billboard.MaxDistance = 100
+	local etiquette: Etiquette
+	local existante = collecteur:FindFirstChild("Etiquette")
+	local montant = existante and existante:FindFirstChild("Montant")
+	if existante and existante:IsA("BillboardGui") and montant and montant:IsA("TextLabel") then
+		etiquette = { gui = existante, montant = montant }
+	else
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "Etiquette"
+		billboard.Size = UDim2.fromOffset(160, 40)
+		billboard.StudsOffsetWorldSpace = Vector3.new(0, 4, 0)
+		billboard.MaxDistance = 100
 
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.TextColor3 = Color3.fromRGB(255, 215, 0)
-	label.TextStrokeTransparency = 0
-	label.TextScaled = true
-	label.Font = Enum.Font.GothamBold
-	label.Parent = billboard
-	billboard.Parent = collecteur
+		local label = Instance.new("TextLabel")
+		label.Name = "Montant"
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundTransparency = 1
+		label.TextColor3 = Color3.fromRGB(255, 211, 77)
+		label.TextStrokeTransparency = 0
+		label.TextScaled = true
+		label.Font = Enum.Font.GothamBold
+		label.Parent = billboard
+		billboard.Parent = collecteur
+		etiquette = { gui = billboard, montant = label }
+	end
 
-	textesCollecteurs[collecteur] = label
-	rafraichirCollecteur(collecteur, label)
+	textesCollecteurs[collecteur] = etiquette
+	rafraichirCollecteur(collecteur, etiquette)
 
 	collecteur.Touched:Connect(function(autre: BasePart)
 		onToucheCollecteur(collecteur, autre)
@@ -134,8 +146,8 @@ function RevenuService.Init()
 				DataService.AjouterNonCollecte(player, revenu * ecoule)
 				mettreAJourAttributs(player, revenu)
 			end
-			for collecteur, label in textesCollecteurs do
-				rafraichirCollecteur(collecteur, label)
+			for collecteur, etiquette in textesCollecteurs do
+				rafraichirCollecteur(collecteur, etiquette)
 			end
 		end
 	end)

@@ -10,6 +10,8 @@ local function revenuParSeconde(revenuBase: number, etoiles: number, rebirths: n
 end
 
 return {
+	BonusParEtoile = BONUS_PAR_ETOILE,
+	BonusParRebirth = BONUS_PAR_REBIRTH,
 	EmplacementsMax = 10,
 	EmplacementsDepart = 2,
 	EtoilesMin = 1,

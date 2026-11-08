@@ -1,5 +1,6 @@
 --!strict
 -- GachaService : tirage gratuit sur la machine RNG de sa base (Part taguée "MachineRNG") via un ProximityPrompt.
+-- La machine est l'autel d'invocation (Model "AutelInvocation") ; la Part "RNG" est son volume invisible.
 -- Le serveur vérifie propriétaire, distance et temps de recharge, puis tire rareté, personnage et étoiles.
 -- Voir docs/wiki/Machine-RNG.md.
 
@@ -21,7 +22,7 @@ local GachaService = {}
 local TAG_MACHINE = "MachineRNG"
 
 local random = Random.new()
-local dernierTirage: { [Player]: number } = {}
+local finTirage: { [Player]: number } = {} -- os.clock() de la fin de l'animation en cours
 local machinesInstallees: { [BasePart]: boolean } = {}
 
 local function choisirPondere<T>(options: { T }, poids: (T) -> number): T
@@ -69,11 +70,11 @@ local function tirerPersonnage(rebirths: number): (Personnages.Personnage, numbe
 end
 
 -- Affichage provisoire du résultat au-dessus de la machine, en attendant l'animation de tirage.
-local function afficherResultat(machine: BasePart, nom: string, etoiles: number, couleur: Color3)
+local function afficherResultat(machine: BasePart, nom: string, etoiles: number, couleur: Color3, duree: number)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "ResultatTirage"
 	billboard.Size = UDim2.fromOffset(240, 60)
-	billboard.StudsOffset = Vector3.new(0, machine.Size.Y / 2 + 3, 0)
+	billboard.StudsOffset = Vector3.new(0, machine.Size.Y / 2 + 7, 0) -- au-dessus du compte à rebours et de « MAX »
 	billboard.AlwaysOnTop = true
 
 	local label = Instance.new("TextLabel")
@@ -91,7 +92,7 @@ local function afficherResultat(machine: BasePart, nom: string, etoiles: number,
 		ancien:Destroy()
 	end
 	billboard.Parent = machine
-	task.delay(GachaConfig.DureeAnimation, function()
+	task.delay(duree, function()
 		if billboard.Parent then
 			billboard:Destroy()
 		end
@@ -101,8 +102,9 @@ end
 -- Effectue un tirage pour `player` sur `machine`. Renvoie false si le tirage est refusé.
 local function tirer(player: Player, machine: BasePart): boolean
 	local maintenant = os.clock()
-	local dernier = dernierTirage[player]
-	if dernier and maintenant - dernier < GachaConfig.DureeAnimation then
+	-- pas de nouveau tirage tant que l'animation du précédent se joue
+	local fin = finTirage[player]
+	if fin and maintenant < fin then
 		return false
 	end
 
@@ -127,11 +129,13 @@ local function tirer(player: Player, machine: BasePart): boolean
 		InterfaceService.Notifier(player, `Inventaire plein ({Economie.PersonnagesMax} personnages maximum).`)
 		return false
 	end
-	dernierTirage[player] = maintenant
-
+	-- rien ne cède la main entre la vérification ci-dessus et ici : deux tirages ne peuvent pas se croiser
 	local personnage, etoiles = tirerPersonnage(data.Rebirths)
+	local duree = GachaConfig.DureeTirage(personnage.Rarete)
+	finTirage[player] = maintenant + duree
 	local uid = DataService.AjouterPersonnage(player, personnage.Id, etoiles)
 	if not uid then
+		finTirage[player] = nil
 		return false
 	end
 
@@ -144,7 +148,19 @@ local function tirer(player: Player, machine: BasePart): boolean
 	print(`[Gacha] {player.Name} : {personnage.Nom} {etoiles}★ → {destination}`)
 
 	local rarete = GachaConfig.RaretesParId[personnage.Rarete]
-	afficherResultat(machine, personnage.Nom, etoiles, if rarete then rarete.Couleur else Color3.new(1, 1, 1))
+	-- L'autel prend la couleur de la rareté obtenue au moment de la révélation (Autel.luau côté client)
+	local autel = machine.Parent and machine.Parent:FindFirstChild("AutelInvocation")
+	if autel then
+		-- compte à rebours au-dessus du toit (heure serveur, lue par le client)
+		autel:SetAttribute("FinRecharge", workspace:GetServerTimeNow() + duree)
+		local rareteId = personnage.Rarete
+		task.delay(GachaConfig.Minutage(rareteId).Revelation, function()
+			if autel.Parent then
+				autel:SetAttribute("Rarete", rareteId)
+			end
+		end)
+	end
+	afficherResultat(machine, personnage.Nom, etoiles, if rarete then rarete.Couleur else Color3.new(1, 1, 1), duree)
 	InterfaceService.EnvoyerResultatTirage(player, {
 		Id = personnage.Id,
 		Etoiles = etoiles,
@@ -167,7 +183,7 @@ local function installerMachine(instance: Instance)
 
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Tirer"
-	prompt.ObjectText = "Machine RNG (gratuit)"
+	prompt.ObjectText = "Autel d'invocation (gratuit)"
 	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = GachaConfig.DistanceMax - 5
 	prompt.RequiresLineOfSight = false
@@ -188,7 +204,7 @@ local function installerOutilTest()
 		if not machine or not machine:IsA("BasePart") then
 			return false
 		end
-		dernierTirage[player] = nil
+		finTirage[player] = nil
 		return tirer(player, machine)
 	end
 	outil.Parent = ServerStorage
@@ -219,7 +235,7 @@ function GachaService.Init()
 	CollectionService:GetInstanceAddedSignal(TAG_MACHINE):Connect(installerMachine)
 
 	Players.PlayerRemoving:Connect(function(player: Player)
-		dernierTirage[player] = nil
+		finTirage[player] = nil
 	end)
 
 	if RunService:IsStudio() then

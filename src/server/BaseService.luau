@@ -15,8 +15,14 @@ local BaseService = {}
 
 local TAG_BASE = "BaseJoueur"
 local TEXTE_BASE_LIBRE = "Base libre"
-local COULEUR_EMPLACEMENT = Color3.fromRGB(235, 235, 235)
-local COULEUR_VERROUILLE = Color3.fromRGB(110, 110, 110)
+-- Socles de la zone « Sanctuaire » (assets/zone/construire_zone.luau)
+local COULEUR_SOCLE_LIBRE = Color3.fromHex("6C6A78")
+local COULEUR_SOCLE_VERROUILLE = Color3.fromHex("3B3F52")
+local TEXTE_SOCLE_LIBRE = "Socle libre"
+local TEXTE_SOCLE_VERROUILLE = "🔒 Verrouillé"
+local COULEUR_TEXTE_LIBRE = Color3.fromHex("B9B6C6")
+local COULEUR_TEXTE_VERROUILLE = Color3.fromHex("8C8A99")
+local NIVEAU_MAX_AUTEL = 10
 local TAILLE_PERSONNAGE = Vector3.new(3, 5, 3)
 local TAG_VITRINE = "PersonnageVitrine"
 local VITRINE_PAUSE = 2 -- secondes entre deux animations de vitrine
@@ -37,45 +43,107 @@ local function trouverBase(instance: Instance): Model?
 	return nil
 end
 
-local function texteEmplacement(emplacement: BasePart): TextLabel?
-	local gui = emplacement:FindFirstChildWhichIsA("SurfaceGui")
-	return if gui then gui:FindFirstChildWhichIsA("TextLabel") else nil
-end
-
-local function texteProprietaire(base: Model): TextLabel?
-	local panneau = base:FindFirstChild("Panneau")
-	local label = panneau and panneau:FindFirstChild("NomProprietaire", true)
+local function texte(parent: Instance?, nom: string): TextLabel?
+	local label = parent and parent:FindFirstChild(nom, true)
 	return if label and label:IsA("TextLabel") then label else nil
 end
 
 local function emplacementsDe(base: Model): { BasePart }
 	local resultat = {}
-	local dossier = base:FindFirstChild("Emplacements")
-	if dossier then
-		for _, enfant in dossier:GetChildren() do
-			if enfant:IsA("BasePart") and typeof(enfant:GetAttribute("Index")) == "number" then
-				table.insert(resultat, enfant)
+	local socles = base:FindFirstChild("Socles")
+	if socles then
+		for _, socle in socles:GetChildren() do
+			local emplacement = socle:FindFirstChild("Emplacement")
+			if
+				emplacement
+				and emplacement:IsA("BasePart")
+				and typeof(emplacement:GetAttribute("Index")) == "number"
+			then
+				table.insert(resultat, emplacement)
 			end
 		end
 	end
 	return resultat
 end
 
--- Orientation d'un personnage posé : face à l'allée de sa base (perpendiculaire à son grand axe).
+-- Orientation d'un personnage posé : face à l'allée de sa base (axe x = 0 du repère du Centre, +Z vers l'entrée).
 local function orientationVersAllee(emplacement: BasePart, position: Vector3): CFrame
 	local base = trouverBase(emplacement)
-	local allee = base and base:FindFirstChild("Allee")
-	if allee and allee:IsA("BasePart") then
-		local relatif = allee.CFrame:PointToObjectSpace(position)
-		local surAxe = if allee.Size.Z >= allee.Size.X
-			then Vector3.new(0, relatif.Y, relatif.Z)
-			else Vector3.new(relatif.X, relatif.Y, 0)
-		local direction = (allee.CFrame:PointToWorldSpace(surAxe) - position) * Vector3.new(1, 0, 1)
+	local centre = base and base:FindFirstChild("Centre")
+	if centre and centre:IsA("BasePart") then
+		local relatif = centre.CFrame:PointToObjectSpace(position)
+		local direction = centre.CFrame:VectorToWorldSpace(Vector3.new(-relatif.X, 0, 0))
 		if direction.Magnitude > 0.01 then
 			return CFrame.lookAt(position, position + direction)
 		end
 	end
 	return CFrame.new(position)
+end
+
+type EtatSocle = "Libre" | "Verrouille" | "Occupe"
+
+-- Apparence d'un socle : anneau (néon à la couleur de la rareté s'il est occupé), lumière, étiquettes.
+local function afficherSocle(
+	emplacement: BasePart,
+	etat: EtatSocle,
+	couleur: Color3?,
+	nom: string?,
+	rarete: string?,
+	gain: string?
+)
+	local socle = emplacement.Parent
+	local anneau = socle and socle:FindFirstChild("Neon_Socle_Anneau")
+	if anneau and anneau:IsA("BasePart") then
+		anneau.Color = if etat == "Occupe"
+			then couleur or COULEUR_SOCLE_LIBRE
+			elseif etat == "Verrouille" then COULEUR_SOCLE_VERROUILLE
+			else COULEUR_SOCLE_LIBRE
+		anneau.Material = if etat == "Occupe" then Enum.Material.Neon else Enum.Material.SmoothPlastic
+	end
+	local lumiere = emplacement:FindFirstChildWhichIsA("PointLight", true)
+	if lumiere then
+		lumiere.Enabled = etat == "Occupe"
+		lumiere.Color = couleur or lumiere.Color
+	end
+
+	local etiquette = emplacement:FindFirstChild("Etiquette")
+	if etiquette and etiquette:IsA("BillboardGui") then
+		etiquette.Enabled = etat == "Occupe"
+		local labelNom, labelRarete, labelGain =
+			texte(etiquette, "Nom"), texte(etiquette, "Rarete"), texte(etiquette, "Gain")
+		if labelNom and labelRarete and labelGain then
+			labelNom.Text = nom or ""
+			labelRarete.Text = rarete or ""
+			labelRarete.TextColor3 = couleur or labelRarete.TextColor3
+			labelGain.Text = gain or ""
+		end
+	end
+	local libre = emplacement:FindFirstChild("Libre")
+	if libre and libre:IsA("BillboardGui") then
+		libre.Enabled = etat ~= "Occupe"
+		local label = texte(libre, "Texte")
+		if label then
+			label.Text = if etat == "Verrouille" then TEXTE_SOCLE_VERROUILLE else TEXTE_SOCLE_LIBRE
+			label.TextColor3 = if etat == "Verrouille" then COULEUR_TEXTE_VERROUILLE else COULEUR_TEXTE_LIBRE
+		end
+	end
+end
+
+-- Panneau du propriétaire (nom + niveau de l'autel) et pupitre d'amélioration (niveau suivant).
+local function afficherNiveau(base: Model, niveau: number?)
+	local niveauPanneau = texte(base:FindFirstChild("Panneau"), "Niveau")
+	if niveauPanneau then
+		niveauPanneau.Text = if niveau then `Niveau {niveau}` else ""
+	end
+	local pupitre = base:FindFirstChild("Amelioration")
+	local niveauPupitre = texte(pupitre, "Niveau")
+	local prix = texte(pupitre, "Prix")
+	local n = niveau or 1
+	if niveauPupitre and prix then
+		niveauPupitre.Text = if n >= NIVEAU_MAX_AUTEL then "MAX" else `Niv. {n} → {n + 1}`
+		-- coût des niveaux à définir (docs/wiki/Machine-RNG.md) : pas encore d'achat
+		prix.Text = if n >= NIVEAU_MAX_AUTEL then "" else "Bientôt"
+	end
 end
 
 local function chargerPiste(animator: Animator, animationId: unknown): AnimationTrack?
@@ -181,12 +249,11 @@ local function animerVitrine(modele: Model, animator: Animator)
 end
 
 -- Modèle 3D animé (ReplicatedStorage.ModelesPersonnages.<Id>, rangé par le skill /perso-roblox), ou nil.
--- Renvoie le support de l'étiquette et la hauteur de l'étiquette au-dessus de ce support.
-local function creerModele(emplacement: BasePart, id: string): (Model?, BasePart?, number)
+local function creerModele(emplacement: BasePart, id: string): Model?
 	local dossier = ReplicatedStorage:FindFirstChild("ModelesPersonnages")
 	local source = dossier and dossier:FindFirstChild(id)
 	if not (source and source:IsA("Model") and source.PrimaryPart) then
-		return nil, nil, 0
+		return nil
 	end
 
 	local modele = source:Clone()
@@ -208,22 +275,13 @@ local function creerModele(emplacement: BasePart, id: string): (Model?, BasePart
 		task.spawn(animerVitrine, modele, animator)
 	end
 
-	return modele, modele.PrimaryPart, taille.Y - sousPivot + 1.5
+	return modele
 end
 
-local function creerPersonnage(
-	emplacement: BasePart,
-	id: string,
-	nom: string,
-	etoiles: number,
-	revenu: number,
-	couleur: Color3
-)
-	local modele, support, hauteurEtiquette = creerModele(emplacement, id)
-	local bloc: BasePart
-	if modele and support then
-		bloc = support
-	else
+-- Modèle 3D du personnage sur le socle (bloc coloré s'il n'a pas de modèle) ; l'étiquette est celle du socle.
+local function creerPersonnage(emplacement: BasePart, id: string, couleur: Color3)
+	local modele = creerModele(emplacement, id)
+	if not modele then
 		local part = Instance.new("Part")
 		part.Name = "Personnage"
 		part.Anchored = true
@@ -231,28 +289,7 @@ local function creerPersonnage(
 		part.Color = couleur
 		part.Material = Enum.Material.SmoothPlastic
 		part.Position = emplacement.Position + Vector3.new(0, emplacement.Size.Y / 2 + TAILLE_PERSONNAGE.Y / 2, 0)
-		bloc = part
-		hauteurEtiquette = TAILLE_PERSONNAGE.Y / 2 + 1.5
-	end
-
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.fromOffset(160, 50)
-	billboard.StudsOffset = Vector3.new(0, hauteurEtiquette, 0)
-	billboard.MaxDistance = 80
-
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.Text = `{nom} {string.rep("★", etoiles)}\n{math.round(revenu * 10) / 10} $/s`
-	label.TextColor3 = couleur
-	label.TextStrokeTransparency = 0
-	label.TextScaled = true
-	label.Font = Enum.Font.GothamBold
-	label.Parent = billboard
-
-	billboard.Parent = bloc
-	if not modele then
-		bloc.Parent = emplacement
+		part.Parent = emplacement
 	end
 end
 
@@ -263,15 +300,33 @@ local function reinitialiserBase(base: Model)
 		if ancien then
 			ancien:Destroy()
 		end
-		emplacement.Color = COULEUR_EMPLACEMENT
-		local label = texteEmplacement(emplacement)
-		if label then
-			label.Text = tostring(emplacement:GetAttribute("Index"))
-		end
+		afficherSocle(emplacement, "Libre")
 	end
-	local nom = texteProprietaire(base)
+	local nom = texte(base:FindFirstChild("Panneau"), "NomProprietaire")
 	if nom then
 		nom.Text = TEXTE_BASE_LIBRE
+	end
+	afficherNiveau(base, nil)
+	local autel = base:FindFirstChild("AutelInvocation")
+	if autel then
+		autel:SetAttribute("Level", 1)
+		autel:SetAttribute("Rarete", nil) -- autel éteint jusqu'au premier tirage
+		autel:SetAttribute("FinRecharge", nil)
+	end
+end
+
+-- Niveau affiché par l'autel d'invocation (Autel.luau côté client) : niveau de la machine, de 1 à 10.
+-- NiveauMachine vaut 0 tant que la machine n'a pas été améliorée → autel de base (niveau 1).
+function BaseService.RafraichirAutel(player: Player)
+	local base = basesParJoueur[player]
+	local data = DataService.GetData(player)
+	local autel = base and base:FindFirstChild("AutelInvocation")
+	if base and data then
+		local niveau = math.clamp(data.NiveauMachine, 1, NIVEAU_MAX_AUTEL)
+		if autel then
+			autel:SetAttribute("Level", niveau)
+		end
+		afficherNiveau(base, niveau)
 	end
 end
 
@@ -293,9 +348,9 @@ local function attribuerBase(player: Player)
 			basesParJoueur[player] = instance
 			instance:SetAttribute("Proprietaire", player.UserId)
 
-			local nom = texteProprietaire(instance)
+			local nom = texte(instance:FindFirstChild("Panneau"), "NomProprietaire")
 			if nom then
-				nom.Text = `Base de {player.DisplayName}`
+				nom.Text = player.DisplayName
 			end
 
 			connexionsApparition[player] = player.CharacterAdded:Connect(function(character)
@@ -307,6 +362,7 @@ local function attribuerBase(player: Player)
 			end
 
 			BaseService.RafraichirEmplacements(player)
+			BaseService.RafraichirAutel(player)
 			return
 		end
 	end
@@ -351,6 +407,16 @@ function BaseService.GetBase(player: Player): Model?
 	return basesParJoueur[player]
 end
 
+-- Ramène le personnage du joueur devant l'entrée de sa base (PointApparition). Renvoie false sans base ou sans perso.
+function BaseService.TeleporterALaBase(player: Player): boolean
+	local character = player.Character
+	if not character or not basesParJoueur[player] then
+		return false
+	end
+	teleporterALaBase(player, character)
+	return true
+end
+
 -- Propriétaire de la base qui contient `instance` (machine, collecteur…), ou nil.
 function BaseService.GetProprietaire(instance: Instance): Player?
 	local base = trouverBase(instance)
@@ -372,27 +438,24 @@ function BaseService.RafraichirEmplacements(player: Player)
 			ancien:Destroy()
 		end
 
-		local debloque = index <= data.EmplacementsDebloques
-		emplacement.Color = if debloque then COULEUR_EMPLACEMENT else COULEUR_VERROUILLE
-		local label = texteEmplacement(emplacement)
-		if label then
-			label.Text = if debloque then tostring(index) else "🔒"
-		end
-
 		local uid = data.Emplacements[tostring(index)]
 		local personnage = uid and data.Personnages[uid]
 		local definition = personnage and Personnages.ParId[personnage.Id]
 		if personnage and definition then
 			local rarete = GachaConfig.RaretesParId[definition.Rarete]
+			local couleur = if rarete then rarete.Couleur else Color3.new(1, 1, 1)
 			local revenu = Economie.RevenuParSeconde(definition.Revenu, personnage.Etoiles, data.Rebirths)
-			creerPersonnage(
+			creerPersonnage(emplacement, definition.Id, couleur)
+			afficherSocle(
 				emplacement,
-				definition.Id,
-				definition.Nom,
-				personnage.Etoiles,
-				revenu,
-				if rarete then rarete.Couleur else Color3.new(1, 1, 1)
+				"Occupe",
+				couleur,
+				`{definition.Nom} {string.rep("★", personnage.Etoiles)}`,
+				if rarete then rarete.Nom else definition.Rarete,
+				`{math.round(revenu * 10) / 10} $/s`
 			)
+		else
+			afficherSocle(emplacement, if index <= data.EmplacementsDebloques then "Libre" else "Verrouille")
 		end
 	end
 end
