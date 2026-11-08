@@ -1,0 +1,493 @@
+{
+	"unites": "studs ; positions Roblox relatives au HumanoidRootPart (Y haut, avant -Z, droite +X)",
+	"pieces": {
+		"salopette": {
+			"type": "layered",
+			"accessoire": "Pants",
+			"triangles": 1260,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"os": [
+				"LeftLowerLeg",
+				"LeftUpperLeg",
+				"LowerTorso",
+				"RightLowerLeg",
+				"RightUpperLeg",
+				"UpperTorso"
+			],
+			"sommets_hors_cage_externe": 0,
+			"sommets_dans_cage_interne": 116,
+			"sommets": 692,
+			"iterations_cage_externe": 8,
+			"taille_roblox": [
+				2.124,
+				3.665,
+				1.1455
+			],
+			"centre_roblox": [
+				0.0,
+				-0.6999,
+				-0.0058
+			],
+			"ecart_max_au_WaistCenterAttachment": 2.449
+		},
+		"chaussure_gauche": {
+			"type": "layered",
+			"accessoire": "LeftShoe",
+			"triangles": 168,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"os": [
+				"LeftFoot",
+				"LeftLowerLeg"
+			],
+			"sommets_hors_cage_externe": 0,
+			"sommets_dans_cage_interne": 16,
+			"sommets": 96,
+			"iterations_cage_externe": 5,
+			"taille_roblox": [
+				1.042,
+				0.57,
+				1.12
+			],
+			"centre_roblox": [
+				-0.527,
+				-2.9174,
+				-0.015
+			],
+			"ecart_max_au_WaistCenterAttachment": 2.276
+		},
+		"chaussure_droite": {
+			"type": "layered",
+			"accessoire": "RightShoe",
+			"triangles": 168,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"os": [
+				"RightFoot",
+				"RightLowerLeg"
+			],
+			"sommets_hors_cage_externe": 0,
+			"sommets_dans_cage_interne": 16,
+			"sommets": 96,
+			"iterations_cage_externe": 5,
+			"taille_roblox": [
+				1.042,
+				0.57,
+				1.12
+			],
+			"centre_roblox": [
+				0.527,
+				-2.9174,
+				-0.015
+			],
+			"ecart_max_au_WaistCenterAttachment": 2.506
+		},
+		"brassard": {
+			"type": "layered",
+			"accessoire": "Jacket",
+			"triangles": 92,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"os": [
+				"LeftLowerArm",
+				"LeftUpperArm"
+			],
+			"sommets_hors_cage_externe": 0,
+			"sommets_dans_cage_interne": 12,
+			"sommets": 48,
+			"iterations_cage_externe": 2,
+			"taille_roblox": [
+				1.062,
+				0.45,
+				1.062
+			],
+			"centre_roblox": [
+				-1.4719,
+				-0.2174,
+				0.0
+			],
+			"ecart_max_au_WaistCenterAttachment": 2.304
+		},
+		"chapeau": {
+			"type": "rigide",
+			"accessoire": "Hat",
+			"triangles": 1062,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"taille_roblox": [
+				2.8353,
+				1.3949,
+				1.9816
+			],
+			"attachment": "HatAttachment",
+			"centre_roblox": [
+				0.0206,
+				2.0572,
+				0.0291
+			],
+			"attachment_dans_Handle": [
+				-0.0206,
+				0.2068,
+				-0.0291
+			],
+			"etendue_depuis_attachment": {
+				"min": [
+					-1.3971,
+					-0.9042,
+					-0.9617
+				],
+				"max": [
+					1.4382,
+					0.4907,
+					1.0198
+				]
+			}
+		},
+		"cheveux": {
+			"type": "rigide",
+			"accessoire": "Hair",
+			"triangles": 3170,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"taille_roblox": [
+				1.6029,
+				1.811,
+				1.082
+			],
+			"attachment": "HairAttachment",
+			"centre_roblox": [
+				0.0123,
+				1.3941,
+				0.4846
+			],
+			"attachment_dans_Handle": [
+				-0.0123,
+				0.8698,
+				-0.4846
+			],
+			"etendue_depuis_attachment": {
+				"min": [
+					-0.7891,
+					-1.7753,
+					-0.0564
+				],
+				"max": [
+					0.8138,
+					0.0357,
+					1.0255
+				]
+			}
+		},
+		"sac": {
+			"type": "rigide",
+			"accessoire": "Back",
+			"triangles": 1520,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"taille_roblox": [
+				2.2982,
+				3.0771,
+				1.3866
+			],
+			"attachment": "BodyBackAttachment",
+			"centre_roblox": [
+				-0.5776,
+				-0.2419,
+				0.0019
+			],
+			"attachment_dans_Handle": [
+				0.5776,
+				0.2792,
+				0.5001
+			],
+			"etendue_depuis_attachment": {
+				"min": [
+					-1.7267,
+					-1.8177,
+					-1.1934
+				],
+				"max": [
+					0.5715,
+					1.2594,
+					0.1932
+				]
+			}
+		},
+		"lance_pierre": {
+			"type": "rigide",
+			"accessoire": "Tool",
+			"triangles": 2912,
+			"aretes_ouvertes": 0,
+			"coplanaires": [],
+			"taille_roblox": [
+				1.4932,
+				6.5091,
+				0.2
+			],
+			"centre_handle_depuis_prise": [
+				0.0,
+				1.3879,
+				0.0
+			],
+			"Tool.Grip_position": [
+				0.0,
+				-1.3879,
+				0.0
+			]
+		}
+	},
+	"palette": {
+		"peau": {
+			"hex": "#D9A67A",
+			"rugosite": 0.7,
+			"metal": 0.0,
+			"uv": [
+				0.125,
+				0.125
+			]
+		},
+		"salopette": {
+			"hex": "#9A8A3C",
+			"rugosite": 0.9,
+			"metal": 0.0,
+			"uv": [
+				0.375,
+				0.125
+			]
+		},
+		"salopette_piece": {
+			"hex": "#7C6E2C",
+			"rugosite": 0.9,
+			"metal": 0.0,
+			"uv": [
+				0.625,
+				0.125
+			]
+		},
+		"cuir": {
+			"hex": "#5A3A22",
+			"rugosite": 0.75,
+			"metal": 0.0,
+			"uv": [
+				0.875,
+				0.125
+			]
+		},
+		"noir": {
+			"hex": "#161412",
+			"rugosite": 0.6,
+			"metal": 0.0,
+			"uv": [
+				0.125,
+				0.375
+			]
+		},
+		"chapeau": {
+			"hex": "#E9E4CF",
+			"rugosite": 0.85,
+			"metal": 0.0,
+			"uv": [
+				0.375,
+				0.375
+			]
+		},
+		"toile": {
+			"hex": "#C9B48A",
+			"rugosite": 0.85,
+			"metal": 0.0,
+			"uv": [
+				0.625,
+				0.375
+			]
+		},
+		"orange": {
+			"hex": "#E2662A",
+			"rugosite": 0.55,
+			"metal": 0.0,
+			"uv": [
+				0.875,
+				0.375
+			]
+		},
+		"rouge_sac": {
+			"hex": "#C8432A",
+			"rugosite": 0.7,
+			"metal": 0.0,
+			"uv": [
+				0.125,
+				0.625
+			]
+		},
+		"bleu": {
+			"hex": "#2F4F9E",
+			"rugosite": 0.7,
+			"metal": 0.0,
+			"uv": [
+				0.375,
+				0.625
+			]
+		},
+		"blanc": {
+			"hex": "#F2F0EA",
+			"rugosite": 0.7,
+			"metal": 0.0,
+			"uv": [
+				0.625,
+				0.625
+			]
+		},
+		"vert": {
+			"hex": "#4F8A1F",
+			"rugosite": 0.5,
+			"metal": 0.0,
+			"uv": [
+				0.875,
+				0.625
+			]
+		},
+		"vert_fonce": {
+			"hex": "#3A6614",
+			"rugosite": 0.6,
+			"metal": 0.0,
+			"uv": [
+				0.125,
+				0.875
+			]
+		},
+		"bandage": {
+			"hex": "#A9ACA8",
+			"rugosite": 0.85,
+			"metal": 0.0,
+			"uv": [
+				0.375,
+				0.875
+			]
+		},
+		"metal": {
+			"hex": "#B8B2A2",
+			"rugosite": 0.35,
+			"metal": 0.35,
+			"uv": [
+				0.625,
+				0.875
+			]
+		},
+		"bretelle": {
+			"hex": "#7A2E1C",
+			"rugosite": 0.8,
+			"metal": 0.0,
+			"uv": [
+				0.875,
+				0.875
+			]
+		}
+	},
+	"brassard_os": "LeftLowerArm",
+	"elements": {
+		"salopette": [
+			"bassin",
+			"pantalon_gauche",
+			"revers_gauche",
+			"couture_jambe_g",
+			"couture_jambe_dos_g",
+			"poche_hanche_g",
+			"rabat_poche_g",
+			"bouton_rabat_g",
+			"bretelle_avant_g",
+			"bretelle_epaule_g",
+			"bretelle_dos_g",
+			"poche_arriere_g",
+			"couture_poche_arriere_g",
+			"pantalon_droit",
+			"revers_droit",
+			"couture_jambe_d",
+			"couture_jambe_dos_d",
+			"poche_hanche_d",
+			"rabat_poche_d",
+			"bouton_rabat_d",
+			"bretelle_avant_d",
+			"bretelle_epaule_d",
+			"bretelle_dos_d",
+			"poche_arriere_d",
+			"couture_poche_arriere_d",
+			"ceinture",
+			"lisere_ceinture",
+			"bavette",
+			"passepoil_bavette",
+			"couture_bavette",
+			"piece_dos"
+		],
+		"chaussure_gauche": [
+			"chaussure_gauche",
+			"semelle_g",
+			"bout_chaussure_g",
+			"lacet_g_0",
+			"lacet_g_1",
+			"lacet_g_2"
+		],
+		"chaussure_droite": [
+			"chaussure_droite",
+			"semelle_d",
+			"bout_chaussure_d",
+			"lacet_d_0",
+			"lacet_d_1",
+			"lacet_d_2"
+		],
+		"brassard": [
+			"brassard"
+		],
+		"chapeau": [
+			"calotte",
+			"bord",
+			"lunette_monture",
+			"lunette_verre",
+			"lunette_fente_0",
+			"lunette_fente_1",
+			"lunette_fente_2",
+			"lunette_sangle"
+		],
+		"cheveux": [
+			"cheveux_boucles"
+		],
+		"sac": [
+			"sac",
+			"noeud_sac",
+			"lien_sac",
+			"ecusson_sac",
+			"ecusson_centre",
+			"couture_sac",
+			"pompon_sac",
+			"cordon_pompon",
+			"bandouliere",
+			"boucle_bandouliere",
+			"boucle_bandouliere_int"
+		],
+		"lance_pierre": [
+			"manche",
+			"embout_bas",
+			"col",
+			"bande_croisee_a",
+			"bande_croisee_b",
+			"anneau",
+			"anneau_extremite_0",
+			"anneau_extremite_1",
+			"pochette",
+			"dent_0",
+			"dent_bout_0",
+			"elastique_0",
+			"dent_1",
+			"dent_bout_1",
+			"elastique_1",
+			"dent_2",
+			"dent_bout_2",
+			"elastique_2",
+			"dent_3",
+			"dent_bout_3",
+			"elastique_3",
+			"dent_4",
+			"dent_bout_4",
+			"elastique_4"
+		]
+	}
+}

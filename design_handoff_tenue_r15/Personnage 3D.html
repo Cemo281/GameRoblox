@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Personnage équipé — 3D</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>html,body{margin:0;height:100%}three-d-stage:not(:defined){visibility:hidden}#parts button{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid #d8d2c4;background:#fbf9f4;color:#2a2620;cursor:pointer}#parts button:hover{background:#fff}#parts button[aria-pressed=true]{background:#2a2620;color:#fbf9f4;border-color:#2a2620}</style>
+</head>
+<body>
+<nav id="parts" style="position:fixed;top:16px;left:16px;z-index:10;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 32px);font:13px/1.2 system-ui,sans-serif"></nav>
+<three-d-stage name="personnage-equipe" autorotate></three-d-stage>
+<script src="three-d-stage.js"></script>
+<script type="module">
+const stage = document.querySelector('three-d-stage');
+const { THREE } = await stage.ready;
+const M = (name, color, rough = 0.8, metal = 0) => { const m = new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal }); m.name = name; return m; };
+const mat = {
+  skin: M('peau', 0xd9a67a, 0.7),
+  overall: M('salopette', 0x9a8a3c, 0.9),
+  patch: M('salopette_piece', 0x7c6e2c, 0.9),
+  leather: M('cuir', 0x5a3a22, 0.75),
+  black: M('noir', 0x161412, 0.6),
+  hat: M('chapeau', 0xe9e4cf, 0.85),
+  orange: M('orange', 0xe2662a, 0.55),
+  red: M('rouge_sac', 0xc8432a, 0.7),
+  blue: M('bleu', 0x2f4f9e, 0.7),
+  white: M('blanc', 0xf2f0ea, 0.7),
+  green: M('vert', 0x4f8a1f, 0.5),
+  greenDark: M('vert_fonce', 0x3a6614, 0.6),
+  wrap: M('bandage', 0xa9aca8, 0.85),
+  metal: M('metal', 0xb8b2a2, 0.35, 0.35),
+  tan: M('toile', 0xc9b48a, 0.85),
+};
+function build() {
+const root = new THREE.Group(); root.name = 'personnage';
+const P = {};
+const grp = (n, parent = root) => { const g = new THREE.Group(); g.name = n; parent.add(g); P[n] = g; return g; };
+const corps = grp('corps'), salo = grp('salopette'), bras = grp('brassard'), sacG = grp('sac');
+const add = (parent, name, geo, m, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => {
+  const mesh = new THREE.Mesh(geo, m); mesh.name = name;
+  mesh.position.set(x, y, z); mesh.rotation.set(rx, ry, rz);
+  mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh); return mesh;
+};
+const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+const cyl = (parent, name, a, b, r, m, seg = 12) => {
+  const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b);
+  const len = A.distanceTo(B);
+  const mesh = add(parent, name, new THREE.CylinderGeometry(r, r, len, seg), m);
+  mesh.position.copy(A).add(B).multiplyScalar(0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize());
+  return mesh;
+};
+
+// ---- Corps (proportions blocs, 1 bloc = 0.3 m) ----
+add(corps, 'torse', box(0.6, 0.6, 0.3), mat.skin, 0, 0.9, 0);
+add(corps, 'pectoraux', box(0.5, 0.14, 0.02), mat.skin, 0, 1.06, 0.151);
+add(corps, 'bras_droit', box(0.29, 0.6, 0.29), mat.skin, -0.45, 0.9, 0);
+add(corps, 'bras_gauche', box(0.29, 0.6, 0.29), mat.skin, 0.45, 0.9, 0);
+for (const [i, m] of [mat.blue, mat.white, mat.blue, mat.white, mat.blue].entries())
+  add(bras, `brassard_${i}`, box(0.305, 0.035, 0.305), m, 0.45, 0.98 + i * 0.035, 0);
+add(corps, 'jambe_droite', box(0.29, 0.6, 0.29), mat.skin, -0.15, 0.3, 0);
+add(corps, 'jambe_gauche', box(0.29, 0.6, 0.29), mat.skin, 0.15, 0.3, 0);
+
+// ---- Salopette ----
+add(salo, 'pantalon_droit', box(0.305, 0.5, 0.305), mat.overall, -0.15, 0.36, 0);
+add(salo, 'pantalon_gauche', box(0.305, 0.5, 0.305), mat.overall, 0.15, 0.36, 0);
+add(salo, 'revers_droit', box(0.32, 0.06, 0.32), mat.overall, -0.15, 0.13, 0);
+add(salo, 'revers_gauche', box(0.32, 0.06, 0.32), mat.overall, 0.15, 0.13, 0);
+add(salo, 'bassin', box(0.615, 0.2, 0.315), mat.overall, 0, 0.66, 0);
+add(salo, 'bavette', box(0.36, 0.2, 0.02), mat.overall, 0, 0.85, 0.16);
+add(salo, 'poche_bavette', box(0.18, 0.08, 0.01), mat.patch, 0, 0.84, 0.172);
+for (const s of [-1, 1]) {
+  add(salo, `poche_cuisse_${s > 0 ? 'g' : 'd'}`, box(0.14, 0.12, 0.012), mat.patch, s * 0.17, 0.42, 0.158);
+  add(salo, `bretelle_avant_${s > 0 ? 'g' : 'd'}`, box(0.05, 0.26, 0.015), mat.overall, s * 0.15, 1.07, 0.158);
+  add(salo, `bretelle_dos_${s > 0 ? 'g' : 'd'}`, box(0.05, 0.5, 0.015), mat.overall, s * 0.15, 0.95, -0.158);
+  add(salo, `bretelle_epaule_${s > 0 ? 'g' : 'd'}`, box(0.05, 0.015, 0.33), mat.overall, s * 0.15, 1.205, 0);
+  add(salo, `bouton_${s > 0 ? 'g' : 'd'}`, new THREE.CylinderGeometry(0.018, 0.018, 0.01, 16), mat.metal, s * 0.15, 0.94, 0.172, Math.PI / 2);
+}
+add(salo, 'piece_genou', box(0.1, 0.1, 0.012), mat.patch, -0.12, 0.26, 0.158, 0, 0, 0.2);
+add(salo, 'ceinture', box(0.63, 0.05, 0.325), mat.leather, 0, 0.73, 0);
+add(salo, 'boucle', box(0.07, 0.06, 0.012), mat.metal, 0, 0.73, 0.166);
+add(salo, 'chaussure_droite', box(0.31, 0.1, 0.36), mat.leather, -0.15, 0.05, 0.03);
+add(salo, 'chaussure_gauche', box(0.31, 0.1, 0.36), mat.leather, 0.15, 0.05, 0.03);
+
+// détails salopette
+const stitch = mat.patch;
+for (const s of [-1, 1]) {
+  const sd = s > 0 ? 'g' : 'd';
+  add(salo, `couture_jambe_${sd}`, box(0.006, 0.48, 0.008), stitch, s * 0.3, 0.37, 0.12);
+  add(salo, `couture_jambe_dos_${sd}`, box(0.006, 0.48, 0.008), stitch, s * 0.3, 0.37, -0.12);
+  add(salo, `couture_revers_${sd}`, box(0.322, 0.006, 0.322), stitch, s * 0.15, 0.155, 0);
+  add(salo, `rabat_poche_${sd}`, box(0.15, 0.035, 0.016), mat.overall, s * 0.17, 0.48, 0.164);
+  add(salo, `bouton_rabat_${sd}`, new THREE.CylinderGeometry(0.01, 0.01, 0.008, 12), mat.metal, s * 0.17, 0.472, 0.174, Math.PI / 2);
+  for (const cx of [-1, 1]) add(salo, `rivet_poche_${sd}_${cx}`, new THREE.CylinderGeometry(0.007, 0.007, 0.006, 10), mat.metal, s * 0.17 + cx * 0.06, 0.37, 0.166, Math.PI / 2);
+  add(salo, `poche_arriere_${sd}`, box(0.13, 0.12, 0.012), mat.patch, s * 0.15, 0.62, -0.164);
+  add(salo, `couture_poche_arriere_${sd}`, box(0.11, 0.005, 0.004), stitch, s * 0.15, 0.665, -0.172);
+  add(salo, `bouton_hanche_${sd}`, new THREE.CylinderGeometry(0.016, 0.016, 0.008, 14), mat.metal, s * 0.311, 0.66, 0, 0, 0, Math.PI / 2);
+  add(salo, `boucle_bretelle_${sd}`, box(0.065, 0.04, 0.01), mat.metal, s * 0.15, 0.99, 0.168);
+  add(salo, `couture_bavette_${sd}`, box(0.005, 0.18, 0.003), stitch, s * 0.165, 0.85, 0.171);
+  for (const lx of [0.08, 0.24]) add(salo, `passant_${sd}_${lx}`, box(0.025, 0.07, 0.012), mat.overall, s * lx, 0.73, 0.168);
+  add(salo, `semelle_${sd}`, box(0.33, 0.025, 0.38), mat.black, s * 0.15, 0.0125, 0.03);
+  add(salo, `bout_chaussure_${sd}`, box(0.315, 0.06, 0.06), mat.black, s * 0.15, 0.055, 0.18);
+  for (let i = 0; i < 3; i++) add(salo, `lacet_${sd}_${i}`, box(0.12, 0.008, 0.014), mat.tan, s * 0.15, 0.103, 0.0 + i * 0.045);
+  add(salo, `languette_${sd}`, box(0.1, 0.04, 0.08), mat.leather, s * 0.15, 0.11, 0.04, -0.3);
+}
+add(salo, 'couture_bavette_haut', box(0.33, 0.005, 0.003), stitch, 0, 0.935, 0.171);
+add(salo, 'crayon_poche', new THREE.CylinderGeometry(0.009, 0.009, 0.11, 12), mat.orange, 0.05, 0.87, 0.168);
+add(salo, 'mine_crayon', new THREE.ConeGeometry(0.009, 0.02, 12), mat.black, 0.05, 0.935, 0.168);
+add(salo, 'outil_poche', box(0.02, 0.08, 0.008), mat.metal, -0.04, 0.86, 0.172, 0, 0, 0.15);
+add(salo, 'trou_ceinture', box(0.012, 0.012, 0.004), mat.black, 0.06, 0.73, 0.165);
+add(salo, 'ardillon', box(0.008, 0.05, 0.006), mat.leather, 0, 0.73, 0.174);
+for (const [dx, rz] of [[-0.025, 0.7], [0.025, -0.7]]) add(salo, `croix_piece_${dx > 0 ? 'b' : 'a'}`, box(0.05, 0.006, 0.004), stitch, -0.12 + dx, 0.26 + 0.025, 0.165, 0, 0, rz);
+add(salo, 'piece_dos', box(0.09, 0.08, 0.012), mat.patch, 0.15, 0.3, -0.158, 0, 0, -0.15);
+
+// ---- Bandoulière + sac ----
+const strap = add(sacG, 'bandouliere', box(0.04, 0.78, 0.012), mat.leather, 0.02, 0.9, 0.175, 0, 0, 0.72);
+add(sacG, 'bandouliere_dos', box(0.04, 0.78, 0.012), mat.leather, 0.02, 0.9, -0.175, 0, 0, 0.72);
+const bag = add(sacG, 'sac', new THREE.SphereGeometry(0.11, 32, 24), mat.red, 0.38, 0.6, 0.14);
+bag.scale.set(1, 0.9, 0.85);
+add(sacG, 'noeud_sac', new THREE.SphereGeometry(0.035, 16, 12), mat.red, 0.33, 0.7, 0.16);
+add(sacG, 'lien_sac', new THREE.TorusGeometry(0.03, 0.008, 8, 24), mat.leather, 0.34, 0.68, 0.16, 0.3, 0, 0.6);
+
+add(sacG, 'boucle_bandouliere', box(0.065, 0.055, 0.012), mat.metal, 0.02, 0.9, 0.183, 0, 0, 0.72);
+add(sacG, 'boucle_bandouliere_int', box(0.035, 0.03, 0.006), mat.leather, 0.02, 0.9, 0.19, 0, 0, 0.72);
+const flap = add(sacG, 'rabat_sac', new THREE.SphereGeometry(0.113, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.6), mat.red, 0.38, 0.6, 0.14);
+flap.scale.set(1, 0.9, 0.85);
+add(sacG, 'ecusson_sac', new THREE.CylinderGeometry(0.03, 0.03, 0.008, 24), mat.tan, 0.38, 0.6, 0.232, Math.PI / 2);
+add(sacG, 'ecusson_centre', new THREE.CylinderGeometry(0.012, 0.012, 0.004, 16), mat.leather, 0.38, 0.6, 0.237, Math.PI / 2);
+add(sacG, 'couture_sac', new THREE.TorusGeometry(0.1, 0.003, 6, 48), mat.leather, 0.38, 0.6, 0.14, Math.PI / 2).scale.set(1, 0.85, 1);
+add(sacG, 'pompon_sac', new THREE.SphereGeometry(0.02, 12, 10), mat.tan, 0.31, 0.62, 0.18);
+cyl(sacG, 'cordon_pompon', [0.33, 0.69, 0.16], [0.31, 0.635, 0.18], 0.004, mat.leather, 6);
+
+// ---- Tête ----
+const head = new THREE.Group(); head.name = 'tete'; head.position.y = 1.2; root.add(head);
+const teteP = grp('tete_visage', head), cheveux = grp('cheveux', head), chapeauG = grp('chapeau', head);
+add(teteP, 'tete_cylindre', new THREE.CylinderGeometry(0.18, 0.18, 0.28, 40), mat.skin, 0, 0.19, 0);
+const capT = add(teteP, 'tete_haut', new THREE.SphereGeometry(0.18, 40, 16, 0, Math.PI * 2, 0, Math.PI / 2), mat.skin, 0, 0.33, 0); capT.scale.y = 0.3;
+const capB = add(teteP, 'tete_bas', new THREE.SphereGeometry(0.18, 40, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), mat.skin, 0, 0.05, 0); capB.scale.y = 0.3;
+add(teteP, 'cou', new THREE.CylinderGeometry(0.1, 0.1, 0.06, 24), mat.skin, 0, 0.02, 0);
+for (const s of [-1, 1]) {
+  add(teteP, `oeil_${s > 0 ? 'g' : 'd'}`, box(0.045, 0.05, 0.01), mat.black, s * 0.07, 0.24, 0.176, 0, s * 0.37, 0);
+  add(teteP, `sourcil_${s > 0 ? 'g' : 'd'}`, box(0.07, 0.016, 0.01), mat.black, s * 0.07, 0.285, 0.175, 0, s * 0.37, s * -0.25);
+}
+add(teteP, 'nez', new THREE.CylinderGeometry(0.018, 0.026, 0.2, 16), mat.skin, 0, 0.19, 0.27, Math.PI / 2 - 0.08);
+add(teteP, 'bout_nez', new THREE.SphereGeometry(0.018, 16, 12), mat.skin, 0, 0.198, 0.37);
+add(teteP, 'bouche', box(0.11, 0.035, 0.012), mat.black, 0, 0.11, 0.177);
+add(teteP, 'dents', box(0.08, 0.012, 0.012), mat.white, 0, 0.12, 0.181);
+// cheveux bouclés
+const curls = [[0, 0.28, -0.13, 0.11], [-0.11, 0.24, -0.1, 0.09], [0.11, 0.24, -0.1, 0.09], [0, 0.14, -0.16, 0.11], [-0.14, 0.1, -0.1, 0.09], [0.14, 0.1, -0.1, 0.09], [-0.08, 0.0, -0.17, 0.1], [0.08, 0.0, -0.17, 0.1], [0, -0.06, -0.2, 0.1], [-0.17, 0.18, -0.03, 0.07], [0.17, 0.18, -0.03, 0.07], [-0.16, -0.02, -0.06, 0.08], [0.16, -0.02, -0.06, 0.08]];
+curls.forEach(([x, y, z, r], i) => add(cheveux, `boucle_cheveux_${i}`, new THREE.SphereGeometry(r, 20, 14), mat.black, x, y, z));
+
+// ---- Chapeau ----
+const hat = new THREE.Group(); hat.name = 'chapeau_forme'; hat.position.set(0, 0.36, -0.01); hat.rotation.set(-0.08, 0, 0.06); chapeauG.add(hat);
+add(hat, 'calotte', new THREE.CylinderGeometry(0.15, 0.2, 0.19, 40), mat.hat, 0, 0.095, 0);
+add(hat, 'dessus', new THREE.CylinderGeometry(0.15, 0.15, 0.01, 40), mat.hat, 0, 0.19, 0);
+add(hat, 'ruban', new THREE.CylinderGeometry(0.196, 0.201, 0.035, 40), mat.tan, 0, 0.02, 0);
+const brimPts = [[0.19, 0.0], [0.26, -0.008], [0.33, -0.018], [0.38, -0.012], [0.41, 0.012], [0.42, 0.03], [0.415, 0.03], [0.4, 0.008], [0.33, -0.004], [0.26, 0.006], [0.19, 0.014]].map(([x, y]) => new THREE.Vector2(x, y));
+add(hat, 'bord', new THREE.LatheGeometry(brimPts, 64), mat.hat, 0, 0, 0);
+// lunettes sur le côté
+const gog = new THREE.Group(); gog.name = 'lunettes'; gog.position.set(0.19, 0.17, 0.06); gog.rotation.set(0, Math.PI / 2 - 0.3, 0); chapeauG.add(gog);
+add(gog, 'lunette_monture', new THREE.CylinderGeometry(0.06, 0.06, 0.05, 32), mat.orange, 0, 0, 0, Math.PI / 2);
+add(gog, 'lunette_verre', new THREE.CylinderGeometry(0.042, 0.042, 0.01, 32), mat.white, 0, 0, 0.026, Math.PI / 2);
+for (let i = 0; i < 3; i++) add(gog, `lunette_fente_${i}`, box(0.05, 0.008, 0.004), mat.black, 0, -0.016 + i * 0.016, 0.032);
+add(gog, 'lunette_sangle', box(0.03, 0.03, 0.24), mat.black, 0, 0, -0.12);
+
+// ---- Lance-pierre bâton (main droite) ----
+const staff = new THREE.Group(); staff.name = 'baton_lance_pierre';
+staff.position.set(-0.45, 0.66, 0.06); staff.rotation.set(0.12, 0, 0.12); root.add(staff); P.arme = staff;
+cyl(staff, 'manche', [0, -0.5, 0], [0, 0.95, 0], 0.02, mat.wrap, 16);
+cyl(staff, 'embout_bas', [0, -0.56, 0], [0, -0.44, 0], 0.024, mat.green, 16);
+cyl(staff, 'col', [0, 0.92, 0], [0, 1.02, 0], 0.026, mat.green, 16);
+for (let i = 0; i < 10; i++) {
+  const r = add(staff, `bande_${i}`, new THREE.TorusGeometry(0.021, 0.004, 6, 20), mat.black, 0, -0.38 + i * 0.13, 0, Math.PI / 2 + 0.35);
+}
+const R = 0.2, tube = 0.024, cy = 1.0 + R;
+const gap = 0.32 * Math.PI, gapCenter = Math.PI / 2 + 0.7;
+const ring = add(staff, 'anneau', new THREE.TorusGeometry(R, tube, 20, 96, Math.PI * 2 - gap), mat.green, 0, cy, 0);
+ring.rotation.z = gapCenter + gap / 2;
+for (const a of [gapCenter + gap / 2, gapCenter - gap / 2]) add(staff, 'anneau_extremite', new THREE.SphereGeometry(tube * 1.15, 20, 14), mat.green, R * Math.cos(a), cy + R * Math.sin(a), 0);
+const pouch = [0.0, cy - 0.06, 0.0];
+add(staff, 'pochette', new THREE.SphereGeometry(0.03, 20, 14), mat.tan, ...pouch).scale.set(1.3, 0.7, 1);
+[0.05 * Math.PI, 0.95 * Math.PI, 1.25 * Math.PI, 1.82 * Math.PI].forEach((a, i) => {
+  const o = [R * Math.cos(a), cy + R * Math.sin(a), 0];
+  const t = [(R - 0.09) * Math.cos(a), cy + (R - 0.09) * Math.sin(a), 0];
+  cyl(staff, `dent_${i}`, o, t, 0.016, mat.green, 12);
+  add(staff, `dent_bout_${i}`, new THREE.SphereGeometry(0.02, 16, 12), mat.greenDark, ...t);
+  cyl(staff, `elastique_${i}`, t, pouch, 0.003, mat.black, 6);
+});
+
+return { root, P };
+}
+
+const PARTS = {
+  complet: { label: 'Personnage complet' },
+  chapeau: { label: 'Chapeau + lunettes' },
+  cheveux: { label: 'Cheveux' },
+  arme: { label: 'Arme (lance-pierre)' },
+  sac: { label: 'Sac + bandoulière' },
+  salopette: { label: 'Salopette + chaussures' },
+  brassard: { label: 'Brassard' },
+};
+function show(key) {
+  const { root, P } = build();
+  let obj = root;
+  if (key !== 'complet') {
+    const part = P[key];
+    if (key === 'arme') { part.position.set(0, 0, 0); part.rotation.set(0, 0, 0); }
+    root.updateMatrixWorld(true);
+    obj = new THREE.Group(); obj.name = key;
+    obj.attach(part);
+    const c = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
+    part.position.sub(c);
+  }
+  stage.setAttribute('name', key === 'complet' ? 'personnage-equipe' : key);
+  stage.setObject(obj);
+  document.querySelectorAll('#parts button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === key));
+}
+const nav = document.getElementById('parts');
+for (const [k, v] of Object.entries(PARTS)) {
+  const b = document.createElement('button'); b.dataset.k = k; b.textContent = v.label;
+  b.onclick = () => show(k); nav.appendChild(b);
+}
+show('complet');
+</script>
+</body>
+</html>
